@@ -76,7 +76,7 @@ function LegSeats({
       <div className="leg__header">
         <h3 className="leg__title">{title}</h3>
         <p className="leg__meta">
-          {leg.meetingPoint && (
+          {leg.direction === 'aller' && leg.meetingPoint && (
             <a href={mapsUrl(leg.meetingPoint)} target="_blank" rel="noreferrer" title={leg.meetingPoint}>
               Point de RDV
             </a>

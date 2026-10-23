@@ -39,7 +39,7 @@ export async function seedTrip(api: Api) {
     seats: 2,
     legs: [
       { direction: 'aller', departsAt: '2026-10-10T07:00:00Z', meetingPoint: 'Gare Part-Dieu' },
-      { direction: 'retour', departsAt: '2026-10-12T15:00:00Z', meetingPoint: null },
+      { direction: 'retour', departsAt: '2026-10-12T15:00:00Z', meetingPoint: 'Ancien RDV retour' },
     ],
   });
   return { code, organizer, hugo: hugo.secret };

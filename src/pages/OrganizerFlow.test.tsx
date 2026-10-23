@@ -22,6 +22,8 @@ describe('Parcours organisateur et conducteur', () => {
 
     expect(await screen.findByRole('heading', { name: 'Ajouter ma voiture' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Une place de plus' }));
+    // Point de RDV seulement pour l'aller.
+    expect(screen.getAllByLabelText('Point de RDV')).toHaveLength(1);
     await user.click(screen.getByRole('checkbox', { name: 'Je fais le retour' }));
     await user.click(screen.getByRole('button', { name: 'Proposer ma voiture' }));
 

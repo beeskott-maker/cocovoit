@@ -61,7 +61,8 @@ function CarForm({ code, secret, state, carId }: { code: string; secret: string;
     .map((d) => ({
       direction: d,
       departsAt: new Date(form[d].departsAt).toISOString(),
-      meetingPoint: form[d].meetingPoint.trim() || null,
+      // Le retour part du lieu du voyage : pas de point de RDV.
+      meetingPoint: d === 'aller' ? form[d].meetingPoint.trim() || null : null,
     }));
   const valid = legs.length > 0 && (['aller', 'retour'] as const).every((d) => !form[d].enabled || form[d].departsAt);
 
@@ -147,14 +148,16 @@ function CarForm({ code, secret, state, carId }: { code: string; secret: string;
                   value={form[d].departsAt}
                   onChange={(e) => setLeg(d, { departsAt: e.target.value })}
                 />
-                <TextField
-                  label="Point de RDV"
-                  icon={pin}
-                  placeholder={d === 'aller' ? 'Ex. Gare Part-Dieu, Lyon' : 'Par défaut : lieu du voyage'}
-                  value={form[d].meetingPoint}
-                  onChange={(e) => setLeg(d, { meetingPoint: e.target.value })}
-                  maxLength={300}
-                />
+                {d === 'aller' && (
+                  <TextField
+                    label="Point de RDV"
+                    icon={pin}
+                    placeholder="Ex. Gare Part-Dieu, Lyon"
+                    value={form[d].meetingPoint}
+                    onChange={(e) => setLeg(d, { meetingPoint: e.target.value })}
+                    maxLength={300}
+                  />
+                )}
               </>
             )}
           </fieldset>
