@@ -107,20 +107,6 @@ export function TripsAdminPage() {
       <div className="page-title">
         <h1 className="display-small">Voyages</h1>
         {trips && <p className="body-medium">{plural(trips.length, 'voyage')}</p>}
-        <p className="body-medium">
-          Connecté·e avec <strong>{email}</strong> ·{' '}
-          <button
-            type="button"
-            className="link-btn"
-            onClick={() => {
-              writeEmail(null);
-              setEmail(null);
-              setTrips(null);
-            }}
-          >
-            Se déconnecter
-          </button>
-        </p>
       </div>
       <main className="admin-list">
         <Link className="btn btn--primary" to="/">
@@ -160,6 +146,22 @@ export function TripsAdminPage() {
           </article>
         ))}
       </main>
+      <footer className="trip-footer body-medium">
+        <span>
+          Connecté·e avec <strong>{email}</strong>
+        </span>
+        <button
+          type="button"
+          className="link-btn"
+          onClick={() => {
+            writeEmail(null);
+            setEmail(null);
+            setTrips(null);
+          }}
+        >
+          Se déconnecter
+        </button>
+      </footer>
       {toast && <Toast message={toast} onDone={hideToast} />}
     </>
   );
