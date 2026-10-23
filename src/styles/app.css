@@ -105,11 +105,10 @@ a {
 
 /* --- En-tête simple (logo) --- */
 .brand-header {
-  height: 111px;
   background: var(--primary);
   border-radius: 0 0 24px 24px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   padding: 8px 0;
   flex-shrink: 0;
@@ -117,6 +116,7 @@ a {
 .brand-header__logo {
   display: block;
   padding: 5px 0;
+  line-height: 0;
 }
 
 .page-title {
