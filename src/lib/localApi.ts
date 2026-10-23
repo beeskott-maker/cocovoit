@@ -20,6 +20,7 @@ interface DbTrip {
   destination: string;
   startsOn: string;
   endsOn: string;
+  createdAt?: number;
 }
 interface DbParticipant {
   id: string;
@@ -64,6 +65,9 @@ export interface KeyValueStore {
 const KEY = 'cocovoit:demo-db';
 const emptyDb = (): Db => ({ trips: [], participants: [], cars: [], legs: [], bookings: [] });
 
+/** Clé de la page de gestion des voyages en mode démo : #/x/demo */
+export const DEMO_ADMIN_KEY = 'demo';
+
 export function createLocalApi(store: KeyValueStore, newId: () => string = () => crypto.randomUUID()): Api {
   // Horodatage strictement croissant, pour garder l'ordre des réservations.
   let last = 0;
@@ -89,6 +93,9 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       return leg?.direction !== direction;
     });
   }
+  function requireAdmin(key: string) {
+    if (key !== DEMO_ADMIN_KEY) throw new ApiError('Accès refusé', 'forbidden');
+  }
   // Petite latence pour que l'appli se comporte comme avec un vrai serveur.
   const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
@@ -105,6 +112,7 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
         destination: t.destination.trim(),
         startsOn: t.startsOn,
         endsOn: t.endsOn,
+        createdAt: now(),
       };
       if (trip.endsOn < trip.startsOn) throw new ApiError('La date de retour est avant le départ', 'invalid');
       const secret = newId();
@@ -259,6 +267,40 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       const db = load();
       const me = participant(db, code, secret);
       db.bookings = db.bookings.filter((b) => !(b.legId === legId && b.participantId === me.id));
+      save(db);
+    },
+
+    async adminListTrips(key) {
+      await tick();
+      requireAdmin(key);
+      const db = load();
+      return [...db.trips]
+        .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+        .map((t) => ({
+          code: t.code,
+          name: t.name,
+          destination: t.destination,
+          startsOn: t.startsOn,
+          endsOn: t.endsOn,
+          createdAt: new Date(t.createdAt ?? 0).toISOString(),
+          participants: db.participants.filter((p) => p.tripId === t.id).length,
+          cars: db.cars.filter((c) => c.tripId === t.id).length,
+        }));
+    },
+
+    async adminDeleteTrip(key, code) {
+      await tick();
+      requireAdmin(key);
+      const db = load();
+      const trip = db.trips.find((t) => t.code === code);
+      if (!trip) throw new ApiError('Voyage introuvable', 'not_found');
+      const carIds = new Set(db.cars.filter((c) => c.tripId === trip.id).map((c) => c.id));
+      const legIds = new Set(db.legs.filter((l) => carIds.has(l.carId)).map((l) => l.id));
+      db.trips = db.trips.filter((t) => t.id !== trip.id);
+      db.participants = db.participants.filter((p) => p.tripId !== trip.id);
+      db.cars = db.cars.filter((c) => !carIds.has(c.id));
+      db.legs = db.legs.filter((l) => !legIds.has(l.id));
+      db.bookings = db.bookings.filter((b) => !legIds.has(b.legId));
       save(db);
     },
   };

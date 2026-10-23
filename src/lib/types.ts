@@ -36,6 +36,14 @@ export interface TripState {
   cars: Car[];
 }
 
+/** Voyage tel qu'affiché dans la page de gestion des voyages. */
+export interface AdminTrip extends TripPreview {
+  /** ISO 8601 */
+  createdAt: string;
+  participants: number;
+  cars: number;
+}
+
 export interface NewTrip {
   name: string;
   destination: string;
@@ -80,4 +88,7 @@ export interface Api {
   deleteCar(code: string, secret: string, carId: string): Promise<void>;
   takeSeat(code: string, secret: string, legId: string): Promise<void>;
   leaveSeat(code: string, secret: string, legId: string): Promise<void>;
+  /** Gestion des voyages, protégée par une clé (page #/x/<clé>). */
+  adminListTrips(key: string): Promise<AdminTrip[]>;
+  adminDeleteTrip(key: string, code: string): Promise<void>;
 }

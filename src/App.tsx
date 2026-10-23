@@ -7,6 +7,7 @@ import { InvitePage } from './pages/InvitePage';
 import { JoinPage } from './pages/JoinPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { TripPage } from './pages/TripPage';
+import { TripsAdminPage } from './pages/TripsAdminPage';
 
 export function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ export function AppRoutes() {
         <Route path="/t/:code/inviter" element={<InvitePage />} />
         <Route path="/t/:code/voiture" element={<CarFormPage />} />
         <Route path="/t/:code/voiture/:carId" element={<CarFormPage />} />
+        <Route path="/x/:key" element={<TripsAdminPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>

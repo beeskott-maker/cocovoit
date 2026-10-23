@@ -736,3 +736,28 @@ a {
 .section {
   margin-top: 16px;
 }
+
+/* --- Liste des voyages (page de gestion) --- */
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+.admin-trip {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--primary-container);
+  border-radius: 16px;
+}
+.admin-trip__infos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.admin-trip__actions {
+  display: flex;
+  gap: 8px;
+}
