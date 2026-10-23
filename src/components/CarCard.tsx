@@ -5,7 +5,7 @@ import check from '../assets/figma/check.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
 import { formatDeparture, mapsUrl } from '../lib/format';
-import { freeSeats, seatCells, type SeatCell } from '../lib/seats';
+import { freeSeats, freeSeatsLabel, seatCells, type SeatCell } from '../lib/seats';
 import type { Car, Leg } from '../lib/types';
 
 interface Props {
@@ -120,7 +120,7 @@ function Seat({ cell, busy, onTake, onLeave }: { cell: SeatCell; busy: boolean; 
       return (
         <div className="seat seat--free">
           <img src={seatIcon} alt="" />
-          <span>Libre</span>
+          <span>{freeSeatsLabel(cell.count)}</span>
         </div>
       );
     case 'take':

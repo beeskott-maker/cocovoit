@@ -1,4 +1,4 @@
-import { freeSeats, seatCells } from './seats';
+import { freeSeats, freeSeatsLabel, seatCells } from './seats';
 import type { Car } from './types';
 
 const car = (passengers: string[], seats = 3): Car => ({
@@ -17,13 +17,18 @@ const car = (passengers: string[], seats = 3): Car => ({
 });
 
 describe('seatCells', () => {
-  it('affiche toutes les places libres, puis « Prendre 1 place » en plus', () => {
+  it('regroupe les places libres dans une seule case, puis « Prendre 1 place »', () => {
     const c = car(['lea']);
-    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'free', 'free', 'take']);
+    expect(seatCells(c, c.legs[0], 'moi')).toEqual([
+      { kind: 'occupied', name: 'LEA' },
+      { kind: 'free', count: 2 },
+      { kind: 'take' },
+    ]);
   });
   it('affiche « Moi » et « Libérer ma place » quand je suis passager', () => {
     const c = car(['lea', 'moi']);
     expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'me', 'free', 'leave']);
+    expect(seatCells(c, c.legs[0], 'moi')[2]).toEqual({ kind: 'free', count: 1 });
   });
   it('ajoute « Libérer ma place » en plus quand la voiture est pleine', () => {
     const c = car(['lea', 'moi', 'max']);
@@ -31,11 +36,16 @@ describe('seatCells', () => {
   });
   it('ne propose rien au conducteur', () => {
     const c = car([]);
-    expect(seatCells(c, c.legs[0], 'hugo').map((x) => x.kind)).toEqual(['free', 'free', 'free']);
+    expect(seatCells(c, c.legs[0], 'hugo')).toEqual([{ kind: 'free', count: 3 }]);
   });
   it('voiture pleine : pas de bouton', () => {
     const c = car(['a', 'b', 'c']);
     expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'occupied', 'occupied']);
     expect(freeSeats(c)).toBe(0);
+  });
+
+  it('accorde le libellé des places libres', () => {
+    expect(freeSeatsLabel(1)).toBe('1 place libre');
+    expect(freeSeatsLabel(3)).toBe('3 places libres');
   });
 });

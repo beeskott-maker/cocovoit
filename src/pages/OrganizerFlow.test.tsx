@@ -42,7 +42,7 @@ describe('Parcours organisateur et conducteur', () => {
     expect(await screen.findByRole('heading', { name: 'Ma voiture' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Aller' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Retour' })).not.toBeInTheDocument();
-    expect(screen.getAllByText('Libre')).toHaveLength(4);
+    expect(screen.getByText('4 places libres')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Ajouter ma voiture' })).not.toBeInTheDocument();
   });
 
