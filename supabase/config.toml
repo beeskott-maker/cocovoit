@@ -1,0 +1,8 @@
+# Configuration minimale pour la CLI Supabase (`supabase link`, `supabase db push`, `supabase start`).
+project_id = "cocovoit"
+
+[api]
+schemas = ["public"]
+
+[db]
+major_version = 15
