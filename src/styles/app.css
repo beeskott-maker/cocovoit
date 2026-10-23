@@ -6,6 +6,8 @@
   --primary-container-60: rgba(234, 221, 255, 0.6);
   --on-primary-container: #4f378a;
   --secondary: #625b71;
+  --secondary-container: #e8def8;
+  --on-secondary-container: #4a4458;
   --tertiary: #7d5260;
   --tertiary-container: #ffd8e4;
   --tertiary-fixed-dim: #efb8c8;
@@ -243,6 +245,10 @@ a {
 .btn--secondary {
   background: var(--secondary);
   color: var(--on-primary);
+}
+.btn--tonal {
+  background: var(--secondary-container);
+  color: var(--on-secondary-container);
 }
 .btn--tertiary {
   background: var(--tertiary-container);
