@@ -5,20 +5,19 @@ import { ApiError, type TripState } from './types';
 const REFRESH_MS = 15_000;
 
 /** Charge l'état du voyage et le rafraîchit régulièrement (et au retour sur l'onglet). */
-export function useTripState(code: string, secret: string | undefined) {
+export function useTripState(token: string, code: string) {
   const api = useApi();
   const [state, setState] = useState<TripState | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
 
   const reload = useCallback(async () => {
-    if (!secret) return;
     try {
-      setState(await api.getTripState(code, secret));
+      setState(await api.getTripState(token, code));
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err : new ApiError('Connexion impossible', 'unknown'));
     }
-  }, [api, code, secret]);
+  }, [api, code, token]);
 
   useEffect(() => {
     void reload();

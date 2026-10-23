@@ -1,45 +1,47 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
+import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
-import { getIdentity } from '../lib/identity';
-import { clearSession, listSessions, saveSession } from '../lib/session';
-import type { MyTrip } from '../lib/types';
+import { useAuth } from '../lib/auth';
+import { ApiError, type MyTrip } from '../lib/types';
 
 /**
  * Accueil : créer un voyage (organisateur) et retrouver ses voyages.
- * L'organisateur est la personne identifiée dans ce navigateur ; sinon on
- * passe d'abord par l'identification.
+ * Réservé aux personnes connectées ; l'organisateur est le compte connecté.
  */
 export function HomePage() {
+  return <RequireAccount>{(token) => <Home token={token} />}</RequireAccount>;
+}
+
+function roles(trip: MyTrip): string {
+  const list = [trip.isOrganizer && 'organisateur', trip.isDriver && 'conducteur', trip.isPassenger && 'passager'];
+  const text = list.filter(Boolean).join(' · ');
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
+}
+
+function Home({ token }: { token: string }) {
   const api = useApi();
   const navigate = useNavigate();
-  const [identity] = useState(getIdentity);
-  // « Mes voyages » : le serveur confirme quels voyages mémorisés existent encore.
+  const { sessionExpired } = useAuth();
+  // « Mes voyages » : les voyages du compte, lus en base.
   const [myTrips, setMyTrips] = useState<MyTrip[] | null>(null);
   useEffect(() => {
     let alive = true;
-    const sessions = listSessions();
-    if (sessions.length === 0) {
-      setMyTrips([]);
-      return;
-    }
-    api.myTrips(sessions).then(
-      (trips) => {
+    api.myTrips(token).then(
+      (trips) => alive && setMyTrips(trips),
+      (err) => {
         if (!alive) return;
-        setMyTrips(trips);
-        // Les voyages supprimés sont oubliés par ce navigateur.
-        const existing = new Set(trips.map((t) => t.code));
-        for (const s of sessions) if (!existing.has(s.code)) clearSession(s.code);
+        if (err instanceof ApiError && err.code === 'unauthenticated') sessionExpired();
+        else setMyTrips([]);
       },
-      () => alive && setMyTrips([]),
     );
     return () => {
       alive = false;
     };
-  }, [api]);
+  }, [api, token, sessionExpired]);
   const [form, setForm] = useState({
     name: '',
     destination: '',
@@ -55,20 +57,13 @@ export function HomePage() {
   // Obligatoires : nom du voyage et dates. La destination est facultative.
   const valid = form.name.trim() && form.startsOn && form.endsOn && !datesError;
 
-  if (!identity) return <Navigate to="/identification?suite=/" replace />;
-
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!valid) return;
     setBusy(true);
     setError(null);
     try {
-      const { code, secret } = await api.createTrip({
-        ...form,
-        organizerName: identity!.name,
-        organizerEmail: identity!.email,
-      });
-      saveSession({ code, secret, name: identity!.name, tripName: form.name.trim() });
+      const code = await api.createTrip(token, form);
       navigate(`/t/${code}/inviter?nouveau=1`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -88,7 +83,10 @@ export function HomePage() {
             {myTrips.map((t) => (
               <li key={t.code}>
                 <Link to={`/t/${t.code}`}>
-                  {t.name}
+                  <span className="trip-list__text">
+                    {t.name}
+                    {roles(t) && <span className="trip-list__roles">{roles(t)}</span>}
+                  </span>
                   <span aria-hidden="true">→</span>
                 </Link>
               </li>

@@ -730,6 +730,17 @@ a {
   text-decoration: none;
   font-weight: 500;
 }
+.trip-list__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.trip-list__roles {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--on-surface-variant);
+}
 
 .section {
   padding: 0 32px;

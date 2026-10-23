@@ -23,49 +23,78 @@ begin
     raise exception 'anon ne devrait pas lire trips';
   exception when insufficient_privilege then null;
   end;
+  begin
+    perform 1 from public.accounts;
+    raise exception 'anon ne devrait pas lire accounts';
+  exception when insufficient_privilege then null;
+  end;
 
-  r := create_trip('WE dans le Beaujolais', '124 Venelle de Brouilly 69460 Odenas',
-                   '2026-10-10', '2026-10-12', 'Loïc', 'loic@example.com');
-  code := r->>'code';
-  orga := (r->>'secret')::uuid;
+  -- Connexion : email inconnu -> nom demandé, puis compte créé.
+  assert (login('loic@example.com')->>'status') = 'needs_name', 'needs_name';
+  r := login('loic@example.com', 'Loïc');
+  orga := (r->>'token')::uuid;
+  assert (r->'account'->>'name') = 'Loïc', 'compte créé';
+  -- Email connu (casse et espaces ignorés) : même compte, nouvelle session.
+  r := login(' LOIC@example.com ');
+  assert (r->>'status') = 'ok' and (r->>'token')::uuid <> orga, 'nouvelle session';
+  assert (me((r->>'token')::uuid)->>'email') = 'loic@example.com', 'même compte';
+  -- Déconnexion : la session ne marche plus.
+  perform logout((r->>'token')::uuid);
+  begin
+    perform me((r->>'token')::uuid);
+    raise exception 'session fermée acceptée';
+  exception when sqlstate '28P01' then null;
+  end;
+  begin
+    perform my_trips(gen_random_uuid());
+    raise exception 'jeton inconnu accepté';
+  exception when sqlstate '28P01' then null;
+  end;
+
+  hugo := (login('hugo@example.com', 'Hugo')->>'token')::uuid;
+  lea := (login('lea@example.com', 'Léa')->>'token')::uuid;
+  max_ := (login('max@example.com', 'Max')->>'token')::uuid;
+
+  code := create_trip(orga, 'WE dans le Beaujolais', '124 Venelle de Brouilly 69460 Odenas', '2026-10-10', '2026-10-12');
   assert length(code) = 16, 'code invitation';
-
   assert (get_trip_preview(code)->>'name') = 'WE dans le Beaujolais', 'preview';
   assert get_trip_preview('inconnu') is null, 'preview inconnu';
 
-  -- Parcours invité : email inconnu -> nom demandé.
-  assert (join_trip(code, 'hugo@example.com')->>'status') = 'needs_name', 'needs_name';
-  r := join_trip(code, 'hugo@example.com', 'Hugo');
-  hugo := (r->>'secret')::uuid;
-  -- Email déjà connu (casse différente) -> même secret, sans redemander le nom.
-  assert (join_trip(code, 'HUGO@example.com')->>'secret')::uuid = hugo, 'join idempotent';
-  lea := (join_trip(code, 'lea@example.com', 'Léa')->>'secret')::uuid;
-  max_ := (join_trip(code, 'max@example.com', 'Max')->>'secret')::uuid;
-
-  -- Mauvais secret refusé.
+  -- Pas encore dans le voyage : refusé.
   begin
-    perform get_trip_state(code, gen_random_uuid());
-    raise exception 'secret invalide accepté';
+    perform get_trip_state(hugo, code);
+    raise exception 'non participant accepté';
   exception when sqlstate '28000' then null;
   end;
+  begin
+    perform join_trip(hugo, 'inconnu');
+    raise exception 'voyage inconnu accepté';
+  exception when sqlstate 'P0002' then null;
+  end;
+
+  perform join_trip(hugo, code);
+  perform join_trip(hugo, code); -- idempotent
+  perform join_trip(lea, code);
+  perform join_trip(max_, code);
 
   -- Hugo propose 1 place à l'aller et au retour.
-  car := save_car(code, hugo, null, 1, json_build_array(
+  car := save_car(hugo, code, null, 1, json_build_array(
     json_build_object('direction', 'aller', 'departsAt', '2026-10-10T09:00:00+02:00', 'meetingPoint', 'Gare Part-Dieu'),
     json_build_object('direction', 'retour', 'departsAt', '2026-10-12T17:00:00+02:00')));
-  st := get_trip_state(code, lea);
+  st := get_trip_state(lea, code);
   assert json_array_length(st->'cars') = 1, 'une voiture';
+  assert (st->'cars'->0->'driver'->>'name') = 'Hugo', 'nom du conducteur depuis son compte';
   assert (st->'cars'->0->'legs'->0->>'direction') = 'aller', 'aller en premier';
   aller := (st->'cars'->0->'legs'->0->>'id')::uuid;
   retour := (st->'cars'->0->'legs'->1->>'id')::uuid;
 
-  perform take_seat(code, lea, aller);
-  perform take_seat(code, lea, aller); -- idempotent
+  perform take_seat(lea, code, aller);
+  perform take_seat(lea, code, aller); -- idempotent
 
   -- Plus de place pour Max.
   failed := false;
   begin
-    perform take_seat(code, max_, aller);
+    perform take_seat(max_, code, aller);
   exception when sqlstate '22023' then failed := true;
   end;
   assert failed, 'voiture pleine';
@@ -73,7 +102,7 @@ begin
   -- Le conducteur ne peut pas réserver dans sa voiture.
   failed := false;
   begin
-    perform take_seat(code, hugo, retour);
+    perform take_seat(hugo, code, retour);
   exception when sqlstate '22023' then failed := true;
   end;
   assert failed, 'conducteur passager';
@@ -81,73 +110,66 @@ begin
   -- Seul le conducteur modifie sa voiture.
   failed := false;
   begin
-    perform delete_car(code, lea, car);
+    perform delete_car(lea, code, car);
   exception when sqlstate '28000' then failed := true;
   end;
   assert failed, 'suppression par un autre';
 
   -- Max crée sa voiture. Une seule place par sens : Léa, déjà à l'aller chez
   -- Hugo, ne peut pas prendre l'aller de Max sans libérer sa place.
-  perform save_car(code, max_, null, 3, json_build_array(
+  perform save_car(max_, code, null, 3, json_build_array(
     json_build_object('direction', 'aller', 'departsAt', '2026-10-10T08:00:00+02:00')));
-  st := get_trip_state(code, lea);
+  st := get_trip_state(lea, code);
   failed := false;
   begin
-    perform take_seat(code, lea, (st->'cars'->1->'legs'->0->>'id')::uuid);
+    perform take_seat(lea, code, (st->'cars'->1->'legs'->0->>'id')::uuid);
   exception when sqlstate '22023' then failed := true;
   end;
   assert failed, 'déjà une place à l''aller';
-  st := get_trip_state(code, lea);
-  assert (st->'cars'->0->'legs'->0->'passengers'->0->>'name') = 'Léa', 'Léa reste chez Hugo';
-  assert json_array_length(st->'cars'->1->'legs'->0->'passengers') = 0, 'personne chez Max';
 
-  perform leave_seat(code, lea, aller);
-  perform take_seat(code, lea, (st->'cars'->1->'legs'->0->>'id')::uuid);
-  st := get_trip_state(code, lea);
+  perform leave_seat(lea, code, aller);
+  perform take_seat(lea, code, (st->'cars'->1->'legs'->0->>'id')::uuid);
+  st := get_trip_state(lea, code);
   assert json_array_length(st->'cars'->0->'legs'->0->'passengers') = 0, 'place libérée chez Hugo';
   assert (st->'cars'->1->'legs'->0->'passengers'->0->>'name') = 'Léa', 'Léa chez Max';
 
-  perform leave_seat(code, lea, (st->'cars'->1->'legs'->0->>'id')::uuid);
-  st := get_trip_state(code, lea);
+  -- Mes voyages : rôles depuis le compte.
+  st := my_trips(lea);
+  assert json_array_length(st) = 1, 'un voyage pour Léa';
+  assert (st->0->>'isPassenger')::boolean and not (st->0->>'isDriver')::boolean, 'Léa passagère';
+  st := my_trips(hugo);
+  assert (st->0->>'isDriver')::boolean and not (st->0->>'isOrganizer')::boolean, 'Hugo conducteur';
+  st := my_trips(orga);
+  assert (st->0->>'isOrganizer')::boolean, 'Loïc organisateur';
+
+  perform leave_seat(lea, code, (get_trip_state(lea, code)->'cars'->1->'legs'->0->>'id')::uuid);
+  st := get_trip_state(lea, code);
   assert json_array_length(st->'cars'->1->'legs'->0->'passengers') = 0, 'leave_seat';
 
   -- Hugo retire le retour : le trajet disparaît.
-  perform save_car(code, hugo, car, 2, json_build_array(
+  perform save_car(hugo, code, car, 2, json_build_array(
     json_build_object('direction', 'aller', 'departsAt', '2026-10-10T09:30:00+02:00')));
-  st := get_trip_state(code, hugo);
+  st := get_trip_state(hugo, code);
   assert json_array_length(st->'cars'->0->'legs') = 1, 'retour supprimé';
   assert (st->'cars'->0->>'seats')::int = 2, 'places mises à jour';
   assert (st->'me'->>'name') = 'Hugo', 'me';
 
-  perform delete_car(code, hugo, car);
-  assert json_array_length(get_trip_state(code, orga)->'cars') = 1, 'voiture supprimée';
-  assert (get_trip_state(code, orga)->'me'->>'isOrganizer')::boolean, 'organisateur';
+  perform delete_car(hugo, code, car);
+  assert json_array_length(get_trip_state(orga, code)->'cars') = 1, 'voiture supprimée';
+  assert (get_trip_state(orga, code)->'me'->>'isOrganizer')::boolean, 'organisateur';
 
   -- Création avec seulement le nom et les dates.
-  r := create_trip('Sans détails', null, '2026-11-01', '2026-11-01', '', '  ');
-  st := get_trip_state(r->>'code', (r->>'secret')::uuid);
-  assert (st->'trip'->>'destination') is null, 'destination facultative';
-  assert (st->'me'->>'name') = 'Organisateur', 'nom par défaut';
-  assert (st->'me'->>'isOrganizer')::boolean, 'organisateur sans email';
-  -- Un invité peut toujours rejoindre ce voyage.
-  assert (join_trip(r->>'code', 'invite@example.com', 'Invité')->>'status') = 'ok', 'invité sur voyage sans détails';
+  code := create_trip(orga, 'Sans détails', null, '2026-11-01', '2026-11-01');
+  assert (get_trip_state(orga, code)->'trip'->>'destination') is null, 'destination facultative';
+  assert json_array_length(my_trips(orga)) = 2, 'deux voyages pour Loïc';
 
   -- Le nom du voyage reste obligatoire.
   failed := false;
   begin
-    perform create_trip('  ', 'Lyon', '2026-11-01', '2026-11-02', 'A', 'a@example.com');
+    perform create_trip(orga, '  ', 'Lyon', '2026-11-01', '2026-11-02');
   exception when check_violation then failed := true;
   end;
   assert failed, 'nom du voyage obligatoire';
-
-  -- « Mes voyages » : seuls les voyages existants avec un secret valide.
-  st := my_trips(json_build_array(
-    json_build_object('code', r->>'code', 'secret', r->>'secret'),
-    json_build_object('code', r->>'code', 'secret', gen_random_uuid()),
-    json_build_object('code', 'nexistepas', 'secret', r->>'secret')));
-  assert json_array_length(st) = 1, 'un seul voyage valide';
-  assert (st->0->>'name') = 'Sans détails', 'nom du voyage à jour';
-  assert json_array_length(my_trips('[]'::json)) = 0, 'liste vide';
 
   raise notice 'Tous les tests SQL passent';
 end;

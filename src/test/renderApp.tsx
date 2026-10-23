@@ -22,19 +22,30 @@ export function renderApp(path: string, api: Api = createTestApi()) {
   return { ...utils, user, api };
 }
 
-/** Un voyage avec la voiture de Hugo (2 places, aller + retour). */
+/** Connexion (création du compte au besoin) : renvoie le jeton de session. */
+export async function loginAs(api: Api, email: string, name: string): Promise<string> {
+  const res = await api.login(email, name);
+  if (res.status !== 'ok') throw new Error('login');
+  return res.token;
+}
+
+/** Ce navigateur est connecté avec ce jeton (comme après une connexion). */
+export function signIn(token: string) {
+  localStorage.setItem('cocovoit:token', token);
+}
+
+/** Un voyage organisé par Loïc, avec la voiture de Hugo (2 places, aller + retour). */
 export async function seedTrip(api: Api) {
-  const { code, secret: organizer } = await api.createTrip({
+  const organizer = await loginAs(api, 'loic@example.com', 'Loïc');
+  const code = await api.createTrip(organizer, {
     name: 'WE dans le Beaujolais',
     destination: '124 Venelle de Brouilly 69460 Odenas',
     startsOn: '2026-10-10',
     endsOn: '2026-10-12',
-    organizerName: 'Loïc',
-    organizerEmail: 'loic@example.com',
   });
-  const hugo = await api.joinTrip(code, 'hugo@example.com', 'Hugo');
-  if (hugo.status !== 'ok') throw new Error('seed');
-  await api.saveCar(code, hugo.secret, {
+  const hugo = await loginAs(api, 'hugo@example.com', 'Hugo');
+  await api.joinTrip(hugo, code);
+  await api.saveCar(hugo, code, {
     carId: null,
     seats: 2,
     legs: [
@@ -42,5 +53,5 @@ export async function seedTrip(api: Api) {
       { direction: 'retour', departsAt: '2026-10-12T15:00:00Z', meetingPoint: 'Ancien RDV retour' },
     ],
   });
-  return { code, organizer, hugo: hugo.secret };
+  return { code, organizer, hugo };
 }

@@ -3,10 +3,11 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import armchair from '../assets/figma/armchair.svg';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
+import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
 import { toDateTimeLocal } from '../lib/format';
-import { getSession } from '../lib/session';
+import { useAuth } from '../lib/auth';
 import type { Direction, LegInput, TripState } from '../lib/types';
 import { useTripState } from '../lib/useTripState';
 
@@ -35,20 +36,28 @@ function initialForm(state: TripState, carId: string | undefined) {
 
 /** Ajouter ou modifier sa voiture : places et trajets aller / retour. */
 export function CarFormPage() {
+  return <RequireAccount>{(token) => <CarFormLoader token={token} />}</RequireAccount>;
+}
+
+function CarFormLoader({ token }: { token: string }) {
   const { code = '', carId } = useParams();
-  const session = getSession(code);
-  const { state, error } = useTripState(code, session?.secret);
-  if (!session || error?.code === 'forbidden') return <Navigate to={`/j/${code}`} replace />;
+  const { sessionExpired } = useAuth();
+  const { state, error } = useTripState(token, code);
+  if (error?.code === 'unauthenticated') {
+    sessionExpired();
+    return null;
+  }
+  if (error?.code === 'forbidden' || error?.code === 'not_found') return <Navigate to={`/j/${code}`} replace />;
   if (!state) return <p className="loading">Chargement…</p>;
   const car = state.cars.find((c) => c.id === carId);
   if (carId && (!car || car.driver.id !== state.me.id)) return <Navigate to={`/t/${code}`} replace />;
   // Garde-fou : une seule voiture par personne.
   const mine = state.cars.find((c) => c.driver.id === state.me.id);
   if (!carId && mine) return <Navigate to={`/t/${code}/voiture/${mine.id}`} replace />;
-  return <CarForm code={code} secret={session.secret} state={state} carId={carId} />;
+  return <CarForm code={code} token={token} state={state} carId={carId} />;
 }
 
-function CarForm({ code, secret, state, carId }: { code: string; secret: string; state: TripState; carId?: string }) {
+function CarForm({ code, token, state, carId }: { code: string; token: string; state: TripState; carId?: string }) {
   const api = useApi();
   const navigate = useNavigate();
   const [form, setForm] = useState(() => initialForm(state, carId));
@@ -73,7 +82,7 @@ function CarForm({ code, secret, state, carId }: { code: string; secret: string;
     if (!valid) return;
     setBusy(true);
     try {
-      await api.saveCar(code, secret, { carId: carId ?? null, seats: form.seats, legs });
+      await api.saveCar(token, code, { carId: carId ?? null, seats: form.seats, legs });
       navigate(`/t/${code}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -85,7 +94,7 @@ function CarForm({ code, secret, state, carId }: { code: string; secret: string;
     if (!carId || !window.confirm('Supprimer votre voiture ? Les passagers perdront leur place.')) return;
     setBusy(true);
     try {
-      await api.deleteCar(code, secret, carId);
+      await api.deleteCar(token, code, carId);
       navigate(`/t/${code}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');

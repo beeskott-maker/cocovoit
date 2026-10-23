@@ -1,21 +1,35 @@
-import { useCallback, useState } from 'react';
-import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { BrandHeader } from '../components/BrandHeader';
 import { Toast } from '../components/Toast';
+import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
-import { getSession } from '../lib/session';
+import type { TripPreview } from '../lib/types';
+import { NotFoundPage } from './NotFoundPage';
 
 /** Partage du lien unique d'invitation. */
 export function InvitePage() {
   const { code = '' } = useParams();
   const [params] = useSearchParams();
-  const session = getSession(code);
+  const api = useApi();
+  const [trip, setTrip] = useState<TripPreview | null | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
   const hideToast = useCallback(() => setToast(null), []);
-  if (!session) return <Navigate to={`/j/${code}`} replace />;
+  useEffect(() => {
+    let alive = true;
+    api.getTripPreview(code).then(
+      (t) => alive && setTrip(t),
+      () => alive && setTrip(null),
+    );
+    return () => {
+      alive = false;
+    };
+  }, [api, code]);
+  if (trip === null) return <NotFoundPage />;
+  if (!trip) return <p className="loading">Chargement…</p>;
 
   const url = inviteUrl(code);
-  const text = `Rejoins « ${session.tripName} » sur Cocovoit pour t'organiser en covoiturage :`;
+  const text = `Rejoins « ${trip.name} » sur Cocovoit pour t'organiser en covoiturage :`;
 
   async function copy() {
     try {
@@ -28,7 +42,7 @@ export function InvitePage() {
 
   async function share() {
     try {
-      await navigator.share({ title: session!.tripName, text, url });
+      await navigator.share({ title: trip!.name, text, url });
     } catch {
       // Partage annulé par l'utilisateur.
     }
@@ -40,7 +54,7 @@ export function InvitePage() {
       <div className="page-title stack">
         <h1 className="display-small">{params.has('nouveau') ? 'Voyage créé !' : 'Inviter des proches'}</h1>
         <p className="body-large">
-          Envoyez ce lien aux participants de <strong>{session.tripName}</strong>. Ils indiqueront leur email et leur nom,
+          Envoyez ce lien aux participants de <strong>{trip.name}</strong>. Ils indiqueront leur email et leur nom,
           puis pourront réserver une place ou proposer leur voiture.
         </p>
       </div>

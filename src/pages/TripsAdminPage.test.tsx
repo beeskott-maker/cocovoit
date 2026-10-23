@@ -1,18 +1,16 @@
 import { screen, within } from '@testing-library/react';
 import { DEMO_ADMIN_EMAIL, DEMO_ADMIN_KEY } from '../lib/localApi';
-import { createTestApi, renderApp, seedTrip } from '../test/renderApp';
+import { createTestApi, loginAs, renderApp, seedTrip } from '../test/renderApp';
 
 describe('Page de gestion des voyages (#/x/<clé>)', () => {
   it('liste les voyages, permet de les ouvrir et de les supprimer après confirmation', async () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
-    await api.createTrip({
+    await api.createTrip(await loginAs(api, 'zoe@example.com', 'Zoé'), {
       name: 'Anniversaire',
       destination: 'Annecy',
       startsOn: '2026-12-05',
       endsOn: '2026-12-06',
-      organizerName: 'Zoé',
-      organizerEmail: 'zoe@example.com',
     });
     const { user } = renderApp(`/x/${DEMO_ADMIN_KEY}`, api);
 

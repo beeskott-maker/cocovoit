@@ -1,25 +1,29 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { IdentityForm } from '../components/IdentityForm';
-import { saveIdentity } from '../lib/identity';
+import { useAuth } from '../lib/auth';
 
 /**
- * Identification avant d'organiser un voyage (#/identification?suite=/).
- * L'identité est mémorisée dans ce navigateur, puis on revient à la page demandée.
+ * Connexion au compte (#/identification?suite=/…) : email, puis nom si le
+ * compte n'existe pas encore. Ensuite, retour à la page demandée.
  */
 export function IdentifyPage() {
   const navigate = useNavigate();
+  const { auth, login } = useAuth();
   const [params] = useSearchParams();
   const next = params.get('suite');
   // Uniquement une page de l'appli, jamais une adresse externe.
   const target = next?.startsWith('/') && !next.startsWith('//') ? next : '/';
 
+  if (auth.status === 'connected') return <Navigate to={target} replace />;
+
   return (
     <IdentityForm
       title="Qui êtes-vous ?"
-      intro="Votre email et votre nom seront mémorisés sur cet appareil pour vos prochains voyages."
-      onEmail={async () => 'needs_name'}
+      intro="Connectez-vous avec votre email. Si c'est votre première fois, on vous demandera votre nom."
+      disabled={auth.status === 'loading'}
+      onEmail={(email) => login(email)}
       onName={async (email, name) => {
-        saveIdentity({ email, name });
+        await login(email, name);
         navigate(target, { replace: true });
       }}
     />

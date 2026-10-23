@@ -1,5 +1,6 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { ApiContext } from './lib/api';
+import { AuthProvider } from './components/AuthProvider';
 import type { Api } from './lib/types';
 import { CarFormPage } from './pages/CarFormPage';
 import { HomePage } from './pages/HomePage';
@@ -12,19 +13,21 @@ import { TripsAdminPage } from './pages/TripsAdminPage';
 
 export function AppRoutes() {
   return (
-    <div className="app">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/identification" element={<IdentifyPage />} />
-        <Route path="/j/:code" element={<JoinPage />} />
-        <Route path="/t/:code" element={<TripPage />} />
-        <Route path="/t/:code/inviter" element={<InvitePage />} />
-        <Route path="/t/:code/voiture" element={<CarFormPage />} />
-        <Route path="/t/:code/voiture/:carId" element={<CarFormPage />} />
-        <Route path="/x/:key" element={<TripsAdminPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </div>
+    <AuthProvider>
+      <div className="app">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/identification" element={<IdentifyPage />} />
+          <Route path="/j/:code" element={<JoinPage />} />
+          <Route path="/t/:code" element={<TripPage />} />
+          <Route path="/t/:code/inviter" element={<InvitePage />} />
+          <Route path="/t/:code/voiture" element={<CarFormPage />} />
+          <Route path="/t/:code/voiture/:carId" element={<CarFormPage />} />
+          <Route path="/x/:key" element={<TripsAdminPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
+    </AuthProvider>
   );
 }
 

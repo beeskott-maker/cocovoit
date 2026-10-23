@@ -2,30 +2,38 @@ import { useCallback, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import { CarCard } from '../components/CarCard';
+import { RequireAccount } from '../components/RequireAccount';
 import { Toast } from '../components/Toast';
 import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
-import { forgetIdentity } from '../lib/identity';
+import { useAuth } from '../lib/auth';
 import { bookedDirections } from '../lib/seats';
-import { clearSession, getSession } from '../lib/session';
 import type { Leg } from '../lib/types';
+import { NotFoundPage } from './NotFoundPage';
 import { useTripState } from '../lib/useTripState';
 
 export function TripPage() {
+  return <RequireAccount>{(token) => <Trip token={token} />}</RequireAccount>;
+}
+
+function Trip({ token }: { token: string }) {
   const { code = '' } = useParams();
-  const session = getSession(code);
   const api = useApi();
   const navigate = useNavigate();
-  const { state, error, reload } = useTripState(code, session?.secret);
+  const { logout, sessionExpired } = useAuth();
+  const { state, error, reload } = useTripState(token, code);
   const [busyLegId, setBusyLegId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const hideToast = useCallback(() => setToast(null), []);
 
-  if (!session || error?.code === 'forbidden') {
-    if (session) clearSession(code);
-    return <Navigate to={`/j/${code}`} replace />;
+  if (error?.code === 'unauthenticated') {
+    sessionExpired();
+    return null;
   }
+  // Pas encore dans ce voyage : le lien d'invitation y ajoute le compte.
+  if (error?.code === 'forbidden') return <Navigate to={`/j/${code}`} replace />;
+  if (error?.code === 'not_found') return <NotFoundPage />;
   if (!state) {
     return error ? (
       <p className="banner banner--error" role="alert">
@@ -43,8 +51,8 @@ export function TripPage() {
   async function act(leg: Leg, action: 'take' | 'leave') {
     setBusyLegId(leg.id);
     try {
-      if (action === 'take') await api.takeSeat(code, session!.secret, leg.id);
-      else await api.leaveSeat(code, session!.secret, leg.id);
+      if (action === 'take') await api.takeSeat(token, code, leg.id);
+      else await api.leaveSeat(token, code, leg.id);
       setToast(action === 'take' ? `Place réservée pour ${leg.direction === 'aller' ? "l'aller" : 'le retour'}` : 'Place libérée');
     } catch (err) {
       setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -63,9 +71,9 @@ export function TripPage() {
     }
   }
 
-  // Oublie l'identité et tous les voyages de ce navigateur, puis on se réidentifie.
-  function switchPerson() {
-    forgetIdentity();
+  // Déconnexion, puis connexion avec un autre compte sur ce voyage.
+  async function switchPerson() {
+    await logout();
     navigate(`/j/${code}`);
   }
 

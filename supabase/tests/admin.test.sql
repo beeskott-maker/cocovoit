@@ -13,10 +13,13 @@ declare
   b json;
   lst json;
   failed boolean;
+  ana uuid := (login('ana@example.com', 'Ana')->>'token')::uuid;
+  ben uuid := (login('ben@example.com', 'Ben')->>'token')::uuid;
+  zoe uuid := (login('zoe@example.com', 'Zoé')->>'token')::uuid;
 begin
-  a := create_trip('Voyage A', 'Lyon', '2026-11-01', '2026-11-02', 'Ana', 'ana@example.com');
-  b := create_trip('Voyage B', 'Paris', '2026-12-01', '2026-12-03', 'Ben', 'ben@example.com');
-  perform join_trip(a->>'code', 'zoe@example.com', 'Zoé');
+  a := json_build_object('code', create_trip(ana, 'Voyage A', 'Lyon', '2026-11-01', '2026-11-02'));
+  b := json_build_object('code', create_trip(ben, 'Voyage B', 'Paris', '2026-12-01', '2026-12-03'));
+  perform join_trip(zoe, a->>'code');
 
   -- Mauvaise clé : refus, même avec la bonne adresse.
   failed := false;

@@ -1,7 +1,5 @@
 import { screen } from '@testing-library/react';
-import { getIdentity, saveIdentity } from '../lib/identity';
-import { listSessions } from '../lib/session';
-import { createTestApi, renderApp, seedTrip } from '../test/renderApp';
+import { createTestApi, loginAs, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe("Parcours d'un invité (maquette Figma)", () => {
   it('email → nom → voyage, puis réservation d’une place', async () => {
@@ -64,7 +62,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     expect(await screen.findByRole('heading', { name: 'Lien introuvable' })).toBeInTheDocument();
   });
 
-  it("mémorise l'identité saisie sur un lien d'invitation", async () => {
+  it("crée le compte depuis un lien d'invitation et le garde connecté", async () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
     const { user } = renderApp(`/j/${code}`, api);
@@ -73,31 +71,38 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     await user.type(await screen.findByLabelText('Mon nom'), 'Léa');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
     expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
-    expect(getIdentity()).toEqual({ email: 'lea@example.com', name: 'Léa' });
+
+    // Compte en base et participation au voyage : le navigateur ne garde que le jeton.
+    const token = localStorage.getItem('cocovoit:token')!;
+    expect(await api.me(token)).toEqual({ email: 'lea@example.com', name: 'Léa' });
+    expect((await api.myTrips(token)).map((t) => t.code)).toEqual([code]);
+    expect(Object.keys(localStorage).filter((k) => k !== 'cocovoit:demo-db')).toEqual(['cocovoit:token']);
   });
 
-  it('déjà identifié : ajouté automatiquement au voyage, sans formulaire', async () => {
+  it('déjà connecté : ajouté automatiquement au voyage, sans formulaire', async () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
-    saveIdentity({ email: 'lea@example.com', name: 'Léa' });
+    const lea = await loginAs(api, 'lea@example.com', 'Léa');
+    signIn(lea);
     renderApp(`/j/${code}`, api);
 
     expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
     expect(screen.queryByLabelText('Mon email')).not.toBeInTheDocument();
     expect(screen.getByText(/Connecté·e en tant que/)).toHaveTextContent('Léa');
-    // Bien inscrit côté serveur : l'email est reconnu.
-    expect(await api.joinTrip(code, 'lea@example.com')).toMatchObject({ status: 'ok', name: 'Léa' });
+    expect((await api.myTrips(lea)).map((t) => t.code)).toEqual([code]);
   });
 
-  it("« Ce n'est pas moi » oublie l'identité et tous les voyages", async () => {
+  it("« Ce n'est pas moi » déconnecte le compte", async () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
-    saveIdentity({ email: 'lea@example.com', name: 'Léa' });
-    const { user } = renderApp(`/j/${code}`, api);
+    const lea = await loginAs(api, 'lea@example.com', 'Léa');
+    await api.joinTrip(lea, code);
+    signIn(lea);
+    const { user } = renderApp(`/t/${code}`, api);
     await user.click(await screen.findByRole('button', { name: "Ce n'est pas moi" }));
 
     expect(await screen.findByLabelText('Mon email')).toBeInTheDocument();
-    expect(getIdentity()).toBeNull();
-    expect(listSessions()).toEqual([]);
+    expect(localStorage.getItem('cocovoit:token')).toBeNull();
+    await expect(api.me(lea)).rejects.toMatchObject({ code: 'unauthenticated' });
   });
 });

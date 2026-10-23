@@ -49,8 +49,6 @@ export interface NewTrip {
   destination: string;
   startsOn: string;
   endsOn: string;
-  organizerName: string;
-  organizerEmail: string;
 }
 
 export interface LegInput {
@@ -65,39 +63,61 @@ export interface CarInput {
   legs: LegInput[];
 }
 
-export type JoinResult = { status: 'needs_name' } | { status: 'ok'; secret: string; name: string };
+/** Compte de la personne connectée. */
+export interface Account {
+  email: string;
+  name: string;
+}
+
+/** Connexion par email : nom demandé si le compte n'existe pas encore. */
+export type LoginResult = { status: 'needs_name' } | { status: 'ok'; token: string; account: Account };
 
 /** Erreur métier affichable telle quelle à l'utilisateur. */
 export class ApiError extends Error {
   constructor(
     message: string,
-    readonly code: 'forbidden' | 'unauthorized_email' | 'not_found' | 'invalid' | 'unknown',
+    readonly code:
+      | 'unauthenticated' // session inconnue ou fermée : il faut se reconnecter
+      | 'forbidden'
+      | 'unauthorized_email'
+      | 'not_found'
+      | 'invalid'
+      | 'unknown',
   ) {
     super(message);
     this.name = 'ApiError';
   }
 }
 
-/** Voyage de « Mes voyages », confirmé par le serveur. */
+/** Voyage de « Mes voyages » : ceux auxquels participe le compte. */
 export interface MyTrip {
   code: string;
   name: string;
   startsOn: string;
   endsOn: string;
+  isOrganizer: boolean;
+  isDriver: boolean;
+  isPassenger: boolean;
 }
 
+/**
+ * Accès aux données. Toutes les opérations liées à une personne prennent le
+ * jeton de session de son compte (`token`), obtenu à la connexion.
+ */
 export interface Api {
   readonly mode: 'supabase' | 'demo';
-  createTrip(input: NewTrip): Promise<{ code: string; secret: string }>;
+  login(email: string, name?: string): Promise<LoginResult>;
+  me(token: string): Promise<Account>;
+  logout(token: string): Promise<void>;
+  createTrip(token: string, input: NewTrip): Promise<string>;
   getTripPreview(code: string): Promise<TripPreview | null>;
-  /** Parmi les accès mémorisés, les voyages qui existent encore. */
-  myTrips(sessions: { code: string; secret: string }[]): Promise<MyTrip[]>;
-  joinTrip(code: string, email: string, name?: string): Promise<JoinResult>;
-  getTripState(code: string, secret: string): Promise<TripState>;
-  saveCar(code: string, secret: string, input: CarInput): Promise<string>;
-  deleteCar(code: string, secret: string, carId: string): Promise<void>;
-  takeSeat(code: string, secret: string, legId: string): Promise<void>;
-  leaveSeat(code: string, secret: string, legId: string): Promise<void>;
+  joinTrip(token: string, code: string): Promise<void>;
+  myTrips(token: string): Promise<MyTrip[]>;
+  getTripState(token: string, code: string): Promise<TripState>;
+  saveCar(token: string, code: string, input: CarInput): Promise<string>;
+  deleteCar(token: string, code: string, carId: string): Promise<void>;
+  takeSeat(token: string, code: string, legId: string): Promise<void>;
+  leaveSeat(token: string, code: string, legId: string): Promise<void>;
   /** Gestion des voyages (page #/x/<clé>) : clé de l'URL + adresse email autorisée. */
   adminListTrips(key: string, email: string): Promise<AdminTrip[]>;
   adminDeleteTrip(key: string, email: string, code: string): Promise<void>;

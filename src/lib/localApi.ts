@@ -22,13 +22,19 @@ interface DbTrip {
   endsOn: string;
   createdAt?: number;
 }
+interface DbAccount {
+  id: string;
+  email: string;
+  name: string;
+}
+interface DbSession {
+  token: string;
+  accountId: string;
+}
 interface DbParticipant {
   id: string;
   tripId: string;
-  /** Absent pour un organisateur qui ne l'a pas donné. */
-  email: string | null;
-  name: string;
-  secret: string;
+  accountId: string;
   isOrganizer: boolean;
 }
 interface DbCar {
@@ -51,6 +57,8 @@ interface DbBooking {
   createdAt: number;
 }
 interface Db {
+  accounts: DbAccount[];
+  sessions: DbSession[];
   trips: DbTrip[];
   participants: DbParticipant[];
   cars: DbCar[];
@@ -64,7 +72,7 @@ export interface KeyValueStore {
 }
 
 const KEY = 'cocovoit:demo-db';
-const emptyDb = (): Db => ({ trips: [], participants: [], cars: [], legs: [], bookings: [] });
+const emptyDb = (): Db => ({ accounts: [], sessions: [], trips: [], participants: [], cars: [], legs: [], bookings: [] });
 
 /** Page de gestion des voyages en mode démo : #/x/demo, avec l'adresse ci-dessous. */
 export const DEMO_ADMIN_KEY = 'demo';
@@ -77,17 +85,31 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
 
   function load(): Db {
     const raw = store.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Db) : emptyDb();
+    const db = raw ? (JSON.parse(raw) as Db) : emptyDb();
+    // Ancienne base démo sans comptes : on repart de zéro, comme en production.
+    return db.accounts ? db : emptyDb();
   }
   function save(db: Db) {
     store.setItem(KEY, JSON.stringify(db));
   }
-  function participant(db: Db, code: string, secret: string): DbParticipant {
-    const trip = db.trips.find((t) => t.code === code);
-    const me = trip && db.participants.find((p) => p.tripId === trip.id && p.secret === secret);
-    if (!me) throw new ApiError('Accès refusé', 'forbidden');
-    return me;
+  function account(db: Db, token: string): DbAccount {
+    const session = db.sessions.find((s) => s.token === token);
+    const found = session && db.accounts.find((a) => a.id === session.accountId);
+    if (!found) throw new ApiError('Session expirée, reconnectez-vous', 'unauthenticated');
+    return found;
   }
+  function participant(db: Db, token: string, code: string): DbParticipant {
+    const me = account(db, token);
+    const trip = db.trips.find((t) => t.code === code);
+    if (!trip) throw new ApiError('Voyage introuvable', 'not_found');
+    const p = db.participants.find((x) => x.tripId === trip.id && x.accountId === me.id);
+    if (!p) throw new ApiError('Vous ne participez pas à ce voyage', 'forbidden');
+    return p;
+  }
+  const nameOf = (db: Db, participantId: string) => {
+    const p = db.participants.find((x) => x.id === participantId)!;
+    return db.accounts.find((a) => a.id === p.accountId)!.name;
+  };
   function removeMyBookings(db: Db, meId: string, direction: Direction) {
     db.bookings = db.bookings.filter((b) => {
       if (b.participantId !== meId) return true;
@@ -107,9 +129,38 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
   return {
     mode: 'demo',
 
-    async createTrip(t: NewTrip) {
+    async login(email, name) {
       await tick();
       const db = load();
+      let found = db.accounts.find((a) => a.email.toLowerCase() === email.trim().toLowerCase());
+      if (!found) {
+        if (!name?.trim()) return { status: 'needs_name' };
+        found = { id: newId(), email: email.trim(), name: name.trim() };
+        db.accounts.push(found);
+      }
+      const token = newId();
+      db.sessions.push({ token, accountId: found.id });
+      save(db);
+      return { status: 'ok', token, account: { email: found.email, name: found.name } };
+    },
+
+    async me(token) {
+      await tick();
+      const { email, name } = account(load(), token);
+      return { email, name };
+    },
+
+    async logout(token) {
+      await tick();
+      const db = load();
+      db.sessions = db.sessions.filter((s) => s.token !== token);
+      save(db);
+    },
+
+    async createTrip(token, t: NewTrip) {
+      await tick();
+      const db = load();
+      const me = account(db, token);
       const trip: DbTrip = {
         id: newId(),
         code: newId().replace(/-/g, '').slice(0, 16),
@@ -121,18 +172,10 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       };
       if (!trip.name) throw new ApiError('Le nom du voyage est obligatoire', 'invalid');
       if (trip.endsOn < trip.startsOn) throw new ApiError('La date de retour est avant le départ', 'invalid');
-      const secret = newId();
       db.trips.push(trip);
-      db.participants.push({
-        id: newId(),
-        tripId: trip.id,
-        email: t.organizerEmail.trim() || null,
-        name: t.organizerName.trim() || 'Organisateur',
-        secret,
-        isOrganizer: true,
-      });
+      db.participants.push({ id: newId(), tripId: trip.id, accountId: me.id, isOrganizer: true });
       save(db);
-      return { code: trip.code, secret };
+      return trip.code;
     },
 
     async getTripPreview(code) {
@@ -143,50 +186,54 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       return { code: c, name, destination, startsOn, endsOn };
     },
 
-    async myTrips(sessions) {
+    async joinTrip(token, code) {
       await tick();
       const db = load();
-      return db.trips
-        .filter((t) =>
-          sessions.some((s) => s.code === t.code && db.participants.some((p) => p.tripId === t.id && p.secret === s.secret)),
-        )
-        .sort((a, b) => a.startsOn.localeCompare(b.startsOn) || a.name.localeCompare(b.name))
-        .map(({ code, name, startsOn, endsOn }) => ({ code, name, startsOn, endsOn }));
-    },
-
-    async joinTrip(code, email, name) {
-      await tick();
-      const db = load();
+      const me = account(db, token);
       const trip = db.trips.find((t) => t.code === code);
       if (!trip) throw new ApiError('Voyage introuvable', 'not_found');
-      let p = db.participants.find(
-        (x) => x.tripId === trip.id && x.email?.toLowerCase() === email.trim().toLowerCase(),
-      );
-      if (!p) {
-        if (!name?.trim()) return { status: 'needs_name' };
-        p = { id: newId(), tripId: trip.id, email: email.trim(), name: name.trim(), secret: newId(), isOrganizer: false };
-        db.participants.push(p);
+      if (!db.participants.some((p) => p.tripId === trip.id && p.accountId === me.id)) {
+        db.participants.push({ id: newId(), tripId: trip.id, accountId: me.id, isOrganizer: false });
         save(db);
       }
-      return { status: 'ok', secret: p.secret, name: p.name };
     },
 
-    async getTripState(code, secret): Promise<TripState> {
+    async myTrips(token) {
       await tick();
       const db = load();
-      const me = participant(db, code, secret);
+      const me = account(db, token);
+      return db.participants
+        .filter((p) => p.accountId === me.id)
+        .map((p) => {
+          const t = db.trips.find((x) => x.id === p.tripId)!;
+          return {
+            code: t.code,
+            name: t.name,
+            startsOn: t.startsOn,
+            endsOn: t.endsOn,
+            isOrganizer: p.isOrganizer,
+            isDriver: db.cars.some((c) => c.driverId === p.id),
+            isPassenger: db.bookings.some((b) => b.participantId === p.id),
+          };
+        })
+        .sort((a, b) => a.startsOn.localeCompare(b.startsOn) || a.name.localeCompare(b.name));
+    },
+
+    async getTripState(token, code): Promise<TripState> {
+      await tick();
+      const db = load();
+      const me = participant(db, token, code);
       const trip = db.trips.find((t) => t.id === me.tripId)!;
-      const nameOf = (id: string) => db.participants.find((p) => p.id === id)!.name;
       return {
         trip: { code: trip.code, name: trip.name, destination: trip.destination, startsOn: trip.startsOn, endsOn: trip.endsOn },
-        me: { id: me.id, name: me.name, isOrganizer: me.isOrganizer },
+        me: { id: me.id, name: nameOf(db, me.id), isOrganizer: me.isOrganizer },
         cars: db.cars
           .filter((c) => c.tripId === trip.id)
           .sort((a, b) => a.createdAt - b.createdAt)
           .map((c) => ({
             id: c.id,
             seats: c.seats,
-            driver: { id: c.driverId, name: nameOf(c.driverId) },
+            driver: { id: c.driverId, name: nameOf(db, c.driverId) },
             legs: db.legs
               .filter((l) => l.carId === c.id)
               .sort((a, b) => a.direction.localeCompare(b.direction))
@@ -198,16 +245,16 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
                 passengers: db.bookings
                   .filter((b) => b.legId === l.id)
                   .sort((a, b) => a.createdAt - b.createdAt)
-                  .map((b) => ({ id: b.participantId, name: nameOf(b.participantId) })),
+                  .map((b) => ({ id: b.participantId, name: nameOf(db, b.participantId) })),
               })),
           })),
       };
     },
 
-    async saveCar(code, secret, input: CarInput) {
+    async saveCar(token, code, input: CarInput) {
       await tick();
       const db = load();
-      const me = participant(db, code, secret);
+      const me = participant(db, token, code);
       if (input.legs.length === 0) throw new ApiError('Indiquez au moins un trajet', 'invalid');
       if (input.seats < 1 || input.seats > 8) throw new ApiError('Entre 1 et 8 places', 'invalid');
 
@@ -245,10 +292,10 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       return carId;
     },
 
-    async deleteCar(code, secret, carId) {
+    async deleteCar(token, code, carId) {
       await tick();
       const db = load();
-      const me = participant(db, code, secret);
+      const me = participant(db, token, code);
       if (!db.cars.some((c) => c.id === carId && c.driverId === me.id)) throw new ApiError('Accès refusé', 'forbidden');
       const legIds = new Set(db.legs.filter((l) => l.carId === carId).map((l) => l.id));
       db.cars = db.cars.filter((c) => c.id !== carId);
@@ -257,10 +304,10 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       save(db);
     },
 
-    async takeSeat(code, secret, legId) {
+    async takeSeat(token, code, legId) {
       await tick();
       const db = load();
-      const me = participant(db, code, secret);
+      const me = participant(db, token, code);
       const leg = db.legs.find((l) => l.id === legId);
       const car = leg && db.cars.find((c) => c.id === leg.carId);
       if (!leg || !car || car.tripId !== me.tripId) throw new ApiError('Trajet introuvable', 'not_found');
@@ -287,10 +334,10 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       save(db);
     },
 
-    async leaveSeat(code, secret, legId) {
+    async leaveSeat(token, code, legId) {
       await tick();
       const db = load();
-      const me = participant(db, code, secret);
+      const me = participant(db, token, code);
       db.bookings = db.bookings.filter((b) => !(b.legId === legId && b.participantId === me.id));
       save(db);
     },
