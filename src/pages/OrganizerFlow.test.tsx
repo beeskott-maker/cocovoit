@@ -13,7 +13,7 @@ describe('Parcours organisateur et conducteur', () => {
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
 
     // Formulaire de création, sans nom ni email.
-    expect(await screen.findByRole('heading', { name: /Organiser\s*un voyage/ })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Nouveau voyage' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Mon nom')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Mon email')).not.toBeInTheDocument();
 
@@ -53,7 +53,7 @@ describe('Parcours organisateur et conducteur', () => {
     const { user, container } = renderApp('/', api);
 
     // Astérisque rouge sur les trois champs obligatoires, et eux seuls.
-    expect(await screen.findByRole('heading', { name: /Organiser\s*un voyage/ })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Nouveau voyage' })).toBeInTheDocument();
     const requiredLabels = [...container.querySelectorAll('.text-field__required')].map((el) =>
       el.parentElement!.textContent!.replace('*', '').trim(),
     );
@@ -88,5 +88,24 @@ describe('Parcours organisateur et conducteur', () => {
     expect(link).toHaveAttribute('href', `/t/${code}`);
     expect(link).toHaveTextContent('Conducteur');
     expect(hugo).toBeTruthy();
+  });
+
+  it('avec des voyages : le formulaire se déplie sur « Nouveau voyage » et se replie sur « Annuler »', async () => {
+    const api = createTestApi();
+    const { organizer } = await seedTrip(api);
+    signIn(organizer);
+    const { user } = renderApp('/', api);
+
+    expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
+    expect(document.title).toBe('Coco·Voit · Mes voyages');
+    expect(screen.queryByRole('button', { name: 'Créer le voyage' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Nouveau voyage' }));
+    expect(screen.getByRole('button', { name: 'Créer le voyage' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Nouveau voyage' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Annuler' }));
+    expect(screen.queryByRole('button', { name: 'Créer le voyage' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Nouveau voyage' })).toBeInTheDocument();
   });
 });
