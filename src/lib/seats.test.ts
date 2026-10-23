@@ -17,13 +17,13 @@ const car = (passengers: string[], seats = 3): Car => ({
 });
 
 describe('seatCells', () => {
-  it('remplace la dernière place libre par « Prendre 1 place »', () => {
+  it('affiche toutes les places libres, puis « Prendre 1 place » en plus', () => {
     const c = car(['lea']);
-    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'free', 'take']);
+    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'free', 'free', 'take']);
   });
   it('affiche « Moi » et « Libérer ma place » quand je suis passager', () => {
     const c = car(['lea', 'moi']);
-    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'me', 'leave']);
+    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'me', 'free', 'leave']);
   });
   it('ajoute « Libérer ma place » en plus quand la voiture est pleine', () => {
     const c = car(['lea', 'moi', 'max']);

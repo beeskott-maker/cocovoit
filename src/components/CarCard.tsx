@@ -71,6 +71,7 @@ function LegSeats({
   onLeave: () => void;
 }) {
   const title = leg.direction === 'aller' ? 'Aller' : 'Retour';
+  const rows = Math.ceil(cells.length / 2);
   return (
     <div className="leg">
       <div className="leg__header">
@@ -89,10 +90,12 @@ function LegSeats({
         role="list"
         aria-label={`Places ${title.toLowerCase()}`}
         // Remplissage par colonne : passagers à gauche, places libres à droite (maquette).
-        style={{ gridTemplateRows: `repeat(${Math.ceil(cells.length / 2)}, auto)` }}
+        style={{ gridTemplateRows: `repeat(${rows}, auto)` }}
       >
         {cells.map((cell, i) => (
           <div role="listitem" key={i} style={{ display: 'contents' }}>
+            {/* Nombre impair de cases : le trou va en bas de la 1re colonne, le bouton reste en bas à droite. */}
+            {cells.length % 2 === 1 && i === rows - 1 && <div aria-hidden="true" />}
             <Seat cell={cell} busy={busy} onTake={onTake} onLeave={onLeave} />
           </div>
         ))}

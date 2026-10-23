@@ -9,9 +9,8 @@ export type SeatCell =
 
 /**
  * Cases de la grille des places d'un trajet (2 colonnes) :
- * passagers, puis places libres. La dernière place libre devient le bouton
- * « Prendre 1 place », ou « Libérer ma place » si j'y suis (ajouté en plus
- * si la voiture est pleine).
+ * une case par place (passagers, puis places libres), suivie du bouton
+ * « Prendre 1 place » s'il reste de la place, ou « Libérer ma place » si j'y suis.
  */
 export function seatCells(car: Car, leg: Leg, meId: string): SeatCell[] {
   const iAmIn = leg.passengers.some((p) => p.id === meId);
@@ -21,11 +20,8 @@ export function seatCells(car: Car, leg: Leg, meId: string): SeatCell[] {
   );
   const free = Math.max(0, car.seats - leg.passengers.length);
   for (let i = 0; i < free; i++) cells.push({ kind: 'free' });
-  const action: SeatCell | null = iAmIn ? { kind: 'leave' } : canTake && free > 0 ? { kind: 'take' } : null;
-  if (action) {
-    if (free > 0) cells[cells.length - 1] = action;
-    else cells.push(action);
-  }
+  if (iAmIn) cells.push({ kind: 'leave' });
+  else if (canTake && free > 0) cells.push({ kind: 'take' });
   return cells;
 }
 
