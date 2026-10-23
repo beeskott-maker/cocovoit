@@ -106,7 +106,7 @@ function Home({ token }: { token: string }) {
       )}
       {showForm && (
         <>
-          <div className="page-title">
+          <div className="page-title page-title--inset">
             <h1 className="display-small">Nouveau voyage</h1>
             <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
           </div>

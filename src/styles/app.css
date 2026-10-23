@@ -126,6 +126,10 @@ a {
 .page-title {
   padding: 0 24px;
 }
+/* Aligné sur les sections et formulaires (32 px) quand ils partagent la page. */
+.page-title--inset {
+  padding: 0 32px;
+}
 
 .form {
   display: flex;
