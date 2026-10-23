@@ -37,13 +37,16 @@ describe('API démo (mêmes règles que les fonctions SQL)', () => {
     await expect(api.takeSeat(code, zoe, aller.id)).rejects.toBeInstanceOf(ApiError);
     await expect(api.takeSeat(code, hugo, aller.id)).rejects.toMatchObject({ code: 'invalid' });
 
-    // Zoé propose sa voiture, Léa y change de place à l'aller.
+    // Zoé propose sa voiture. Léa, déjà à l'aller chez Hugo, doit libérer sa
+    // place avant d'en prendre une à l'aller chez Zoé.
     await api.saveCar(code, zoe, {
       carId: null,
       seats: 3,
       legs: [{ direction: 'aller', departsAt: '2026-10-10T06:00:00Z', meetingPoint: null }],
     });
     st = await api.getTripState(code, lea);
+    await expect(api.takeSeat(code, lea, st.cars[1].legs[0].id)).rejects.toMatchObject({ code: 'invalid' });
+    await api.leaveSeat(code, lea, st.cars[0].legs[0].id);
     await api.takeSeat(code, lea, st.cars[1].legs[0].id);
     st = await api.getTripState(code, lea);
     expect(st.cars[0].legs[0].passengers.map((p) => p.name)).toEqual(['Max']);

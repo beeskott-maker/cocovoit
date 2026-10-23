@@ -6,18 +6,20 @@ import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
 import { formatDeparture, mapsUrl } from '../lib/format';
 import { freeSeats, freeSeatsLabel, seatCells, type SeatCell } from '../lib/seats';
-import type { Car, Leg } from '../lib/types';
+import type { Car, Direction, Leg } from '../lib/types';
 
 interface Props {
   car: Car;
   meId: string;
   editHref: string;
   busyLegId: string | null;
+  /** Sens dans lesquels j'ai déjà une place (dans n'importe quelle voiture). */
+  myDirections: ReadonlySet<Direction>;
   onTake: (leg: Leg) => void;
   onLeave: (leg: Leg) => void;
 }
 
-export function CarCard({ car, meId, editHref, busyLegId, onTake, onLeave }: Props) {
+export function CarCard({ car, meId, editHref, busyLegId, myDirections, onTake, onLeave }: Props) {
   const mine = car.driver.id === meId;
   const free = freeSeats(car);
   return (
@@ -46,7 +48,7 @@ export function CarCard({ car, meId, editHref, busyLegId, onTake, onLeave }: Pro
           <LegSeats
             key={leg.id}
             leg={leg}
-            cells={seatCells(car, leg, meId)}
+            cells={seatCells(car, leg, meId, myDirections)}
             busy={busyLegId === leg.id}
             onTake={() => onTake(leg)}
             onLeave={() => onLeave(leg)}
@@ -125,7 +127,13 @@ function Seat({ cell, busy, onTake, onLeave }: { cell: SeatCell; busy: boolean; 
       );
     case 'take':
       return (
-        <button type="button" className="btn btn--primary" onClick={onTake} disabled={busy}>
+        <button
+          type="button"
+          className="btn btn--primary"
+          onClick={onTake}
+          disabled={busy || cell.disabled}
+          title={cell.disabled ? 'Vous avez déjà une place dans ce sens : libérez-la d\'abord' : undefined}
+        >
           Prendre 1 place
         </button>
       );

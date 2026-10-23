@@ -7,6 +7,7 @@ import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
 import { forgetIdentity } from '../lib/identity';
+import { bookedDirections } from '../lib/seats';
 import { clearSession, getSession } from '../lib/session';
 import type { Leg } from '../lib/types';
 import { useTripState } from '../lib/useTripState';
@@ -36,6 +37,7 @@ export function TripPage() {
   }
 
   const myCar = state.cars.find((c) => c.driver.id === state.me.id);
+  const myDirections = bookedDirections(state.cars, state.me.id);
   const carHref = myCar ? `/t/${code}/voiture/${myCar.id}` : `/t/${code}/voiture`;
 
   async function act(leg: Leg, action: 'take' | 'leave') {
@@ -90,6 +92,7 @@ export function TripPage() {
               meId={state.me.id}
               editHref={`/t/${code}/voiture/${car.id}`}
               busyLegId={busyLegId}
+              myDirections={myDirections}
               onTake={(leg) => act(leg, 'take')}
               onLeave={(leg) => act(leg, 'leave')}
             />

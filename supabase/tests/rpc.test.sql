@@ -86,10 +86,22 @@ begin
   end;
   assert failed, 'suppression par un autre';
 
-  -- Max crée sa voiture, Léa change de voiture à l'aller : une seule place par sens.
+  -- Max crée sa voiture. Une seule place par sens : Léa, déjà à l'aller chez
+  -- Hugo, ne peut pas prendre l'aller de Max sans libérer sa place.
   perform save_car(code, max_, null, 3, json_build_array(
     json_build_object('direction', 'aller', 'departsAt', '2026-10-10T08:00:00+02:00')));
   st := get_trip_state(code, lea);
+  failed := false;
+  begin
+    perform take_seat(code, lea, (st->'cars'->1->'legs'->0->>'id')::uuid);
+  exception when sqlstate '22023' then failed := true;
+  end;
+  assert failed, 'déjà une place à l''aller';
+  st := get_trip_state(code, lea);
+  assert (st->'cars'->0->'legs'->0->'passengers'->0->>'name') = 'Léa', 'Léa reste chez Hugo';
+  assert json_array_length(st->'cars'->1->'legs'->0->'passengers') = 0, 'personne chez Max';
+
+  perform leave_seat(code, lea, aller);
   perform take_seat(code, lea, (st->'cars'->1->'legs'->0->>'id')::uuid);
   st := get_trip_state(code, lea);
   assert json_array_length(st->'cars'->0->'legs'->0->'passengers') = 0, 'place libérée chez Hugo';

@@ -1,18 +1,20 @@
-import type { Car, Leg } from './types';
+import type { Car, Direction, Leg } from './types';
 
 export type SeatCell =
   | { kind: 'occupied'; name: string }
   | { kind: 'me' }
   | { kind: 'free'; count: number }
-  | { kind: 'take' }
+  | { kind: 'take'; disabled: boolean }
   | { kind: 'leave' };
 
 /**
  * Cases de la grille des places d'un trajet : une case par passager, une
  * seule case pour les places libres (avec leur nombre), puis le bouton
  * « Prendre 1 place » s'il reste de la place, ou « Libérer ma place » si j'y suis.
+ * Le bouton « Prendre 1 place » est désactivé si j'ai déjà une place dans ce
+ * sens (aller ou retour) dans une autre voiture.
  */
-export function seatCells(car: Car, leg: Leg, meId: string): SeatCell[] {
+export function seatCells(car: Car, leg: Leg, meId: string, myDirections: ReadonlySet<Direction> = new Set()): SeatCell[] {
   const iAmIn = leg.passengers.some((p) => p.id === meId);
   const canTake = !iAmIn && car.driver.id !== meId;
   const cells: SeatCell[] = leg.passengers.map((p) =>
@@ -21,7 +23,7 @@ export function seatCells(car: Car, leg: Leg, meId: string): SeatCell[] {
   const free = Math.max(0, car.seats - leg.passengers.length);
   if (free > 0) cells.push({ kind: 'free', count: free });
   if (iAmIn) cells.push({ kind: 'leave' });
-  else if (canTake && free > 0) cells.push({ kind: 'take' });
+  else if (canTake && free > 0) cells.push({ kind: 'take', disabled: myDirections.has(leg.direction) });
   return cells;
 }
 
@@ -34,4 +36,15 @@ export function freeSeatsLabel(count: number): string {
 export function freeSeats(car: Car): number {
   if (car.legs.length === 0) return 0;
   return Math.max(...car.legs.map((l) => car.seats - l.passengers.length));
+}
+
+/** Sens (aller, retour) dans lesquels j'ai déjà une place de passager. */
+export function bookedDirections(cars: Car[], meId: string): Set<Direction> {
+  const directions = new Set<Direction>();
+  for (const car of cars) {
+    for (const leg of car.legs) {
+      if (leg.passengers.some((p) => p.id === meId)) directions.add(leg.direction);
+    }
+  }
+  return directions;
 }

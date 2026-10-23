@@ -1,4 +1,4 @@
-import { freeSeats, freeSeatsLabel, seatCells } from './seats';
+import { bookedDirections, freeSeats, freeSeatsLabel, seatCells } from './seats';
 import type { Car } from './types';
 
 const car = (passengers: string[], seats = 3): Car => ({
@@ -22,7 +22,7 @@ describe('seatCells', () => {
     expect(seatCells(c, c.legs[0], 'moi')).toEqual([
       { kind: 'occupied', name: 'LEA' },
       { kind: 'free', count: 2 },
-      { kind: 'take' },
+      { kind: 'take', disabled: false },
     ]);
   });
   it('affiche « Moi » et « Libérer ma place » quand je suis passager', () => {
@@ -49,3 +49,17 @@ describe('seatCells', () => {
     expect(freeSeatsLabel(3)).toBe('3 places libres');
   });
 });
+
+describe('une place par sens', () => {
+  it('désactive « Prendre 1 place » si j\'ai déjà une place dans ce sens', () => {
+    const c = car(['lea']);
+    expect(seatCells(c, c.legs[0], 'moi', new Set(['aller'])).at(-1)).toEqual({ kind: 'take', disabled: true });
+    expect(seatCells(c, c.legs[0], 'moi', new Set(['retour'])).at(-1)).toEqual({ kind: 'take', disabled: false });
+  });
+
+  it('liste les sens où j\'ai une place', () => {
+    expect([...bookedDirections([car(['moi'])], 'moi')]).toEqual(['aller']);
+    expect(bookedDirections([car(['lea'])], 'moi').size).toBe(0);
+  });
+});
+

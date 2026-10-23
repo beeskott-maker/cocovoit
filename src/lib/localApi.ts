@@ -88,9 +88,9 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
     if (!me) throw new ApiError('Accès refusé', 'forbidden');
     return me;
   }
-  function removeMyBookings(db: Db, meId: string, direction: Direction, exceptLegId?: string) {
+  function removeMyBookings(db: Db, meId: string, direction: Direction) {
     db.bookings = db.bookings.filter((b) => {
-      if (b.participantId !== meId || b.legId === exceptLegId) return true;
+      if (b.participantId !== meId) return true;
       const leg = db.legs.find((l) => l.id === b.legId);
       return leg?.direction !== direction;
     });
@@ -259,7 +259,15 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       );
       if (drivesThisWay) throw new ApiError('Vous conduisez déjà sur ce trajet', 'invalid');
 
-      removeMyBookings(db, me.id, leg.direction, leg.id);
+      const bookedElsewhere = db.bookings.some(
+        (b) =>
+          b.participantId === me.id &&
+          b.legId !== leg.id &&
+          db.legs.find((l) => l.id === b.legId)?.direction === leg.direction,
+      );
+      if (bookedElsewhere) {
+        throw new ApiError(`Vous avez déjà une place ${leg.direction === 'aller' ? "à l'aller" : 'au retour'}`, 'invalid');
+      }
       const others = db.bookings.filter((b) => b.legId === leg.id && b.participantId !== me.id);
       if (others.length >= car.seats) throw new ApiError('Plus de place disponible', 'invalid');
       if (!db.bookings.some((b) => b.legId === leg.id && b.participantId === me.id)) {

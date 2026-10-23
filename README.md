@@ -27,7 +27,7 @@ Le nom et l'email saisis une fois (en rejoignant un voyage ou avant d'en créer 
 ## Règles métier
 
 - Une personne conduit au plus une voiture par voyage.
-- Une seule place par sens : réserver ailleurs libère l'ancienne place.
+- Une seule place par sens : déjà inscrit sur un aller (ou un retour), on ne peut pas prendre de place sur un autre aller (ou retour) du voyage ; le bouton « Prendre 1 place » est désactivé tant qu'on n'a pas libéré sa place.
 - Le conducteur ne peut pas être passager dans le sens où il conduit.
 - Si le conducteur réduit le nombre de places ou supprime un trajet, les dernières réservations sont annulées.
 
