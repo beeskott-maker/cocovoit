@@ -87,6 +87,7 @@ describe('Parcours organisateur et conducteur', () => {
     const link = await screen.findByRole('link', { name: /WE dans le Beaujolais/ });
     expect(link).toHaveAttribute('href', `/t/${code}`);
     expect(link).toHaveTextContent('Conducteur');
+    expect(link).toHaveTextContent('sam 10 → lun 12 oct 2026');
     expect(hugo).toBeTruthy();
   });
 

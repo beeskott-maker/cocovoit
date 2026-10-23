@@ -772,6 +772,11 @@ a {
   flex-direction: column;
   min-width: 0;
 }
+.trip-list__dates {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
 .trip-list__roles {
   font-size: 12px;
   line-height: 16px;

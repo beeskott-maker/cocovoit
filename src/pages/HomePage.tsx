@@ -6,6 +6,7 @@ import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { formatTripDates } from '../lib/format';
 import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type MyTrip } from '../lib/types';
 
@@ -90,6 +91,7 @@ function Home({ token }: { token: string }) {
                 <Link to={`/t/${t.code}`}>
                   <span className="trip-list__text">
                     {t.name}
+                    <span className="trip-list__dates">{formatTripDates(t.startsOn, t.endsOn)}</span>
                     {roles(t) && <span className="trip-list__roles">{roles(t)}</span>}
                   </span>
                   <span aria-hidden="true">→</span>
