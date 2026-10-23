@@ -761,3 +761,6 @@ a {
   display: flex;
   gap: 8px;
 }
+.admin-trip__actions .btn--danger {
+  color: #d06661;
+}

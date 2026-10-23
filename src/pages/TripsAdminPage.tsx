@@ -145,9 +145,6 @@ export function TripsAdminPage() {
               </p>
             </div>
             <div className="admin-trip__actions">
-              <Link className="btn btn--outline" to={`/j/${trip.code}`}>
-                Ouvrir
-              </Link>
               <button
                 type="button"
                 className="btn btn--danger"
@@ -156,6 +153,9 @@ export function TripsAdminPage() {
               >
                 Supprimer
               </button>
+              <Link className="btn btn--outline" to={`/j/${trip.code}`}>
+                Ouvrir
+              </Link>
             </div>
           </article>
         ))}
