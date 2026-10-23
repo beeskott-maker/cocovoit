@@ -329,6 +329,15 @@ a {
   letter-spacing: 0.1px;
   text-decoration: none;
   flex-shrink: 0;
+  border: 0;
+  cursor: pointer;
+}
+.chip-go:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.trip-header__row + .trip-header__row {
+  margin-top: 4px;
 }
 
 .trip-body {

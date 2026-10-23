@@ -6,6 +6,7 @@ import { Sheet } from '../components/Sheet';
 import { Toast } from '../components/Toast';
 import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
+import { inviteUrl } from '../lib/format';
 import { clearSession, getSession } from '../lib/session';
 import type { Leg } from '../lib/types';
 import { useTripState } from '../lib/useTripState';
@@ -52,6 +53,15 @@ export function TripPage() {
     }
   }
 
+  async function shareLink() {
+    try {
+      await navigator.clipboard.writeText(inviteUrl(code));
+      setToast("Lien copié : envoyez-le aux nouveaux passagers");
+    } catch {
+      setToast(`Copie impossible. Lien : ${inviteUrl(code)}`);
+    }
+  }
+
   function switchPerson() {
     clearSession(code);
     navigate(`/j/${code}`);
@@ -59,7 +69,7 @@ export function TripPage() {
 
   return (
     <>
-      <TripHeader trip={state.trip} onMenu={() => setMenuOpen(true)} />
+      <TripHeader trip={state.trip} onMenu={() => setMenuOpen(true)} onShare={shareLink} />
       {api.mode === 'demo' && (
         <p className="banner">
           Mode démo : les données restent dans ce navigateur. Configurez Supabase pour partager le voyage.

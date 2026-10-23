@@ -32,6 +32,11 @@ describe("Parcours d'un invité (maquette Figma)", () => {
       expect.stringContaining('Gare%20Part-Dieu'),
     );
 
+    // Partager : copie le lien d'invitation.
+    await user.click(screen.getByRole('button', { name: 'Partager' }));
+    expect(await navigator.clipboard.readText()).toMatch(new RegExp(`#/j/${code}$`));
+    expect(screen.getByRole('status')).toHaveTextContent('Lien copié');
+
     const [takeAller] = screen.getAllByRole('button', { name: 'Prendre 1 place' });
     await user.click(takeAller);
     expect(await screen.findByText('Moi')).toBeInTheDocument();
