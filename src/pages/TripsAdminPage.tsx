@@ -138,7 +138,7 @@ export function TripsAdminPage() {
             <div className="admin-trip__infos">
               <h2 className="title-large">{trip.name}</h2>
               <p className="body-medium">{formatTripDates(trip.startsOn, trip.endsOn)}</p>
-              <p className="body-medium">{trip.destination}</p>
+              {trip.destination && <p className="body-medium">{trip.destination}</p>}
               <p className="body-medium">
                 {plural(trip.participants, 'participant')} · {plural(trip.cars, 'voiture')} · créé le{' '}
                 {createdFormat.format(new Date(trip.createdAt))}

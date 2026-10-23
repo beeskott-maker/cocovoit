@@ -160,6 +160,9 @@ a {
   letter-spacing: 0.4px;
   color: var(--on-surface-variant);
 }
+.text-field__required {
+  color: var(--error);
+}
 .text-field:focus-within .text-field__label {
   top: -10px;
   left: 11px;

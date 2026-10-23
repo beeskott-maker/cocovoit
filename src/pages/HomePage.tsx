@@ -28,14 +28,9 @@ export function HomePage() {
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const datesError = form.startsOn && form.endsOn && form.endsOn < form.startsOn ? 'Le retour est avant le départ' : null;
-  const valid =
-    form.name.trim() &&
-    form.destination.trim() &&
-    form.startsOn &&
-    form.endsOn &&
-    !datesError &&
-    form.organizerName.trim() &&
-    isEmail(form.organizerEmail);
+  const emailError = form.organizerEmail.trim() && !isEmail(form.organizerEmail) ? 'Adresse email invalide' : null;
+  // Obligatoires : nom du voyage et dates. Le reste est facultatif.
+  const valid = form.name.trim() && form.startsOn && form.endsOn && !datesError && !emailError;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -44,7 +39,7 @@ export function HomePage() {
     setError(null);
     try {
       const { code, secret } = await api.createTrip(form);
-      saveSession({ code, secret, name: form.organizerName.trim(), tripName: form.name.trim() });
+      saveSession({ code, secret, name: form.organizerName.trim() || 'Organisateur', tripName: form.name.trim() });
       navigate(`/t/${code}/inviter?nouveau=1`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -81,7 +76,7 @@ export function HomePage() {
         <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
       </div>
       <form className="form form--compact" onSubmit={submit} noValidate>
-        <TextField label="Nom du voyage" placeholder="WE dans le Beaujolais" value={form.name} onChange={set('name')} maxLength={120} />
+        <TextField label="Nom du voyage" required placeholder="WE dans le Beaujolais" value={form.name} onChange={set('name')} maxLength={120} />
         <TextField
           label="Destination"
           icon={pin}
@@ -92,9 +87,10 @@ export function HomePage() {
           maxLength={300}
         />
         <div className="row">
-          <TextField label="Départ le" type="date" value={form.startsOn} onChange={set('startsOn')} />
+          <TextField label="Départ le" required type="date" value={form.startsOn} onChange={set('startsOn')} />
           <TextField
             label="Retour le"
+            required
             type="date"
             value={form.endsOn}
             min={form.startsOn || undefined}
@@ -111,6 +107,7 @@ export function HomePage() {
           autoComplete="email"
           value={form.organizerEmail}
           onChange={set('organizerEmail')}
+          error={emailError}
           hint="Pour retrouver le voyage depuis un autre appareil"
         />
         {error && (

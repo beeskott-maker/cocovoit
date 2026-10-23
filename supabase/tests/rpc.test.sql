@@ -111,6 +111,23 @@ begin
   assert json_array_length(get_trip_state(code, orga)->'cars') = 1, 'voiture supprimée';
   assert (get_trip_state(code, orga)->'me'->>'isOrganizer')::boolean, 'organisateur';
 
+  -- Création avec seulement le nom et les dates.
+  r := create_trip('Sans détails', null, '2026-11-01', '2026-11-01', '', '  ');
+  st := get_trip_state(r->>'code', (r->>'secret')::uuid);
+  assert (st->'trip'->>'destination') is null, 'destination facultative';
+  assert (st->'me'->>'name') = 'Organisateur', 'nom par défaut';
+  assert (st->'me'->>'isOrganizer')::boolean, 'organisateur sans email';
+  -- Un invité peut toujours rejoindre ce voyage.
+  assert (join_trip(r->>'code', 'invite@example.com', 'Invité')->>'status') = 'ok', 'invité sur voyage sans détails';
+
+  -- Le nom du voyage reste obligatoire.
+  failed := false;
+  begin
+    perform create_trip('  ', 'Lyon', '2026-11-01', '2026-11-02', 'A', 'a@example.com');
+  exception when check_violation then failed := true;
+  end;
+  assert failed, 'nom du voyage obligatoire';
+
   raise notice 'Tous les tests SQL passent';
 end;
 $$;

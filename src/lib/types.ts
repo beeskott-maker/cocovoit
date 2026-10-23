@@ -3,7 +3,7 @@ export type Direction = 'aller' | 'retour';
 export interface TripPreview {
   code: string;
   name: string;
-  destination: string;
+  destination: string | null;
   /** Dates au format YYYY-MM-DD */
   startsOn: string;
   endsOn: string;

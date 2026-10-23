@@ -17,7 +17,7 @@ interface DbTrip {
   id: string;
   code: string;
   name: string;
-  destination: string;
+  destination: string | null;
   startsOn: string;
   endsOn: string;
   createdAt?: number;
@@ -25,7 +25,8 @@ interface DbTrip {
 interface DbParticipant {
   id: string;
   tripId: string;
-  email: string;
+  /** Absent pour un organisateur qui ne l'a pas donné. */
+  email: string | null;
   name: string;
   secret: string;
   isOrganizer: boolean;
@@ -113,19 +114,20 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
         id: newId(),
         code: newId().replace(/-/g, '').slice(0, 16),
         name: t.name.trim(),
-        destination: t.destination.trim(),
+        destination: t.destination.trim() || null,
         startsOn: t.startsOn,
         endsOn: t.endsOn,
         createdAt: now(),
       };
+      if (!trip.name) throw new ApiError('Le nom du voyage est obligatoire', 'invalid');
       if (trip.endsOn < trip.startsOn) throw new ApiError('La date de retour est avant le départ', 'invalid');
       const secret = newId();
       db.trips.push(trip);
       db.participants.push({
         id: newId(),
         tripId: trip.id,
-        email: t.organizerEmail.trim(),
-        name: t.organizerName.trim(),
+        email: t.organizerEmail.trim() || null,
+        name: t.organizerName.trim() || 'Organisateur',
         secret,
         isOrganizer: true,
       });
@@ -147,7 +149,7 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       const trip = db.trips.find((t) => t.code === code);
       if (!trip) throw new ApiError('Voyage introuvable', 'not_found');
       let p = db.participants.find(
-        (x) => x.tripId === trip.id && x.email.toLowerCase() === email.trim().toLowerCase(),
+        (x) => x.tripId === trip.id && x.email?.toLowerCase() === email.trim().toLowerCase(),
       );
       if (!p) {
         if (!name?.trim()) return { status: 'needs_name' };
