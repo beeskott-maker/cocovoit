@@ -1,4 +1,4 @@
-import { formatDeparture, formatTripDates, isEmail } from './format';
+import { directionsUrl, formatDeparture, formatTripDates, isEmail } from './format';
 
 describe('formatTripDates', () => {
   it('formate un week-end dans le même mois comme la maquette', () => {
@@ -26,4 +26,14 @@ describe('isEmail', () => {
     ['loic', false],
     ['loic@gmail', false],
   ])('%s → %s', (value, expected) => expect(isEmail(value)).toBe(expected));
+});
+
+describe('directionsUrl', () => {
+  it('ouvre un itinéraire en voiture avec guidage, pas une simple localisation', () => {
+    const url = new URL(directionsUrl('124 Venelle de Brouilly 69460 Odenas'));
+    expect(url.pathname).toBe('/maps/dir/');
+    expect(url.searchParams.get('destination')).toBe('124 Venelle de Brouilly 69460 Odenas');
+    expect(url.searchParams.get('travelmode')).toBe('driving');
+    expect(url.searchParams.get('dir_action')).toBe('navigate');
+  });
 });

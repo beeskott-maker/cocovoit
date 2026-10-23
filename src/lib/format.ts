@@ -39,8 +39,15 @@ export function mapsUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
+/** Itinéraire en voiture depuis la position actuelle, guidage lancé directement sur mobile. */
 export function directionsUrl(address: string): string {
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+  const params = new URLSearchParams({
+    api: '1',
+    destination: address,
+    travelmode: 'driving',
+    dir_action: 'navigate',
+  });
+  return `https://www.google.com/maps/dir/?${params}`;
 }
 
 export const isEmail = (s: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.trim());
