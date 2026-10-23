@@ -63,3 +63,10 @@ describe('une place par sens', () => {
   });
 });
 
+describe('conducteur', () => {
+  it("pas de « Prendre 1 place » dans les autres voitures quand je conduis", () => {
+    const c = car(['lea']);
+    expect(seatCells(c, c.legs[0], 'moi', new Set(), true).map((x) => x.kind)).toEqual(['occupied', 'free']);
+  });
+});
+

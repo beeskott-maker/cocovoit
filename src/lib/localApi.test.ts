@@ -51,6 +51,10 @@ describe('API démo (mêmes règles que les fonctions SQL)', () => {
     await expect(api.takeSeat(zoe, code, aller.id)).rejects.toBeInstanceOf(ApiError);
     await expect(api.takeSeat(hugo, code, aller.id)).rejects.toMatchObject({ code: 'invalid' });
 
+    // Zoé a une place au retour chez Hugo, puis propose sa voiture (aller) :
+    // un conducteur n'est jamais passager, sa place au retour est libérée.
+    await api.takeSeat(zoe, code, st.cars[0].legs[1].id);
+
     // Zoé propose sa voiture. Léa, déjà à l'aller chez Hugo, doit libérer sa
     // place avant d'en prendre une à l'aller chez Zoé.
     await api.saveCar(zoe, code, {
@@ -59,6 +63,8 @@ describe('API démo (mêmes règles que les fonctions SQL)', () => {
       legs: [{ direction: 'aller', departsAt: '2026-10-10T06:00:00Z', meetingPoint: null }],
     });
     st = await api.getTripState(lea, code);
+    expect(st.cars[0].legs[1].passengers).toEqual([]);
+    await expect(api.takeSeat(zoe, code, st.cars[0].legs[1].id)).rejects.toMatchObject({ code: 'invalid' });
     await expect(api.takeSeat(lea, code, st.cars[1].legs[0].id)).rejects.toMatchObject({ code: 'invalid' });
     await api.leaveSeat(lea, code, st.cars[0].legs[0].id);
     await api.takeSeat(lea, code, st.cars[1].legs[0].id);

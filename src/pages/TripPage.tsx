@@ -101,6 +101,7 @@ function Trip({ token }: { token: string }) {
               editHref={`/t/${code}/voiture/${car.id}`}
               busyLegId={busyLegId}
               myDirections={myDirections}
+              iDrive={!!myCar}
               onTake={(leg) => act(leg, 'take')}
               onLeave={(leg) => act(leg, 'leave')}
             />

@@ -110,13 +110,6 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
     const p = db.participants.find((x) => x.id === participantId)!;
     return db.accounts.find((a) => a.id === p.accountId)!.name;
   };
-  function removeMyBookings(db: Db, meId: string, direction: Direction) {
-    db.bookings = db.bookings.filter((b) => {
-      if (b.participantId !== meId) return true;
-      const leg = db.legs.find((l) => l.id === b.legId);
-      return leg?.direction !== direction;
-    });
-  }
   function requireAdmin(key: string, email: string) {
     if (key !== DEMO_ADMIN_KEY) throw new ApiError('Accès refusé', 'forbidden');
     if (email.trim().toLowerCase() !== DEMO_ADMIN_EMAIL) {
@@ -270,8 +263,9 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       }
       const carId = car.id;
 
+      // Un conducteur n'est jamais passager : ses places sont libérées.
+      db.bookings = db.bookings.filter((b) => b.participantId !== me.id);
       for (const leg of input.legs) {
-        removeMyBookings(db, me.id, leg.direction);
         const existing = db.legs.find((l) => l.carId === carId && l.direction === leg.direction);
         const meetingPoint = leg.meetingPoint?.trim() || null;
         if (existing) Object.assign(existing, { departsAt: leg.departsAt, meetingPoint });
@@ -312,10 +306,9 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       const car = leg && db.cars.find((c) => c.id === leg.carId);
       if (!leg || !car || car.tripId !== me.tripId) throw new ApiError('Trajet introuvable', 'not_found');
       if (car.driverId === me.id) throw new ApiError('Vous conduisez cette voiture', 'invalid');
-      const drivesThisWay = db.cars.some(
-        (c) => c.driverId === me.id && db.legs.some((l) => l.carId === c.id && l.direction === leg.direction),
-      );
-      if (drivesThisWay) throw new ApiError('Vous conduisez déjà sur ce trajet', 'invalid');
+      if (db.cars.some((c) => c.driverId === me.id)) {
+        throw new ApiError('Vous conduisez une voiture : vous ne pouvez pas être passager', 'invalid');
+      }
 
       const bookedElsewhere = db.bookings.some(
         (b) =>

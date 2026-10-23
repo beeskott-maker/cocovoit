@@ -15,11 +15,13 @@ interface Props {
   busyLegId: string | null;
   /** Sens dans lesquels j'ai déjà une place (dans n'importe quelle voiture). */
   myDirections: ReadonlySet<Direction>;
+  /** Je conduis une voiture de ce voyage : pas de place passager pour moi. */
+  iDrive: boolean;
   onTake: (leg: Leg) => void;
   onLeave: (leg: Leg) => void;
 }
 
-export function CarCard({ car, meId, editHref, busyLegId, myDirections, onTake, onLeave }: Props) {
+export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, onTake, onLeave }: Props) {
   const mine = car.driver.id === meId;
   const free = freeSeats(car);
   return (
@@ -48,7 +50,7 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, onTake, 
           <LegSeats
             key={leg.id}
             leg={leg}
-            cells={seatCells(car, leg, meId, myDirections)}
+            cells={seatCells(car, leg, meId, myDirections, iDrive)}
             busy={busyLegId === leg.id}
             onTake={() => onTake(leg)}
             onLeave={() => onLeave(leg)}

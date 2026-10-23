@@ -12,11 +12,18 @@ export type SeatCell =
  * seule case pour les places libres (avec leur nombre), puis le bouton
  * « Prendre 1 place » s'il reste de la place, ou « Libérer ma place » si j'y suis.
  * Le bouton « Prendre 1 place » est désactivé si j'ai déjà une place dans ce
- * sens (aller ou retour) dans une autre voiture.
+ * sens (aller ou retour) dans une autre voiture, et absent si je conduis une
+ * voiture de ce voyage : un conducteur n'est jamais passager.
  */
-export function seatCells(car: Car, leg: Leg, meId: string, myDirections: ReadonlySet<Direction> = new Set()): SeatCell[] {
+export function seatCells(
+  car: Car,
+  leg: Leg,
+  meId: string,
+  myDirections: ReadonlySet<Direction> = new Set(),
+  iDrive = car.driver.id === meId,
+): SeatCell[] {
   const iAmIn = leg.passengers.some((p) => p.id === meId);
-  const canTake = !iAmIn && car.driver.id !== meId;
+  const canTake = !iAmIn && !iDrive;
   const cells: SeatCell[] = leg.passengers.map((p) =>
     p.id === meId ? { kind: 'me' } : { kind: 'occupied', name: p.name },
   );
