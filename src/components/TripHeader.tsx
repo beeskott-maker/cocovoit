@@ -1,18 +1,16 @@
 import calendar from '../assets/figma/calendar.svg';
 import globe from '../assets/figma/globe.svg';
-import logoMark from '../assets/figma/logo-mark.svg';
 import pin from '../assets/figma/pin.svg';
-import share from '../assets/share.svg';
+import share from '../assets/share-on-tertiary.svg';
 import { directionsUrl, formatTripDates } from '../lib/format';
 import type { TripPreview } from '../lib/types';
 
 interface Props {
   trip: TripPreview;
-  onMenu: () => void;
   onShare: () => void;
 }
 
-export function TripHeader({ trip, onMenu, onShare }: Props) {
+export function TripHeader({ trip, onShare }: Props) {
   return (
     <header className="trip-header">
       <div className="trip-header__top">
@@ -20,8 +18,9 @@ export function TripHeader({ trip, onMenu, onShare }: Props) {
           <p className="title-small">Votre voyage</p>
           <h1 className="title-large">{trip.name}</h1>
         </div>
-        <button type="button" className="trip-header__menu" onClick={onMenu} aria-label="Menu" aria-haspopup="dialog">
-          <img src={logoMark} width={35} height={33} alt="" />
+        <button type="button" className="chip-go chip-go--tertiary" onClick={onShare} title="Copier le lien du voyage">
+          <img src={share} alt="" width={20} height={20} />
+          Partager
         </button>
       </div>
       <div>
@@ -32,9 +31,6 @@ export function TripHeader({ trip, onMenu, onShare }: Props) {
         <div className="trip-header__row">
           <img src={pin} alt="" width={11} height={13} />
           <p className="title-small">{trip.destination}</p>
-          <button type="button" className="chip-go chip-go--icon" onClick={onShare} aria-label="Partager" title="Copier le lien du voyage">
-            <img src={share} alt="" width={20} height={20} />
-          </button>
           <a className="chip-go" href={directionsUrl(trip.destination)} target="_blank" rel="noreferrer">
             <img src={globe} alt="" width={20} height={20} />
             Go

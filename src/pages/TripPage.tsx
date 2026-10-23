@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import { CarCard } from '../components/CarCard';
-import { Sheet } from '../components/Sheet';
 import { Toast } from '../components/Toast';
 import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
@@ -17,7 +16,6 @@ export function TripPage() {
   const api = useApi();
   const navigate = useNavigate();
   const { state, error, reload } = useTripState(code, session?.secret);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [busyLegId, setBusyLegId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const hideToast = useCallback(() => setToast(null), []);
@@ -69,7 +67,7 @@ export function TripPage() {
 
   return (
     <>
-      <TripHeader trip={state.trip} onMenu={() => setMenuOpen(true)} onShare={shareLink} />
+      <TripHeader trip={state.trip} onShare={shareLink} />
       {api.mode === 'demo' && (
         <p className="banner">
           Mode démo : les données restent dans ce navigateur. Configurez Supabase pour partager le voyage.
@@ -101,26 +99,18 @@ export function TripPage() {
           </Link>
         )}
       </main>
-      {menuOpen && (
-        <Sheet label="Menu du voyage" onClose={() => setMenuOpen(false)}>
-          <p className="body-medium sheet__who">
-            Connecté·e en tant que <strong>{state.me.name}</strong>
-            {state.me.isOrganizer && ' · organisateur'}
-          </p>
-          <Link className="sheet__item" to={`/t/${code}/inviter`}>
-            Inviter des proches
-          </Link>
-          <Link className="sheet__item" to={carHref}>
-            {myCar ? 'Modifier ma voiture' : 'Ajouter ma voiture'}
-          </Link>
-          <Link className="sheet__item" to="/">
-            Mes voyages
-          </Link>
-          <button type="button" className="sheet__item" onClick={switchPerson}>
+      <footer className="trip-footer body-medium">
+        <span>
+          Connecté·e en tant que <strong>{state.me.name}</strong>
+        </span>
+        <span>
+          <button type="button" className="link-btn" onClick={switchPerson}>
             Ce n'est pas moi
           </button>
-        </Sheet>
-      )}
+          {' · '}
+          <Link to="/">Mes voyages</Link>
+        </span>
+      </footer>
       {toast && <Toast message={toast} onDone={hideToast} />}
     </>
   );
