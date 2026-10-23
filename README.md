@@ -12,7 +12,7 @@ Organiser le covoiturage d'un voyage entre proches. L'organisateur crée le voya
 | --- | --- |
 | `#/j/:code` | **Rejoindre** (maquette Figma) : email, puis nom pour un nouvel invité. Un email déjà connu entre directement. Si la personne est déjà identifiée dans ce navigateur, elle est ajoutée automatiquement au voyage, sans formulaire. |
 | `#/t/:code` | **Votre voyage** (maquette Figma) : voitures, places aller / retour, « Prendre 1 place » / « Libérer ma place », lien vers le point de RDV, bouton « Go » (itinéraire). Le logo ouvre le menu. |
-| `#/` | Accueil : créer un voyage (nom, destination, dates ; l'organisateur est la personne identifiée), retrouver ses voyages. |
+| `#/` | Accueil : créer un voyage (nom, destination, dates ; l'organisateur est la personne identifiée), retrouver ses voyages. La liste « Mes voyages » vient du serveur (`my_trips`) : il ne renvoie que les voyages qui existent encore parmi les accès mémorisés par le navigateur, qui oublie les autres. |
 | `#/identification` | Identification (email puis nom) avant de créer un voyage, si la personne n'est pas encore connue dans ce navigateur. |
 | `#/t/:code/inviter` | Lien d'invitation à copier ou partager. |
 | `#/t/:code/voiture[/:id]` | Ajouter / modifier / supprimer sa voiture : nombre de places, trajets aller et retour (date, heure, point de RDV). |

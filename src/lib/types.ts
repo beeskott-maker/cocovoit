@@ -78,10 +78,20 @@ export class ApiError extends Error {
   }
 }
 
+/** Voyage de « Mes voyages », confirmé par le serveur. */
+export interface MyTrip {
+  code: string;
+  name: string;
+  startsOn: string;
+  endsOn: string;
+}
+
 export interface Api {
   readonly mode: 'supabase' | 'demo';
   createTrip(input: NewTrip): Promise<{ code: string; secret: string }>;
   getTripPreview(code: string): Promise<TripPreview | null>;
+  /** Parmi les accès mémorisés, les voyages qui existent encore. */
+  myTrips(sessions: { code: string; secret: string }[]): Promise<MyTrip[]>;
   joinTrip(code: string, email: string, name?: string): Promise<JoinResult>;
   getTripState(code: string, secret: string): Promise<TripState>;
   saveCar(code: string, secret: string, input: CarInput): Promise<string>;

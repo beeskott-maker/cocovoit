@@ -1,11 +1,12 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
 import { getIdentity } from '../lib/identity';
-import { listSessions, saveSession } from '../lib/session';
+import { clearSession, listSessions, saveSession } from '../lib/session';
+import type { MyTrip } from '../lib/types';
 
 /**
  * Accueil : créer un voyage (organisateur) et retrouver ses voyages.
@@ -16,7 +17,29 @@ export function HomePage() {
   const api = useApi();
   const navigate = useNavigate();
   const [identity] = useState(getIdentity);
-  const sessions = listSessions();
+  // « Mes voyages » : le serveur confirme quels voyages mémorisés existent encore.
+  const [myTrips, setMyTrips] = useState<MyTrip[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const sessions = listSessions();
+    if (sessions.length === 0) {
+      setMyTrips([]);
+      return;
+    }
+    api.myTrips(sessions).then(
+      (trips) => {
+        if (!alive) return;
+        setMyTrips(trips);
+        // Les voyages supprimés sont oubliés par ce navigateur.
+        const existing = new Set(trips.map((t) => t.code));
+        for (const s of sessions) if (!existing.has(s.code)) clearSession(s.code);
+      },
+      () => alive && setMyTrips([]),
+    );
+    return () => {
+      alive = false;
+    };
+  }, [api]);
   const [form, setForm] = useState({
     name: '',
     destination: '',
@@ -56,16 +79,16 @@ export function HomePage() {
   return (
     <>
       <BrandHeader />
-      {sessions.length > 0 && (
+      {myTrips && myTrips.length > 0 && (
         <section className="section" aria-labelledby="my-trips">
           <h2 id="my-trips" className="title-large">
             Mes voyages
           </h2>
           <ul className="trip-list">
-            {sessions.map((s) => (
-              <li key={s.code}>
-                <Link to={`/t/${s.code}`}>
-                  {s.tripName}
+            {myTrips.map((t) => (
+              <li key={t.code}>
+                <Link to={`/t/${t.code}`}>
+                  {t.name}
                   <span aria-hidden="true">→</span>
                 </Link>
               </li>

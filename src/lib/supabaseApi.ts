@@ -1,5 +1,5 @@
 import { createClient, type PostgrestError } from '@supabase/supabase-js';
-import { ApiError, type AdminTrip, type Api, type JoinResult, type TripPreview, type TripState } from './types';
+import { ApiError, type AdminTrip, type Api, type JoinResult, type MyTrip, type TripPreview, type TripState } from './types';
 
 function toApiError(error: PostgrestError): ApiError {
   switch (error.code) {
@@ -38,6 +38,8 @@ export function createSupabaseApi(url: string, anonKey: string): Api {
         p_organizer_email: t.organizerEmail,
       }),
     getTripPreview: (code) => rpc<TripPreview | null>('get_trip_preview', { p_code: code }),
+    myTrips: (sessions) =>
+      rpc<MyTrip[]>('my_trips', { p_sessions: sessions.map(({ code, secret }) => ({ code, secret })) }),
     joinTrip: (code, email, name) =>
       rpc<JoinResult>('join_trip', { p_code: code, p_email: email, p_name: name ?? null }),
     getTripState: (code, secret) => rpc<TripState>('get_trip_state', { p_code: code, p_secret: secret }),

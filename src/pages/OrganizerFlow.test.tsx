@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import { saveIdentity } from '../lib/identity';
-import { renderApp } from '../test/renderApp';
+import { listSessions, saveSession } from '../lib/session';
+import { createTestApi, renderApp, seedTrip } from '../test/renderApp';
 
 describe('Parcours organisateur et conducteur', () => {
   it("s'identifie une fois, crée un voyage, affiche le lien puis ajoute sa voiture", async () => {
@@ -72,5 +73,20 @@ describe('Parcours organisateur et conducteur', () => {
     // Sans destination : ni adresse ni bouton Go. L'organisateur est la personne identifiée.
     expect(screen.queryByRole('link', { name: 'Go' })).not.toBeInTheDocument();
     expect(screen.getByText(/Connecté·e en tant que/)).toHaveTextContent('Loïc');
+  });
+
+  it('« Mes voyages » ne montre que les voyages qui existent encore sur le serveur', async () => {
+    const api = createTestApi();
+    const { code, organizer } = await seedTrip(api);
+    saveIdentity({ email: 'loic@example.com', name: 'Loïc' });
+    saveSession({ code, secret: organizer, name: 'Loïc', tripName: 'Ancien nom' });
+    saveSession({ code: 'supprime', secret: 'x', name: 'Loïc', tripName: 'Voyage supprimé' });
+
+    renderApp('/', api);
+
+    expect(await screen.findByRole('link', { name: /WE dans le Beaujolais/ })).toBeInTheDocument();
+    expect(screen.queryByText('Voyage supprimé')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ancien nom')).not.toBeInTheDocument();
+    expect(listSessions().map((s) => s.code)).toEqual([code]);
   });
 });

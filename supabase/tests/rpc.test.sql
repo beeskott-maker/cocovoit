@@ -140,6 +140,15 @@ begin
   end;
   assert failed, 'nom du voyage obligatoire';
 
+  -- « Mes voyages » : seuls les voyages existants avec un secret valide.
+  st := my_trips(json_build_array(
+    json_build_object('code', r->>'code', 'secret', r->>'secret'),
+    json_build_object('code', r->>'code', 'secret', gen_random_uuid()),
+    json_build_object('code', 'nexistepas', 'secret', r->>'secret')));
+  assert json_array_length(st) = 1, 'un seul voyage valide';
+  assert (st->0->>'name') = 'Sans détails', 'nom du voyage à jour';
+  assert json_array_length(my_trips('[]'::json)) = 0, 'liste vide';
+
   raise notice 'Tous les tests SQL passent';
 end;
 $$;

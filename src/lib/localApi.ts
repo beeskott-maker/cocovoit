@@ -143,6 +143,17 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       return { code: c, name, destination, startsOn, endsOn };
     },
 
+    async myTrips(sessions) {
+      await tick();
+      const db = load();
+      return db.trips
+        .filter((t) =>
+          sessions.some((s) => s.code === t.code && db.participants.some((p) => p.tripId === t.id && p.secret === s.secret)),
+        )
+        .sort((a, b) => a.startsOn.localeCompare(b.startsOn) || a.name.localeCompare(b.name))
+        .map(({ code, name, startsOn, endsOn }) => ({ code, name, startsOn, endsOn }));
+    },
+
     async joinTrip(code, email, name) {
       await tick();
       const db = load();
