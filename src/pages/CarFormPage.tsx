@@ -178,7 +178,7 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
           </p>
         )}
         <button type="submit" className="btn btn--primary" disabled={!valid || busy}>
-          {carId ? 'Enregistrer' : 'Proposer ma voiture'}
+          {carId ? 'Enregistrer' : 'Ajouter ma voiture'}
         </button>
         {carId && (
           <button type="button" className="btn btn--danger" onClick={remove} disabled={busy}>
