@@ -31,7 +31,7 @@ export function InvitePage() {
   if (!trip) return <p className="loading">Chargement…</p>;
 
   const url = inviteUrl(code);
-  const text = `Rejoins « ${trip.name} » sur Cocovoit pour t'organiser en covoiturage :`;
+  const text = `Rejoins « ${trip.name} » sur Coco·Voit pour t'organiser en covoiturage :`;
 
   async function copy() {
     try {

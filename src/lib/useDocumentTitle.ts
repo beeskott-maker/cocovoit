@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 
-export const APP_TITLE = 'CocoVoit';
+export const APP_TITLE = 'Coco·Voit';
 
 /**
- * Titre de l'onglet : « nom du voyage · CocoVoit » sur les pages d'un voyage,
- * « CocoVoit · Authentification » sur la connexion, sinon « CocoVoit ».
- * Sans titre (données pas encore chargées), on garde « CocoVoit ».
+ * Titre de l'onglet : « nom du voyage · Coco·Voit » sur les pages d'un voyage,
+ * « Coco·Voit · Authentification » sur la connexion, sinon « Coco·Voit ».
+ * Sans titre (données pas encore chargées), on garde « Coco·Voit ».
  */
 export function useDocumentTitle(title: string | null | undefined) {
   useEffect(() => {

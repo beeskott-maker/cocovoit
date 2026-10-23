@@ -8,7 +8,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     const { user } = renderApp(`/j/${code}`, api);
 
     expect(await screen.findByRole('heading', { name: /Rejoindre\s*WE dans le Beaujolais/ })).toBeInTheDocument();
-    expect(document.title).toBe('CocoVoit · Authentification');
+    expect(document.title).toBe('Coco·Voit · Authentification');
     const next = screen.getByRole('button', { name: 'Suivant' });
     expect(next).toBeDisabled();
 
@@ -25,7 +25,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
 
     // Écran du voyage
     expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
-    expect(document.title).toBe('WE dans le Beaujolais · CocoVoit');
+    expect(document.title).toBe('WE dans le Beaujolais · Coco·Voit');
     expect(screen.getByRole('heading', { name: 'Voiture de Hugo' })).toBeInTheDocument();
     expect(screen.getByText('sam 10 → lun 12 oct 2026')).toBeInTheDocument();
     // Un seul lien « Point de RDV » : celui de l'aller.
