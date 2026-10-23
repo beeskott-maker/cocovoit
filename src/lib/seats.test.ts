@@ -40,7 +40,7 @@ describe('seatCells', () => {
   });
   it('voiture pleine : pas de bouton', () => {
     const c = car(['a', 'b', 'c']);
-    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'occupied', 'occupied']);
+    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'occupied', 'occupied', 'full']);
     expect(freeSeats(c)).toBe(0);
   });
 
@@ -67,6 +67,16 @@ describe('conducteur', () => {
   it("pas de « Prendre 1 place » dans les autres voitures quand je conduis", () => {
     const c = car(['lea']);
     expect(seatCells(c, c.legs[0], 'moi', new Set(), true).map((x) => x.kind)).toEqual(['occupied', 'free']);
+  });
+});
+
+describe('voiture pleine', () => {
+  it('« Voiture pleine 😢 » à la place de « Prendre 1 place »', () => {
+    const c = car(['lea', 'max', 'zoe']);
+    expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'occupied', 'occupied', 'full']);
+    // Ni pour le conducteur, ni pour un passager de cette voiture.
+    expect(seatCells(c, c.legs[0], 'hugo').map((x) => x.kind)).toEqual(['occupied', 'occupied', 'occupied']);
+    expect(seatCells(c, c.legs[0], 'lea').at(-1)).toEqual({ kind: 'leave' });
   });
 });
 

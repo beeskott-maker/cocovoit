@@ -497,9 +497,10 @@ a {
   gap: 8px;
   overflow-x: auto;
 }
-/* Le bouton reste dans la colonne de droite : s'il tomberait dans la 1re
+/* Le bouton (ou « Voiture pleine ») reste dans la colonne de droite : s'il tomberait dans la 1re
    colonne (3 cases ou moins), il passe en haut de la 2e. */
-.seats > :nth-child(-n + 3) > .btn {
+.seats > :nth-child(-n + 3) > .btn,
+.seats > :nth-child(-n + 3) > .seat--full {
   grid-column: 2;
   grid-row: 1;
 }
@@ -532,6 +533,11 @@ a {
 }
 .seat--free {
   background: var(--primary-container-60);
+}
+.seat--full {
+  margin: 0;
+  justify-content: center;
+  color: var(--on-surface-variant);
 }
 .seat--me {
   border: 1px solid var(--me);

@@ -139,6 +139,8 @@ function Seat({ cell, busy, onTake, onLeave }: { cell: SeatCell; busy: boolean; 
           Prendre 1 place
         </button>
       );
+    case 'full':
+      return <p className="seat seat--full">Voiture pleine 😢</p>;
     case 'leave':
       return (
         <button type="button" className="btn btn--secondary" onClick={onLeave} disabled={busy}>

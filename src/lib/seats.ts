@@ -5,6 +5,7 @@ export type SeatCell =
   | { kind: 'me' }
   | { kind: 'free'; count: number }
   | { kind: 'take'; disabled: boolean }
+  | { kind: 'full' }
   | { kind: 'leave' };
 
 /**
@@ -13,7 +14,8 @@ export type SeatCell =
  * « Prendre 1 place » s'il reste de la place, ou « Libérer ma place » si j'y suis.
  * Le bouton « Prendre 1 place » est désactivé si j'ai déjà une place dans ce
  * sens (aller ou retour) dans une autre voiture, et absent si je conduis une
- * voiture de ce voyage : un conducteur n'est jamais passager.
+ * voiture de ce voyage : un conducteur n'est jamais passager. Si le trajet est
+ * complet, « Voiture pleine 😢 » prend la place du bouton.
  */
 export function seatCells(
   car: Car,
@@ -30,7 +32,7 @@ export function seatCells(
   const free = Math.max(0, car.seats - leg.passengers.length);
   if (free > 0) cells.push({ kind: 'free', count: free });
   if (iAmIn) cells.push({ kind: 'leave' });
-  else if (canTake && free > 0) cells.push({ kind: 'take', disabled: myDirections.has(leg.direction) });
+  else if (canTake) cells.push(free > 0 ? { kind: 'take', disabled: myDirections.has(leg.direction) } : { kind: 'full' });
   return cells;
 }
 
