@@ -35,19 +35,9 @@ export function toDateTimeLocal(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+/** Affiche le lieu dans Google Maps (sans itinéraire). */
 export function mapsUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-}
-
-/** Itinéraire en voiture depuis la position actuelle, guidage lancé directement sur mobile. */
-export function directionsUrl(address: string): string {
-  const params = new URLSearchParams({
-    api: '1',
-    destination: address,
-    travelmode: 'driving',
-    dir_action: 'navigate',
-  });
-  return `https://www.google.com/maps/dir/?${params}`;
 }
 
 export const isEmail = (s: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.trim());

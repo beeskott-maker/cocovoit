@@ -2,7 +2,7 @@ import calendar from '../assets/figma/calendar.svg';
 import globe from '../assets/figma/globe.svg';
 import pin from '../assets/figma/pin.svg';
 import share from '../assets/figma/share.svg';
-import { directionsUrl, formatTripDates } from '../lib/format';
+import { formatTripDates, mapsUrl } from '../lib/format';
 import type { TripPreview } from '../lib/types';
 
 interface Props {
@@ -34,7 +34,7 @@ export function TripHeader({ trip, onShare }: Props) {
             <p className="title-small">{trip.destination}</p>
           </div>
         </div>
-        <a className="chip-go" href={directionsUrl(trip.destination)} target="_blank" rel="noreferrer">
+        <a className="chip-go" href={mapsUrl(trip.destination)} target="_blank" rel="noreferrer">
           <img src={globe} alt="" width={20} height={20} />
           Go
         </a>
