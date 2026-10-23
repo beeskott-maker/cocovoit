@@ -50,7 +50,7 @@ DATABASE_URL=postgresql://postgres@localhost:5432/cocovoit_test scripts/test-db.
 
 ## CI / déploiement
 
-Le workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) s'exécute à chaque push et à chaque PR vers `main` :
+Le workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) s'exécute à chaque push sur `main` et à chaque PR vers `main` :
 
 1. **Front** : lint, typecheck, tests, build
 2. **Base de données** : migrations appliquées sur un Postgres 15 vierge, puis tests SQL ([`supabase/tests`](supabase/tests))
