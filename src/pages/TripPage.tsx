@@ -71,7 +71,7 @@ function Trip({ token }: { token: string }) {
     }
   }
 
-  // Déconnexion, puis connexion avec un autre compte sur ce voyage.
+  // Déconnexion, puis connexion (éventuellement avec un autre compte) sur ce voyage.
   async function switchPerson() {
     await logout();
     navigate(`/j/${code}`);
@@ -125,12 +125,10 @@ function Trip({ token }: { token: string }) {
           ))}
       </main>
       <footer className="trip-footer body-medium">
-        <span>
-          Connecté·e en tant que <strong>{state.me.name}</strong>
-        </span>
+        <span>Connecté·e en tant que {state.me.name}</span>
         <span>
           <button type="button" className="link-btn" onClick={switchPerson}>
-            Ce n'est pas moi
+            Déconnexion
           </button>
           {' · '}
           <Link to="/">Mes voyages</Link>

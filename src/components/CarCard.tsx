@@ -79,14 +79,18 @@ function LegSeats({
     <div className="leg">
       <div className="leg__header">
         <h3 className="leg__title">{title}</h3>
-        <p className="leg__meta">
-          {leg.direction === 'aller' && leg.meetingPoint && (
-            <a href={mapsUrl(leg.meetingPoint)} target="_blank" rel="noreferrer" title={leg.meetingPoint}>
-              Point de RDV
-            </a>
-          )}
-          <span>{formatDeparture(leg.departsAt)}</span>
-        </p>
+        <span className="leg__date">{formatDeparture(leg.departsAt)}</span>
+        {leg.direction === 'aller' && leg.meetingPoint && (
+          <a
+            className="leg__rdv"
+            href={mapsUrl(leg.meetingPoint)}
+            target="_blank"
+            rel="noreferrer"
+            title={leg.meetingPoint}
+          >
+            Point de RDV
+          </a>
+        )}
       </div>
       <div
         className="seats"

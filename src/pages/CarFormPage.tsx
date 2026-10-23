@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import armchair from '../assets/figma/armchair.svg';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
 import { RequireAccount } from '../components/RequireAccount';
@@ -116,7 +115,7 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
         <div className="stepper">
           <div>
             <p className="body-large" id="seats-label">
-              Places passagers
+              Places dispos
             </p>
             <p className="body-medium">Sans compter le conducteur</p>
           </div>
@@ -131,7 +130,6 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
               −
             </button>
             <span className="stepper__value" aria-live="polite">
-              <img src={armchair} alt="" width={24} height={24} />
               {form.seats}
             </span>
             <button

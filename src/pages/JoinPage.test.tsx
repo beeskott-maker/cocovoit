@@ -97,14 +97,14 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     expect((await api.myTrips(lea)).map((t) => t.code)).toEqual([code]);
   });
 
-  it("« Ce n'est pas moi » déconnecte le compte", async () => {
+  it("« Déconnexion » ferme la session du compte", async () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
     const lea = await loginAs(api, 'lea@example.com', 'Léa');
     await api.joinTrip(lea, code);
     signIn(lea);
     const { user } = renderApp(`/t/${code}`, api);
-    await user.click(await screen.findByRole('button', { name: "Ce n'est pas moi" }));
+    await user.click(await screen.findByRole('button', { name: 'Déconnexion' }));
 
     expect(await screen.findByLabelText('Mon email')).toBeInTheDocument();
     expect(localStorage.getItem('cocovoit:token')).toBeNull();

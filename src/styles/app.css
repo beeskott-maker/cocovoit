@@ -391,6 +391,10 @@ a {
   text-decoration: underline;
   cursor: pointer;
 }
+.trip-footer a,
+.trip-footer .link-btn {
+  text-decoration: none;
+}
 
 .trip-body {
   display: flex;
@@ -458,31 +462,30 @@ a {
 .leg__header {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 .leg__title {
-  flex: 1;
   margin: 0;
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
   letter-spacing: 0.5px;
 }
-.leg__meta {
-  display: flex;
-  align-items: center;
+.leg__date,
+.leg__rdv {
   color: var(--primary);
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.25px;
   white-space: nowrap;
 }
-.leg__meta a {
-  text-decoration: underline;
-}
-.leg__meta a + span::before {
+.leg__date::before {
   content: '•';
   margin: 0 8px;
+}
+.leg__rdv {
+  margin-left: auto;
+  padding-left: 8px;
+  text-decoration: underline;
 }
 
 .seats {
@@ -639,13 +642,14 @@ a {
 .stepper__controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 .stepper__btn {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   border-radius: 50%;
-  border: 1px solid var(--outline);
+  border: 2px solid var(--outline);
   background: #fff;
   color: var(--primary);
   font-size: 22px;
@@ -657,15 +661,13 @@ a {
   cursor: default;
 }
 .stepper__value {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 48px;
-  justify-content: center;
+  min-width: 24px;
+  text-align: center;
   font-family: var(--font-title);
   font-weight: 600;
-  font-size: 20px;
-  color: var(--success);
+  font-size: 36px;
+  line-height: 44px;
+  color: var(--primary);
 }
 
 .leg-fieldset {
