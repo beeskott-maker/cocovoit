@@ -271,21 +271,32 @@ a {
   gap: 8px;
   padding: 24px 24px 8px;
   border-radius: 0 0 24px 24px;
-  background: linear-gradient(-72deg, var(--primary) 3%, var(--on-primary-container) 100%);
+  background: linear-gradient(-71deg, var(--primary) 3%, var(--on-primary-container) 100%);
   color: #fff;
   filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.25));
 }
-.trip-header__top {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-}
 .trip-header__titles {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+.trip-header__name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.trip-header__name-row > h1 {
+  flex: 1;
+  min-width: 0;
+}
+.trip-header__bottom {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.trip-header__infos {
+  flex: 1;
+  min-width: 0;
 }
 .trip-header__row {
   display: flex;
@@ -303,13 +314,33 @@ a {
   flex: 1;
   min-width: 0;
 }
+/* Bouton texte blanc (« Partager ») */
+.header-text-btn {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--on-primary);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+}
+.header-text-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 .chip-go {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  /* Bouton M3 « square », petite taille */
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--tertiary-fixed-dim);
   color: var(--tertiary);
   font-size: 14px;
@@ -318,16 +349,10 @@ a {
   letter-spacing: 0.1px;
   text-decoration: none;
   flex-shrink: 0;
-  border: 0;
-  cursor: pointer;
 }
 .chip-go:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
-}
-.chip-go--tertiary {
-  background: var(--tertiary);
-  color: var(--on-primary);
 }
 
 .trip-footer {
