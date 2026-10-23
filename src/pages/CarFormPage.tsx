@@ -8,6 +8,7 @@ import { useApi } from '../lib/api';
 import { toDateTimeLocal } from '../lib/format';
 import { useAuth } from '../lib/auth';
 import type { Direction, LegInput, TripState } from '../lib/types';
+import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import { useTripState } from '../lib/useTripState';
 
 interface LegForm {
@@ -42,6 +43,7 @@ function CarFormLoader({ token }: { token: string }) {
   const { code = '', carId } = useParams();
   const { sessionExpired } = useAuth();
   const { state, error } = useTripState(token, code);
+  useDocumentTitle(tripTitle(state?.trip.name));
   if (error?.code === 'unauthenticated') {
     sessionExpired();
     return null;

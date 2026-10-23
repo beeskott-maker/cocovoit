@@ -11,6 +11,7 @@ import { useAuth } from '../lib/auth';
 import { bookedDirections } from '../lib/seats';
 import type { Leg } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
+import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import { useTripState } from '../lib/useTripState';
 
 export function TripPage() {
@@ -26,6 +27,7 @@ function Trip({ token }: { token: string }) {
   const [busyLegId, setBusyLegId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const hideToast = useCallback(() => setToast(null), []);
+  useDocumentTitle(tripTitle(state?.trip.name));
 
   if (error?.code === 'unauthenticated') {
     sessionExpired();

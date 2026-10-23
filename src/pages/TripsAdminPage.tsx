@@ -6,6 +6,7 @@ import { TextField } from '../components/TextField';
 import { Toast } from '../components/Toast';
 import { useApi } from '../lib/api';
 import { formatTripDates, isEmail } from '../lib/format';
+import { AUTH_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type AdminTrip } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -168,6 +169,7 @@ export function TripsAdminPage() {
 }
 
 function EmailLogin({ onSubmit }: { onSubmit: (email: string) => Promise<LoadResult> }) {
+  useDocumentTitle(AUTH_TITLE);
   const [value, setValue] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

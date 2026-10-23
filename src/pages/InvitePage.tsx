@@ -4,6 +4,7 @@ import { BrandHeader } from '../components/BrandHeader';
 import { Toast } from '../components/Toast';
 import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
+import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import type { TripPreview } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -15,6 +16,7 @@ export function InvitePage() {
   const [trip, setTrip] = useState<TripPreview | null | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
   const hideToast = useCallback(() => setToast(null), []);
+  useDocumentTitle(tripTitle(trip?.name));
   useEffect(() => {
     let alive = true;
     api.getTripPreview(code).then(

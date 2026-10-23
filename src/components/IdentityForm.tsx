@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from 'react';
 import mail from '../assets/figma/mail.svg';
 import person from '../assets/figma/person.svg';
 import { isEmail } from '../lib/format';
+import { AUTH_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { BrandHeader } from './BrandHeader';
 import { TextField } from './TextField';
 
@@ -17,6 +18,7 @@ interface Props {
 
 /** Identification en deux temps (maquette « Rejoindre ») : email, puis nom si besoin. */
 export function IdentityForm({ title, intro, disabled, onEmail, onName }: Props) {
+  useDocumentTitle(AUTH_TITLE);
   const [step, setStep] = useState<'email' | 'name'>('email');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
