@@ -485,6 +485,12 @@ a {
   gap: 8px;
   overflow-x: auto;
 }
+/* Le bouton reste dans la colonne de droite : s'il tomberait dans la 1re
+   colonne (3 cases ou moins), il passe en haut de la 2e. */
+.seats > :nth-child(-n + 3) > .btn {
+  grid-column: 2;
+  grid-row: 1;
+}
 .seat {
   display: flex;
   align-items: center;
