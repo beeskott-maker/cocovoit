@@ -6,6 +6,7 @@ import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type MyTrip } from '../lib/types';
 
 /**
@@ -23,6 +24,7 @@ function roles(trip: MyTrip): string {
 }
 
 function Home({ token }: { token: string }) {
+  useDocumentTitle(`${APP_TITLE} · Mes voyages`);
   const api = useApi();
   const navigate = useNavigate();
   const { sessionExpired } = useAuth();
@@ -48,6 +50,9 @@ function Home({ token }: { token: string }) {
     startsOn: '',
     endsOn: '',
   });
+  // Le formulaire s'ouvre sur « Nouveau voyage », ou d'emblée s'il n'y a aucun voyage.
+  const [creating, setCreating] = useState(false);
+  const showForm = creating || (myTrips !== null && myTrips.length === 0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) =>
@@ -92,48 +97,64 @@ function Home({ token }: { token: string }) {
               </li>
             ))}
           </ul>
+          {!showForm && (
+            <button type="button" className="btn btn--secondary" onClick={() => setCreating(true)}>
+              Nouveau voyage
+            </button>
+          )}
         </section>
       )}
-      <div className="page-title">
-        <h1 className="display-small">
-          Organiser
-          <br />
-          un voyage
-        </h1>
-        <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
-      </div>
-      <form className="form form--compact" onSubmit={submit} noValidate>
-        <TextField label="Nom du voyage" required placeholder="WE dans le Beaujolais" value={form.name} onChange={set('name')} maxLength={120} />
-        <TextField
-          label="Destination"
-          icon={pin}
-          placeholder="Adresse du lieu"
-          autoComplete="street-address"
-          value={form.destination}
-          onChange={set('destination')}
-          maxLength={300}
-        />
-        <div className="row">
-          <TextField label="Départ le" required type="date" value={form.startsOn} onChange={set('startsOn')} />
-          <TextField
-            label="Retour le"
-            required
-            type="date"
-            value={form.endsOn}
-            min={form.startsOn || undefined}
-            onChange={set('endsOn')}
-            error={datesError}
-          />
-        </div>
-        {error && (
-          <p className="field-hint field-hint--error" role="alert">
-            {error}
-          </p>
-        )}
-        <button type="submit" className="btn btn--primary" disabled={!valid || busy}>
-          Créer le voyage
-        </button>
-      </form>
+      {showForm && (
+        <>
+          <div className="page-title">
+            <h1 className="display-small">
+              Organiser
+              <br />
+              un voyage
+            </h1>
+            <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
+          </div>
+          <form className="form form--compact" onSubmit={submit} noValidate>
+            <TextField
+              label="Nom du voyage"
+              required
+              placeholder="WE dans le Beaujolais"
+              value={form.name}
+              onChange={set('name')}
+              maxLength={120}
+            />
+            <TextField
+              label="Destination"
+              icon={pin}
+              placeholder="Adresse du lieu"
+              autoComplete="street-address"
+              value={form.destination}
+              onChange={set('destination')}
+              maxLength={300}
+            />
+            <div className="row">
+              <TextField label="Départ le" required type="date" value={form.startsOn} onChange={set('startsOn')} />
+              <TextField
+                label="Retour le"
+                required
+                type="date"
+                value={form.endsOn}
+                min={form.startsOn || undefined}
+                onChange={set('endsOn')}
+                error={datesError}
+              />
+            </div>
+            {error && (
+              <p className="field-hint field-hint--error" role="alert">
+                {error}
+              </p>
+            )}
+            <button type="submit" className="btn btn--primary" disabled={!valid || busy}>
+              Créer le voyage
+            </button>
+          </form>
+        </>
+      )}
     </>
   );
 }
