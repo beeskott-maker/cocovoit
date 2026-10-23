@@ -71,7 +71,13 @@ function LegSeats({
   onLeave: () => void;
 }) {
   const title = leg.direction === 'aller' ? 'Aller' : 'Retour';
-  const rows = Math.ceil(cells.length / 2);
+  // Grille de 2 colonnes × 3 lignes (plus si plus de 6 places), remplie
+  // colonne par colonne. Le bouton prend la case qui suit la dernière place,
+  // ou passe en dessous, sur toute la largeur, si la grille est pleine.
+  const seatCount = cells.filter((c) => c.kind !== 'take' && c.kind !== 'leave').length;
+  const rows = Math.max(3, Math.ceil(seatCount / 2));
+  const actionBelow = cells.length > rows * 2;
+  const gridCells = actionBelow ? cells.slice(0, -1) : cells;
   return (
     <div className="leg">
       <div className="leg__header">
@@ -89,17 +95,15 @@ function LegSeats({
         className="seats"
         role="list"
         aria-label={`Places ${title.toLowerCase()}`}
-        // Remplissage par colonne : passagers à gauche, places libres à droite (maquette).
         style={{ gridTemplateRows: `repeat(${rows}, auto)` }}
       >
-        {cells.map((cell, i) => (
+        {gridCells.map((cell, i) => (
           <div role="listitem" key={i} style={{ display: 'contents' }}>
-            {/* Nombre impair de cases : le trou va en bas de la 1re colonne, le bouton reste en bas à droite. */}
-            {cells.length % 2 === 1 && i === rows - 1 && <div aria-hidden="true" />}
             <Seat cell={cell} busy={busy} onTake={onTake} onLeave={onLeave} />
           </div>
         ))}
       </div>
+      {actionBelow && <Seat cell={cells[cells.length - 1]} busy={busy} onTake={onTake} onLeave={onLeave} />}
     </div>
   );
 }
