@@ -121,7 +121,8 @@ function Trip({ token }: { token: string }) {
               </p>
             </div>
           ) : (
-            <Link className="btn btn--tertiary" to={carHref}>
+            // Aucune voiture encore : l'ajout est l'action principale de l'écran.
+            <Link className={state.cars.length === 0 ? 'btn btn--primary' : 'btn btn--tertiary'} to={carHref}>
               Ajouter ma voiture
             </Link>
           ))}

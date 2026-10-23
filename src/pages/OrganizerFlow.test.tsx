@@ -29,6 +29,8 @@ describe('Parcours organisateur et conducteur', () => {
 
     expect(await screen.findByText("Personne n'a encore proposé de voiture.")).toBeInTheDocument();
     expect(screen.getByText(/Connecté·e en tant que/)).toHaveTextContent('Loïc');
+    // Aucune voiture : bouton principal.
+    expect(screen.getByRole('link', { name: 'Ajouter ma voiture' })).toHaveClass('btn--primary');
     await user.click(screen.getByRole('link', { name: 'Ajouter ma voiture' }));
 
     expect(await screen.findByRole('heading', { name: 'Ajouter ma voiture' })).toBeInTheDocument();
