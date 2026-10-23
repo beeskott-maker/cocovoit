@@ -19,7 +19,7 @@ export function HomePage() {
 }
 
 function roles(trip: MyTrip): string {
-  const list = [trip.isOrganizer && 'organisateur', trip.isDriver && 'conducteur', trip.isPassenger && 'passager'];
+  const list = [trip.isDriver && 'conducteur', trip.isPassenger && 'passager'];
   const text = list.filter(Boolean).join(' · ');
   return text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
 }

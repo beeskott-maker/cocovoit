@@ -99,6 +99,8 @@ describe('Parcours organisateur et conducteur', () => {
 
     expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
     expect(document.title).toBe('Coco·Voit · Mes voyages');
+    // Le rôle d'organisateur n'est pas affiché.
+    expect(screen.getByRole('link', { name: /WE dans le Beaujolais/ })).not.toHaveTextContent(/organisateur/i);
     expect(screen.queryByRole('button', { name: 'Créer le voyage' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Nouveau voyage' }));
