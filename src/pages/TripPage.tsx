@@ -107,11 +107,22 @@ function Trip({ token }: { token: string }) {
             />
           ))
         )}
-        {!myCar && (
-          <Link className="btn btn--tertiary" to={carHref}>
-            Ajouter ma voiture
-          </Link>
-        )}
+        {!myCar &&
+          (myDirections.size > 0 ? (
+            // Un passager ne peut pas aussi conduire : il libère d'abord ses places.
+            <div className="add-car-locked">
+              <button type="button" className="btn btn--tertiary" disabled aria-describedby="add-car-hint">
+                Ajouter ma voiture
+              </button>
+              <p id="add-car-hint" className="body-medium">
+                Vous avez une place de passager : libérez-la pour ajouter votre voiture.
+              </p>
+            </div>
+          ) : (
+            <Link className="btn btn--tertiary" to={carHref}>
+              Ajouter ma voiture
+            </Link>
+          ))}
       </main>
       <footer className="trip-footer body-medium">
         <span>

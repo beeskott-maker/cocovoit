@@ -28,6 +28,7 @@ Les comptes sont en base (`accounts`). On se connecte avec son email, **sans vé
 
 - Une personne conduit au plus une voiture par voyage.
 - Une seule place par sens : déjà inscrit sur un aller (ou un retour), on ne peut pas prendre de place sur un autre aller (ou retour) du voyage ; le bouton « Prendre 1 place » est désactivé tant qu'on n'a pas libéré sa place.
+- Un passager (aller ou retour) ne peut pas ajouter de voiture : le bouton « Ajouter ma voiture » est désactivé tant qu'il n'a pas libéré ses places.
 - Un conducteur n'est jamais passager dans son voyage (ni à l'aller ni au retour) : les boutons « Prendre 1 place » disparaissent, et proposer sa voiture libère les places qu'on avait prises.
 - Si le conducteur réduit le nombre de places ou supprime un trajet, les dernières réservations sont annulées.
 

@@ -107,9 +107,16 @@ begin
   end;
   assert failed, 'conducteur passager';
 
-  -- Max a une place au retour, puis propose sa voiture (aller seulement) :
-  -- un conducteur n'est jamais passager, sa place au retour est libérée.
+  -- Max a une place au retour : il ne peut pas ajouter sa voiture sans la libérer.
   perform take_seat(max_, code, retour);
+  failed := false;
+  begin
+    perform save_car(max_, code, null, 3, json_build_array(
+      json_build_object('direction', 'aller', 'departsAt', '2026-10-10T08:00:00+02:00')));
+  exception when sqlstate '22023' then failed := true;
+  end;
+  assert failed, 'passager sans voiture';
+  perform leave_seat(max_, code, retour);
 
   -- Seul le conducteur modifie sa voiture.
   failed := false;
@@ -124,7 +131,6 @@ begin
   perform save_car(max_, code, null, 3, json_build_array(
     json_build_object('direction', 'aller', 'departsAt', '2026-10-10T08:00:00+02:00')));
   st := get_trip_state(lea, code);
-  assert json_array_length(st->'cars'->0->'legs'->1->'passengers') = 0, 'place de Max au retour libérée';
   -- Ni au retour chez Hugo : il conduit.
   failed := false;
   begin

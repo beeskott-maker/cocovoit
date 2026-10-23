@@ -54,6 +54,9 @@ function CarFormLoader({ token }: { token: string }) {
   // Garde-fou : une seule voiture par personne.
   const mine = state.cars.find((c) => c.driver.id === state.me.id);
   if (!carId && mine) return <Navigate to={`/t/${code}/voiture/${mine.id}`} replace />;
+  // Un passager ne peut pas ajouter de voiture tant qu'il a une place.
+  const isPassenger = state.cars.some((c) => c.legs.some((l) => l.passengers.some((p) => p.id === state.me.id)));
+  if (!carId && isPassenger) return <Navigate to={`/t/${code}`} replace />;
   return <CarForm code={code} token={token} state={state} carId={carId} />;
 }
 

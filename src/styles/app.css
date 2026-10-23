@@ -248,6 +248,17 @@ a {
   background: var(--tertiary-container);
   color: #000;
 }
+.btn--tertiary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.add-car-locked {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+  color: var(--on-surface-variant);
+}
 .btn--outline {
   background: #fff;
   color: var(--primary);

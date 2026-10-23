@@ -258,6 +258,9 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
         car.seats = input.seats;
       } else {
         if (db.cars.some((c) => c.driverId === me.id)) throw new ApiError('Vous avez déjà une voiture', 'invalid');
+        if (db.bookings.some((b) => b.participantId === me.id)) {
+          throw new ApiError('Vous avez une place de passager : libérez-la pour ajouter votre voiture', 'invalid');
+        }
         car = { id: newId(), tripId: me.tripId, driverId: me.id, seats: input.seats, createdAt: now() };
         db.cars.push(car);
       }

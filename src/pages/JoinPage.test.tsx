@@ -43,7 +43,12 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     expect(screen.getByRole('button', { name: 'Libérer ma place' })).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent("Place réservée pour l'aller");
 
+    // Passager : pas de voiture possible tant qu'on a une place.
+    expect(screen.getByRole('button', { name: 'Ajouter ma voiture' })).toBeDisabled();
+    expect(screen.queryByRole('link', { name: 'Ajouter ma voiture' })).not.toBeInTheDocument();
+
     await user.click(screen.getByRole('button', { name: 'Libérer ma place' }));
+    expect(await screen.findByRole('link', { name: 'Ajouter ma voiture' })).toBeInTheDocument();
     expect(await screen.findAllByRole('button', { name: 'Prendre 1 place' })).toHaveLength(2);
   });
 
