@@ -1,26 +1,27 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import mail from '../assets/figma/mail.svg';
-import person from '../assets/figma/person.svg';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
-import { isEmail } from '../lib/format';
+import { getIdentity } from '../lib/identity';
 import { listSessions, saveSession } from '../lib/session';
 
-/** Accueil : créer un voyage (organisateur) et retrouver ses voyages. */
+/**
+ * Accueil : créer un voyage (organisateur) et retrouver ses voyages.
+ * L'organisateur est la personne identifiée dans ce navigateur ; sinon on
+ * passe d'abord par l'identification.
+ */
 export function HomePage() {
   const api = useApi();
   const navigate = useNavigate();
+  const [identity] = useState(getIdentity);
   const sessions = listSessions();
   const [form, setForm] = useState({
     name: '',
     destination: '',
     startsOn: '',
     endsOn: '',
-    organizerName: '',
-    organizerEmail: '',
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +29,10 @@ export function HomePage() {
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const datesError = form.startsOn && form.endsOn && form.endsOn < form.startsOn ? 'Le retour est avant le départ' : null;
-  const emailError = form.organizerEmail.trim() && !isEmail(form.organizerEmail) ? 'Adresse email invalide' : null;
-  // Obligatoires : nom du voyage et dates. Le reste est facultatif.
-  const valid = form.name.trim() && form.startsOn && form.endsOn && !datesError && !emailError;
+  // Obligatoires : nom du voyage et dates. La destination est facultative.
+  const valid = form.name.trim() && form.startsOn && form.endsOn && !datesError;
+
+  if (!identity) return <Navigate to="/identification?suite=/" replace />;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -38,8 +40,12 @@ export function HomePage() {
     setBusy(true);
     setError(null);
     try {
-      const { code, secret } = await api.createTrip(form);
-      saveSession({ code, secret, name: form.organizerName.trim() || 'Organisateur', tripName: form.name.trim() });
+      const { code, secret } = await api.createTrip({
+        ...form,
+        organizerName: identity!.name,
+        organizerEmail: identity!.email,
+      });
+      saveSession({ code, secret, name: identity!.name, tripName: form.name.trim() });
       navigate(`/t/${code}/inviter?nouveau=1`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -98,18 +104,6 @@ export function HomePage() {
             error={datesError}
           />
         </div>
-        <TextField label="Mon nom" icon={person} autoComplete="given-name" value={form.organizerName} onChange={set('organizerName')} maxLength={80} />
-        <TextField
-          label="Mon email"
-          icon={mail}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          value={form.organizerEmail}
-          onChange={set('organizerEmail')}
-          error={emailError}
-          hint="Pour retrouver le voyage depuis un autre appareil"
-        />
         {error && (
           <p className="field-hint field-hint--error" role="alert">
             {error}

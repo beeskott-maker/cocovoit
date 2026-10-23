@@ -1,4 +1,6 @@
 import { screen } from '@testing-library/react';
+import { getIdentity, saveIdentity } from '../lib/identity';
+import { listSessions } from '../lib/session';
 import { createTestApi, renderApp, seedTrip } from '../test/renderApp';
 
 describe("Parcours d'un invité (maquette Figma)", () => {
@@ -60,5 +62,42 @@ describe("Parcours d'un invité (maquette Figma)", () => {
   it('affiche une erreur pour un lien inconnu', async () => {
     renderApp('/j/inconnu');
     expect(await screen.findByRole('heading', { name: 'Lien introuvable' })).toBeInTheDocument();
+  });
+
+  it("mémorise l'identité saisie sur un lien d'invitation", async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    const { user } = renderApp(`/j/${code}`, api);
+    await user.type(await screen.findByLabelText('Mon email'), 'lea@example.com');
+    await user.click(screen.getByRole('button', { name: 'Suivant' }));
+    await user.type(await screen.findByLabelText('Mon nom'), 'Léa');
+    await user.click(screen.getByRole('button', { name: 'Suivant' }));
+    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(getIdentity()).toEqual({ email: 'lea@example.com', name: 'Léa' });
+  });
+
+  it('déjà identifié : ajouté automatiquement au voyage, sans formulaire', async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    saveIdentity({ email: 'lea@example.com', name: 'Léa' });
+    renderApp(`/j/${code}`, api);
+
+    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Mon email')).not.toBeInTheDocument();
+    expect(screen.getByText(/Connecté·e en tant que/)).toHaveTextContent('Léa');
+    // Bien inscrit côté serveur : l'email est reconnu.
+    expect(await api.joinTrip(code, 'lea@example.com')).toMatchObject({ status: 'ok', name: 'Léa' });
+  });
+
+  it("« Ce n'est pas moi » oublie l'identité et tous les voyages", async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    saveIdentity({ email: 'lea@example.com', name: 'Léa' });
+    const { user } = renderApp(`/j/${code}`, api);
+    await user.click(await screen.findByRole('button', { name: "Ce n'est pas moi" }));
+
+    expect(await screen.findByLabelText('Mon email')).toBeInTheDocument();
+    expect(getIdentity()).toBeNull();
+    expect(listSessions()).toEqual([]);
   });
 });

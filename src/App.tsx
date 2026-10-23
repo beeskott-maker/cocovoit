@@ -3,6 +3,7 @@ import { ApiContext } from './lib/api';
 import type { Api } from './lib/types';
 import { CarFormPage } from './pages/CarFormPage';
 import { HomePage } from './pages/HomePage';
+import { IdentifyPage } from './pages/IdentifyPage';
 import { InvitePage } from './pages/InvitePage';
 import { JoinPage } from './pages/JoinPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -14,6 +15,7 @@ export function AppRoutes() {
     <div className="app">
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/identification" element={<IdentifyPage />} />
         <Route path="/j/:code" element={<JoinPage />} />
         <Route path="/t/:code" element={<TripPage />} />
         <Route path="/t/:code/inviter" element={<InvitePage />} />

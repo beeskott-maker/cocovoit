@@ -10,14 +10,19 @@ Organiser le covoiturage d'un voyage entre proches. L'organisateur crée le voya
 
 | Route | Écran |
 | --- | --- |
-| `#/j/:code` | **Rejoindre** (maquette Figma) : email, puis nom pour un nouvel invité. Un email déjà connu entre directement. |
+| `#/j/:code` | **Rejoindre** (maquette Figma) : email, puis nom pour un nouvel invité. Un email déjà connu entre directement. Si la personne est déjà identifiée dans ce navigateur, elle est ajoutée automatiquement au voyage, sans formulaire. |
 | `#/t/:code` | **Votre voyage** (maquette Figma) : voitures, places aller / retour, « Prendre 1 place » / « Libérer ma place », lien vers le point de RDV, bouton « Go » (itinéraire). Le logo ouvre le menu. |
-| `#/` | Accueil : créer un voyage, retrouver ses voyages. |
+| `#/` | Accueil : créer un voyage (nom, destination, dates ; l'organisateur est la personne identifiée), retrouver ses voyages. |
+| `#/identification` | Identification (email puis nom) avant de créer un voyage, si la personne n'est pas encore connue dans ce navigateur. |
 | `#/t/:code/inviter` | Lien d'invitation à copier ou partager. |
 | `#/t/:code/voiture[/:id]` | Ajouter / modifier / supprimer sa voiture : nombre de places, trajets aller et retour (date, heure, point de RDV). |
 | `#/x/<clé>` | Gestion des voyages : liste de tous les voyages, ouverture, suppression (avec confirmation). Accès en deux temps : la clé de l'URL, puis l'adresse email autorisée, vérifiée par la base à chaque appel (sans envoi d'email). Ni la clé ni l'adresse ne sont dans le dépôt : seules leurs empreintes SHA-256 sont en base (`admin_keys`, `admin_emails`). En mode démo : clé `demo`, adresse `demo@example.com`. |
 
 Seuls les deux premiers écrans sont maquettés dans Figma. Les autres réutilisent les mêmes composants et tokens.
+
+## Identité
+
+Le nom et l'email saisis une fois (en rejoignant un voyage ou avant d'en créer un) sont mémorisés dans le navigateur (`localStorage`) et réutilisés pour tous les voyages. « Ce n'est pas moi » (bas de l'écran du voyage) oublie cette identité et l'accès à tous les voyages de ce navigateur. Aucune vérification de l'email : la fluidité est privilégiée.
 
 ## Règles métier
 

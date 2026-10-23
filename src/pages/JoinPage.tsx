@@ -1,28 +1,26 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import mail from '../assets/figma/mail.svg';
-import person from '../assets/figma/person.svg';
-import { BrandHeader } from '../components/BrandHeader';
-import { TextField } from '../components/TextField';
+import { IdentityForm } from '../components/IdentityForm';
 import { useApi } from '../lib/api';
-import { isEmail } from '../lib/format';
+import { getIdentity, saveIdentity } from '../lib/identity';
 import { getSession, saveSession } from '../lib/session';
-import type { TripPreview } from '../lib/types';
+import { ApiError, type TripPreview } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
 
-
-
-/** Parcours de l'invité : email, puis nom si on ne le connaît pas encore. */
+/**
+ * Lien d'invitation d'un voyage.
+ * - Personne déjà identifiée dans ce navigateur : ajoutée automatiquement au voyage.
+ * - Sinon : email, puis nom si on ne la connaît pas encore ; l'identité est mémorisée.
+ */
 export function JoinPage() {
   const { code = '' } = useParams();
   const api = useApi();
   const navigate = useNavigate();
   const [trip, setTrip] = useState<TripPreview | null | undefined>(undefined);
-  const [step, setStep] = useState<'email' | 'name'>('email');
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [autoJoinError, setAutoJoinError] = useState<string | null>(null);
+  const [identity] = useState(getIdentity);
+  const hasSession = getSession(code) !== null;
+  const autoJoinStarted = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -35,79 +33,58 @@ export function JoinPage() {
     };
   }, [api, code]);
 
-  if (getSession(code)) return <Navigate to={`/t/${code}`} replace />;
-  if (trip === null) return <NotFoundPage />;
-
-  const canSubmit = step === 'email' ? isEmail(email) : name.trim().length > 0;
-
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    if (!canSubmit || !trip) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await api.joinTrip(code, email, step === 'name' ? name : undefined);
-      if (res.status === 'needs_name') {
-        setStep('name');
-      } else {
+  // Ajout automatique avec l'identité mémorisée.
+  useEffect(() => {
+    if (hasSession || !identity || !trip || autoJoinStarted.current) return;
+    autoJoinStarted.current = true;
+    api.joinTrip(code, identity.email, identity.name).then(
+      (res) => {
+        if (res.status !== 'ok') return;
         saveSession({ code, secret: res.secret, name: res.name, tripName: trip.name });
         navigate(`/t/${code}`, { replace: true });
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
-    } finally {
-      setBusy(false);
-    }
+      },
+      (err) => setAutoJoinError(err instanceof ApiError ? err.message : 'Connexion impossible, réessayez.'),
+    );
+  }, [api, code, identity, navigate, hasSession, trip]);
+
+  if (hasSession) return <Navigate to={`/t/${code}`} replace />;
+  if (trip === null) return <NotFoundPage />;
+  if (identity) {
+    return autoJoinError ? (
+      <p className="banner banner--error" role="alert">
+        {autoJoinError}
+      </p>
+    ) : (
+      <p className="loading">Ouverture du voyage…</p>
+    );
+  }
+
+  function enter(secret: string, email: string, name: string) {
+    saveSession({ code, secret, name, tripName: trip!.name });
+    saveIdentity({ email, name });
+    navigate(`/t/${code}`, { replace: true });
   }
 
   return (
-    <>
-      <BrandHeader />
-      <div className="page-title">
-        <h1 className="display-small">
+    <IdentityForm
+      title={
+        <>
           Rejoindre
           <br />
           {trip?.name ?? '…'}
-        </h1>
-      </div>
-      <form className="form" onSubmit={submit} noValidate>
-        <TextField
-          label="Mon email"
-          icon={mail}
-          type="email"
-          autoComplete="email"
-          inputMode="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={step === 'name' || !trip}
-          autoFocus
-        />
-        {step === 'name' && (
-          <TextField
-            label="Mon nom"
-            icon={person}
-            autoComplete="given-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            hint="Le prénom que les autres verront dans les voitures"
-            maxLength={80}
-            autoFocus
-          />
-        )}
-        {error && (
-          <p className="field-hint field-hint--error" role="alert">
-            {error}
-          </p>
-        )}
-        <button type="submit" className="btn btn--primary" disabled={!canSubmit || busy}>
-          Suivant
-        </button>
-        {step === 'name' && (
-          <button type="button" className="btn btn--text" onClick={() => setStep('email')}>
-            Ce n'est pas mon email
-          </button>
-        )}
-      </form>
-    </>
+        </>
+      }
+      disabled={!trip}
+      onEmail={async (email) => {
+        const res = await api.joinTrip(code, email);
+        if (res.status === 'needs_name') return 'needs_name';
+        enter(res.secret, email, res.name);
+        return 'done';
+      }}
+      onName={async (email, name) => {
+        const res = await api.joinTrip(code, email, name);
+        if (res.status === 'ok') enter(res.secret, email, res.name);
+      }}
+    />
   );
 }

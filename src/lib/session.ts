@@ -33,3 +33,7 @@ export function clearSession(code: string) {
   delete all[code];
   localStorage.setItem(KEY, JSON.stringify(all));
 }
+
+export function clearAllSessions() {
+  localStorage.removeItem(KEY);
+}

@@ -6,6 +6,7 @@ import { Toast } from '../components/Toast';
 import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
+import { forgetIdentity } from '../lib/identity';
 import { clearSession, getSession } from '../lib/session';
 import type { Leg } from '../lib/types';
 import { useTripState } from '../lib/useTripState';
@@ -60,8 +61,9 @@ export function TripPage() {
     }
   }
 
+  // Oublie l'identité et tous les voyages de ce navigateur, puis on se réidentifie.
   function switchPerson() {
-    clearSession(code);
+    forgetIdentity();
     navigate(`/j/${code}`);
   }
 
