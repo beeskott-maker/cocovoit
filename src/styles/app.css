@@ -808,23 +808,28 @@ a {
 .section + .new-trip {
   margin-top: 40px;
 }
-.new-trip--reveal {
-  animation: reveal 400ms cubic-bezier(0.2, 0, 0, 1);
+/* Dépliement : la hauteur passe de 0 à la taille du contenu (grille 0fr → 1fr). */
+.new-trip {
+  display: grid;
+  grid-template-rows: 1fr;
 }
-@keyframes reveal {
+.new-trip__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+.new-trip--unfold {
+  animation: unfold 450ms cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes unfold {
   from {
-    opacity: 0;
-    transform: translateY(-16px);
-    clip-path: inset(0 0 100% 0);
+    grid-template-rows: 0fr;
   }
   to {
-    opacity: 1;
-    transform: none;
-    clip-path: inset(0 0 -100% 0);
+    grid-template-rows: 1fr;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .new-trip--reveal {
+  .new-trip--unfold {
     animation: none;
   }
 }
