@@ -105,7 +105,8 @@ a {
 
 /* --- En-tête simple (logo) --- */
 .brand-header {
-  background: var(--primary);
+  /* Dégradé de la maquette Figma (composant Header) */
+  background: linear-gradient(98deg, var(--primary) 0%, var(--on-primary-container) 100%);
   border-radius: 0 0 24px 24px;
   display: flex;
   align-items: center;
