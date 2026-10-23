@@ -71,13 +71,6 @@ function LegSeats({
   onLeave: () => void;
 }) {
   const title = leg.direction === 'aller' ? 'Aller' : 'Retour';
-  // Grille de 2 colonnes × 3 lignes (plus si plus de 6 places), remplie
-  // colonne par colonne. Le bouton prend la case qui suit la dernière place,
-  // ou passe en dessous, sur toute la largeur, si la grille est pleine.
-  const seatCount = cells.filter((c) => c.kind !== 'take' && c.kind !== 'leave').length;
-  const rows = Math.max(3, Math.ceil(seatCount / 2));
-  const actionBelow = cells.length > rows * 2;
-  const gridCells = actionBelow ? cells.slice(0, -1) : cells;
   return (
     <div className="leg">
       <div className="leg__header">
@@ -95,15 +88,13 @@ function LegSeats({
         className="seats"
         role="list"
         aria-label={`Places ${title.toLowerCase()}`}
-        style={{ gridTemplateRows: `repeat(${rows}, auto)` }}
       >
-        {gridCells.map((cell, i) => (
+        {cells.map((cell, i) => (
           <div role="listitem" key={i} style={{ display: 'contents' }}>
             <Seat cell={cell} busy={busy} onTake={onTake} onLeave={onLeave} />
           </div>
         ))}
       </div>
-      {actionBelow && <Seat cell={cells[cells.length - 1]} busy={busy} onTake={onTake} onLeave={onLeave} />}
     </div>
   );
 }
