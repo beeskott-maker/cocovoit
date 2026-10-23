@@ -22,6 +22,7 @@ describe('Page de gestion des voyages (#/x/<clé>)', () => {
     await user.click(screen.getByRole('button', { name: 'Accéder' }));
 
     expect(await screen.findByText('2 voyages')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Créer un voyage' })).toHaveAttribute('href', '/');
     const we = screen.getByRole('article', { name: 'WE dans le Beaujolais' });
     expect(within(we).getByText(/2 participants · 1 voiture/)).toBeInTheDocument();
     expect(within(we).getByRole('link', { name: 'Ouvrir' })).toHaveAttribute('href', `/j/${code}`);

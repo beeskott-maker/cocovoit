@@ -123,6 +123,9 @@ export function TripsAdminPage() {
         </p>
       </div>
       <main className="admin-list">
+        <Link className="btn btn--primary" to="/">
+          Créer un voyage
+        </Link>
         {error && (
           <p className="banner banner--error" role="alert">
             {error}
