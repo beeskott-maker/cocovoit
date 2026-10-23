@@ -71,7 +71,7 @@ export type JoinResult = { status: 'needs_name' } | { status: 'ok'; secret: stri
 export class ApiError extends Error {
   constructor(
     message: string,
-    readonly code: 'forbidden' | 'not_found' | 'invalid' | 'unknown',
+    readonly code: 'forbidden' | 'unauthorized_email' | 'not_found' | 'invalid' | 'unknown',
   ) {
     super(message);
     this.name = 'ApiError';
@@ -88,7 +88,7 @@ export interface Api {
   deleteCar(code: string, secret: string, carId: string): Promise<void>;
   takeSeat(code: string, secret: string, legId: string): Promise<void>;
   leaveSeat(code: string, secret: string, legId: string): Promise<void>;
-  /** Gestion des voyages, protégée par une clé (page #/x/<clé>). */
-  adminListTrips(key: string): Promise<AdminTrip[]>;
-  adminDeleteTrip(key: string, code: string): Promise<void>;
+  /** Gestion des voyages (page #/x/<clé>) : clé de l'URL + adresse email autorisée. */
+  adminListTrips(key: string, email: string): Promise<AdminTrip[]>;
+  adminDeleteTrip(key: string, email: string, code: string): Promise<void>;
 }

@@ -15,7 +15,7 @@ Organiser le covoiturage d'un voyage entre proches. L'organisateur crée le voya
 | `#/` | Accueil : créer un voyage, retrouver ses voyages. |
 | `#/t/:code/inviter` | Lien d'invitation à copier ou partager. |
 | `#/t/:code/voiture[/:id]` | Ajouter / modifier / supprimer sa voiture : nombre de places, trajets aller et retour (date, heure, point de RDV). |
-| `#/x/<clé>` | Gestion des voyages : liste de tous les voyages, ouverture, suppression (avec confirmation). La clé n'est pas dans le dépôt : seule son empreinte SHA-256 est en base (`admin_keys`). En mode démo, la clé est `demo`. |
+| `#/x/<clé>` | Gestion des voyages : liste de tous les voyages, ouverture, suppression (avec confirmation). Accès en deux temps : la clé de l'URL, puis l'adresse email autorisée, vérifiée par la base à chaque appel (sans envoi d'email). Ni la clé ni l'adresse ne sont dans le dépôt : seules leurs empreintes SHA-256 sont en base (`admin_keys`, `admin_emails`). En mode démo : clé `demo`, adresse `demo@example.com`. |
 
 Seuls les deux premiers écrans sont maquettés dans Figma. Les autres réutilisent les mêmes composants et tokens.
 

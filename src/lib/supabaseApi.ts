@@ -5,6 +5,8 @@ function toApiError(error: PostgrestError): ApiError {
   switch (error.code) {
     case '28000':
       return new ApiError(error.message, 'forbidden');
+    case '42501':
+      return new ApiError(error.message, 'unauthorized_email');
     case 'P0002':
       return new ApiError(error.message, 'not_found');
     case '22023':
@@ -53,7 +55,8 @@ export function createSupabaseApi(url: string, anonKey: string): Api {
       rpc('take_seat', { p_code: code, p_secret: secret, p_leg_id: legId }),
     leaveSeat: (code, secret, legId) =>
       rpc('leave_seat', { p_code: code, p_secret: secret, p_leg_id: legId }),
-    adminListTrips: (key) => rpc<AdminTrip[]>('admin_list_trips', { p_key: key }),
-    adminDeleteTrip: (key, code) => rpc('admin_delete_trip', { p_key: key, p_code: code }),
+    adminListTrips: (key, email) => rpc<AdminTrip[]>('admin_list_trips', { p_key: key, p_email: email }),
+    adminDeleteTrip: (key, email, code) =>
+      rpc('admin_delete_trip', { p_key: key, p_email: email, p_code: code }),
   };
 }

@@ -65,8 +65,9 @@ export interface KeyValueStore {
 const KEY = 'cocovoit:demo-db';
 const emptyDb = (): Db => ({ trips: [], participants: [], cars: [], legs: [], bookings: [] });
 
-/** Clé de la page de gestion des voyages en mode démo : #/x/demo */
+/** Page de gestion des voyages en mode démo : #/x/demo, avec l'adresse ci-dessous. */
 export const DEMO_ADMIN_KEY = 'demo';
+export const DEMO_ADMIN_EMAIL = 'demo@example.com';
 
 export function createLocalApi(store: KeyValueStore, newId: () => string = () => crypto.randomUUID()): Api {
   // Horodatage strictement croissant, pour garder l'ordre des réservations.
@@ -93,8 +94,11 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       return leg?.direction !== direction;
     });
   }
-  function requireAdmin(key: string) {
+  function requireAdmin(key: string, email: string) {
     if (key !== DEMO_ADMIN_KEY) throw new ApiError('Accès refusé', 'forbidden');
+    if (email.trim().toLowerCase() !== DEMO_ADMIN_EMAIL) {
+      throw new ApiError('Adresse email non autorisée', 'unauthorized_email');
+    }
   }
   // Petite latence pour que l'appli se comporte comme avec un vrai serveur.
   const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -270,9 +274,9 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       save(db);
     },
 
-    async adminListTrips(key) {
+    async adminListTrips(key, email) {
       await tick();
-      requireAdmin(key);
+      requireAdmin(key, email);
       const db = load();
       return [...db.trips]
         .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
@@ -288,9 +292,9 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
         }));
     },
 
-    async adminDeleteTrip(key, code) {
+    async adminDeleteTrip(key, email, code) {
       await tick();
-      requireAdmin(key);
+      requireAdmin(key, email);
       const db = load();
       const trip = db.trips.find((t) => t.code === code);
       if (!trip) throw new ApiError('Voyage introuvable', 'not_found');
