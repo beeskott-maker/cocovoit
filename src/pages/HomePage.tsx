@@ -105,7 +105,8 @@ function Home({ token }: { token: string }) {
         </section>
       )}
       {showForm && (
-        <>
+        // Dévoilement animé seulement quand on ouvre via « Nouveau voyage ».
+        <div className={creating ? 'new-trip new-trip--reveal' : 'new-trip'}>
           <div className="page-title page-title--inset">
             <h1 className="display-small">Nouveau voyage</h1>
             <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
@@ -154,7 +155,7 @@ function Home({ token }: { token: string }) {
               </button>
             )}
           </form>
-        </>
+        </div>
       )}
     </>
   );
