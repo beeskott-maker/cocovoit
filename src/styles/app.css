@@ -336,8 +336,8 @@ a {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
-.trip-header__row + .trip-header__row {
-  margin-top: 4px;
+.chip-go--icon {
+  padding: 6px;
 }
 
 .trip-body {

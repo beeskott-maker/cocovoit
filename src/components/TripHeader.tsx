@@ -28,14 +28,13 @@ export function TripHeader({ trip, onMenu, onShare }: Props) {
         <div className="trip-header__row">
           <img src={calendar} alt="" width={13} height={13} />
           <p className="title-small">{formatTripDates(trip.startsOn, trip.endsOn)}</p>
-          <button type="button" className="chip-go" onClick={onShare}>
-            <img src={share} alt="" width={20} height={20} />
-            Partager
-          </button>
         </div>
         <div className="trip-header__row">
           <img src={pin} alt="" width={11} height={13} />
           <p className="title-small">{trip.destination}</p>
+          <button type="button" className="chip-go chip-go--icon" onClick={onShare} aria-label="Partager" title="Copier le lien du voyage">
+            <img src={share} alt="" width={20} height={20} />
+          </button>
           <a className="chip-go" href={directionsUrl(trip.destination)} target="_blank" rel="noreferrer">
             <img src={globe} alt="" width={20} height={20} />
             Go
