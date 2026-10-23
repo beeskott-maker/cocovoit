@@ -795,6 +795,9 @@ a {
 .section {
   margin-top: 16px;
 }
+.section + .page-title {
+  margin-top: 40px;
+}
 
 /* --- Liste des voyages (page de gestion) --- */
 .admin-list {
