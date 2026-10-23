@@ -14,6 +14,7 @@
   --on-surface-variant: #49454f;
   --outline: #79747e;
   --success: #587527;
+  --me: #579e36;
   --error: #b3261e;
 
   --font: 'Roboto', system-ui, sans-serif;
@@ -522,9 +523,8 @@ a {
   background: var(--primary-container-60);
 }
 .seat--me {
-  background: var(--primary-container-60);
-  border: 1px solid var(--primary-container);
-  font-weight: 600;
+  border: 1px solid var(--me);
+  color: var(--me);
 }
 
 /* --- Divers --- */
