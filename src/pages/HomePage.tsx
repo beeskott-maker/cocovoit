@@ -51,7 +51,7 @@ function Home({ token }: { token: string }) {
     startsOn: '',
     endsOn: '',
   });
-  // Le formulaire s'ouvre sur « Nouveau voyage », ou d'emblée s'il n'y a aucun voyage.
+  // Le formulaire s'ouvre sur « Créer un voyage », ou d'emblée s'il n'y a aucun voyage.
   const [creating, setCreating] = useState(false);
   const showForm = creating || (myTrips !== null && myTrips.length === 0);
   const [busy, setBusy] = useState(false);
@@ -101,13 +101,13 @@ function Home({ token }: { token: string }) {
           </ul>
           {!showForm && (
             <button type="button" className="btn btn--tonal" onClick={() => setCreating(true)}>
-              Nouveau voyage
+              Créer un voyage
             </button>
           )}
         </section>
       )}
       {showForm && (
-        // Dépliement animé seulement quand on ouvre via « Nouveau voyage ».
+        // Dépliement animé seulement quand on ouvre via « Créer un voyage ».
         <div className={creating ? 'new-trip new-trip--unfold' : 'new-trip'}>
           <div className="new-trip__inner">
             <div className="page-title">

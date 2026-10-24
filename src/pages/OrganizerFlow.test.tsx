@@ -91,7 +91,7 @@ describe('Parcours organisateur et conducteur', () => {
     expect(hugo).toBeTruthy();
   });
 
-  it('avec des voyages : le formulaire se déplie sur « Nouveau voyage » et se replie sur « Annuler »', async () => {
+  it('avec des voyages : le formulaire se déplie sur « Créer un voyage » et se replie sur « Annuler »', async () => {
     const api = createTestApi();
     const { organizer } = await seedTrip(api);
     signIn(organizer);
@@ -103,13 +103,13 @@ describe('Parcours organisateur et conducteur', () => {
     expect(screen.getByRole('link', { name: /WE dans le Beaujolais/ })).toHaveTextContent('Organisateur');
     expect(screen.queryByRole('button', { name: 'Créer' })).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Nouveau voyage' }));
+    await user.click(screen.getByRole('button', { name: 'Créer un voyage' }));
     expect(screen.getByRole('button', { name: 'Créer' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Nouveau voyage' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Créer un voyage' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Annuler' }));
     expect(screen.queryByRole('button', { name: 'Créer' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Nouveau voyage' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Créer un voyage' })).toBeInTheDocument();
   });
 
   it("l'organisateur peut supprimer le voyage après confirmation, pas les participants", async () => {
