@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { createTestApi, loginAs, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe('Parcours organisateur et conducteur', () => {
@@ -72,7 +72,7 @@ describe('Parcours organisateur et conducteur', () => {
     await user.click(screen.getByRole('link', { name: 'Voir le voyage' }));
     expect(await screen.findByRole('heading', { name: 'Pique-nique' })).toBeInTheDocument();
     // Sans destination : ni adresse ni bouton Itinéraire. L'organisateur est la personne identifiée.
-    expect(screen.queryByRole('link', { name: 'Itinéraire' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Itinéraire' })).not.toBeInTheDocument();
     expect(screen.getByText(/Connecté·e en tant que/)).toHaveTextContent('Loïc');
   });
 
@@ -225,5 +225,36 @@ describe('Parcours organisateur et conducteur', () => {
     renderApp(`/t/${code}`, api);
     const car = await screen.findByRole('region', { name: 'Voiture de Hugo' });
     expect(car.querySelector('.car__free')).toHaveTextContent(/^Complet$/);
+  });
+
+  it('« Itinéraire » propose les applis, et retient le choix si on coche « Toujours utiliser »', async () => {
+    const api = createTestApi();
+    const { code, organizer } = await seedTrip(api);
+    signIn(organizer);
+    const { user } = renderApp(`/t/${code}`, api);
+    await user.click(await screen.findByRole('button', { name: 'Itinéraire' }));
+    const sheet = screen.getByRole('dialog', { name: "Ouvrir l'itinéraire avec" });
+    const waze = within(sheet).getByRole('link', { name: 'Waze' });
+    expect(waze).toHaveAttribute('href', expect.stringMatching(/^https:\/\/waze\.com\/ul\?q=124%20Venelle/));
+    expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toBeInTheDocument();
+
+    await user.click(within(sheet).getByRole('button', { name: 'Annuler' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Itinéraire' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Toujours utiliser cette application' }));
+    await user.click(screen.getByRole('link', { name: 'Waze' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText(/Itinéraire avec Waze/)).toBeInTheDocument();
+
+    // Appli retenue : plus de choix, ouverture directe ; « Changer d'appli » l'oublie.
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    await user.click(screen.getByRole('button', { name: 'Itinéraire' }));
+    expect(open).toHaveBeenCalledWith(expect.stringContaining('waze.com'), '_blank', 'noreferrer');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: "Changer d'appli" }));
+    await user.click(screen.getByRole('button', { name: 'Itinéraire' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    open.mockRestore();
   });
 });

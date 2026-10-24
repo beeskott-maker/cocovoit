@@ -2,15 +2,17 @@ import calendar from '../assets/figma/calendar.svg';
 import globe from '../assets/figma/globe-white.svg';
 import pin from '../assets/figma/pin.svg';
 import share from '../assets/figma/share-primary.svg';
-import { formatTripDates, mapsUrl } from '../lib/format';
+import { formatTripDates } from '../lib/format';
 import type { TripPreview } from '../lib/types';
 
 interface Props {
   trip: TripPreview;
   onShare: () => void;
+  /** Itinéraire vers la destination (choix de l'appli). */
+  onRoute: () => void;
 }
 
-export function TripHeader({ trip, onShare }: Props) {
+export function TripHeader({ trip, onShare, onRoute }: Props) {
   return (
     <header className="trip-header">
       <div className="trip-header__titles">
@@ -25,16 +27,18 @@ export function TripHeader({ trip, onShare }: Props) {
         {trip.destination && (
           <div className="trip-header__row">
             <img src={pin} alt="" width={11} height={13} />
-            <p className="title-small">{trip.destination}</p>
+            <button type="button" className="trip-header__address title-small" onClick={onRoute}>
+              {trip.destination}
+            </button>
           </div>
         )}
       </div>
       <div className="trip-header__actions">
         {trip.destination && (
-          <a className="header-btn header-btn--outline" href={mapsUrl(trip.destination)} target="_blank" rel="noreferrer">
+          <button type="button" className="header-btn header-btn--outline" onClick={onRoute}>
             <img src={globe} alt="" width={20} height={20} />
             Itinéraire
-          </a>
+          </button>
         )}
         <button type="button" className="header-btn header-btn--filled" onClick={onShare} title="Copier le lien du voyage">
           <img src={share} alt="" width={20} height={20} />

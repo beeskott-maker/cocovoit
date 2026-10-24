@@ -2,11 +2,13 @@ import { useCallback, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import { CarCard } from '../components/CarCard';
+import { MapsSheet } from '../components/MapsSheet';
 import { RequireAccount } from '../components/RequireAccount';
 import { Toast } from '../components/Toast';
 import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
+import { routeUrl, useMapsPreference, type MapsAppId } from '../lib/maps';
 import { useAuth } from '../lib/auth';
 import { bookedDirections } from '../lib/seats';
 import type { Leg } from '../lib/types';
@@ -27,6 +29,9 @@ function Trip({ token }: { token: string }) {
   const [busyLegId, setBusyLegId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const hideToast = useCallback(() => setToast(null), []);
+  const maps = useMapsPreference();
+  const [mapsOpen, setMapsOpen] = useState(false);
+  const closeMaps = useCallback(() => setMapsOpen(false), []);
   useDocumentTitle(tripTitle(state?.trip.name));
 
   if (error?.code === 'unauthenticated') {
@@ -84,6 +89,23 @@ function Trip({ token }: { token: string }) {
     }
   }
 
+  // Itinéraire : l'appli mémorisée directement, sinon le choix de l'appli.
+  function openRoute() {
+    const destination = state?.trip.destination;
+    if (!destination) return;
+    if (!maps.preference) {
+      setMapsOpen(true);
+      return;
+    }
+    const url = routeUrl(maps.preference, destination);
+    if (maps.preference === 'other') window.location.href = url;
+    else window.open(url, '_blank', 'noreferrer');
+  }
+  function chooseMaps(app: MapsAppId, remember: boolean) {
+    if (remember) maps.save(app);
+    setMapsOpen(false);
+  }
+
   // Déconnexion, puis connexion (éventuellement avec un autre compte) sur ce voyage.
   async function switchPerson() {
     await logout();
@@ -92,7 +114,7 @@ function Trip({ token }: { token: string }) {
 
   return (
     <>
-      <TripHeader trip={state.trip} onShare={shareLink} />
+      <TripHeader trip={state.trip} onShare={shareLink} onRoute={openRoute} />
       {api.mode === 'demo' && (
         <p className="banner">
           Mode démo : les données restent dans ce navigateur. Configurez Supabase pour partager le voyage.
@@ -152,7 +174,19 @@ function Trip({ token }: { token: string }) {
           {' · '}
           <Link to="/">Mes voyages</Link>
         </span>
+        {maps.app && (
+          <span>
+            Itinéraire avec {maps.app.name}
+            {' · '}
+            <button type="button" className="link-btn" onClick={() => maps.save(null)}>
+              Changer d'appli
+            </button>
+          </span>
+        )}
       </footer>
+      {mapsOpen && state.trip.destination && (
+        <MapsSheet address={state.trip.destination} onChoose={chooseMaps} onClose={closeMaps} />
+      )}
       {toast && <Toast message={toast} onDone={hideToast} />}
     </>
   );

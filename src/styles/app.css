@@ -337,6 +337,19 @@ a {
   background: #fff;
   color: var(--primary);
 }
+.trip-header__address {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.trip-header__address:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
 .header-btn:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
@@ -884,4 +897,112 @@ a {
   line-height: 16px;
   letter-spacing: 0.5px;
   pointer-events: none;
+}
+
+/* --- Panneau du bas : choix de l'appli d'itinéraire --- */
+.sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(29, 27, 32, 0.4);
+}
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px 24px 32px;
+  border-radius: 28px 28px 0 0;
+  background: #fff;
+}
+.sheet__handle {
+  align-self: center;
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--outline);
+  opacity: 0.4;
+}
+.sheet__title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 400;
+}
+.sheet__address {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-surface-variant);
+}
+.maps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.maps-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--primary-container);
+  border-radius: 4px;
+  color: var(--on-surface);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.maps-option__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #e3e3e3;
+}
+.maps-option__icon--other {
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+.maps-option__hint {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--on-surface-variant);
+}
+/* Case centrée sous les icônes (24 + 1 + 16 + 18 = 59 px), texte aligné sur les noms (93 px). */
+.maps-remember {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding-left: 26px;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+.maps-remember input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+.sheet__cancel {
+  align-self: center;
 }
