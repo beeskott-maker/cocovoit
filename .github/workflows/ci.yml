@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -75,6 +75,20 @@ jobs:
           supabase link --project-ref "$SUPABASE_PROJECT_ID"
           supabase db push
 
+  # La branche dev est publiée sous /dev/, mais Pages ne se déploie que depuis
+  # main : on relance donc la CI de main, qui reconstruit les deux versions.
+  redeploy:
+    name: Relance le déploiement (prod + dev)
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+    needs: [web, database]
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - run: gh workflow run ci.yml --ref main -R "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   deploy:
     name: Déploiement GitHub Pages
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -101,6 +115,23 @@ jobs:
           # Sans elles, le site tourne en mode démo.
           VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+      # Version de test (branche dev) sous /dev/, en mode démo : sans Supabase,
+      # les données restent dans le navigateur. Un échec ici ne bloque pas la prod.
+      - id: dev
+        continue-on-error: true
+        run: git ls-remote --exit-code --heads origin dev
+      - if: steps.dev.outcome == 'success'
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          path: dev-src
+      - if: steps.dev.outcome == 'success'
+        continue-on-error: true
+        working-directory: dev-src
+        run: npm ci && npm run build -- --outDir ../dist/dev
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/dev/
+          VITE_APP_ENV: dev
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

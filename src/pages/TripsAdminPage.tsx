@@ -5,6 +5,7 @@ import { BrandHeader } from '../components/BrandHeader';
 import { TextField } from '../components/TextField';
 import { Toast } from '../components/Toast';
 import { useApi } from '../lib/api';
+import { storageKey } from '../lib/env';
 import { formatTripDates, isEmail } from '../lib/format';
 import { AUTH_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type AdminTrip } from '../lib/types';
@@ -15,7 +16,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`;
 type LoadResult = 'ok' | 'unauthorized' | 'error';
 
 // Adresse mémorisée dans ce navigateur pour ne pas la ressaisir.
-const EMAIL_KEY = 'cocovoit:admin-email';
+const EMAIL_KEY = storageKey('admin-email');
 function readEmail(): string {
   try {
     return localStorage.getItem(EMAIL_KEY) ?? '';

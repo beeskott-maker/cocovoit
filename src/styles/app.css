@@ -860,3 +860,21 @@ a {
 .admin-trip__actions .btn--danger {
   color: #d06661;
 }
+
+/* --- Badge de l'environnement de test --- */
+.env-badge {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  margin: 0;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--error);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}

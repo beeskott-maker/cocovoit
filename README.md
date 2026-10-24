@@ -57,11 +57,21 @@ DATABASE_URL=postgresql://postgres@localhost:5432/cocovoit_test scripts/test-db.
 
 ## CI / déploiement
 
-Le workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) s'exécute à chaque push sur `main` et à chaque PR vers `main` :
+Le workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) s'exécute à chaque push sur `main` ou `dev` et à chaque PR vers `main` :
 
 1. **Front** : lint, typecheck, tests, build
 2. **Base de données** : migrations appliquées sur un Postgres 15 vierge, puis tests SQL ([`supabase/tests`](supabase/tests))
 3. Sur `main` uniquement : **migrations Supabase** (`supabase db push`), puis **déploiement GitHub Pages**
+4. Sur `dev` : relance de la CI de `main`, seule autorisée à déployer sur Pages
+
+### Environnements
+
+| | Branche | URL | Données |
+|---|---|---|---|
+| Production | `main` | `/cocovoit/` | Supabase |
+| Test | `dev` | `/cocovoit/dev/` | mode démo, dans le navigateur |
+
+Chaque déploiement publie les deux : la prod à la racine, la branche `dev` sous `/dev/` (si elle existe ; un échec de sa construction ne bloque pas la prod). La version de test affiche un badge « DEV », a ses propres clés de stockage (`cocovoit-dev:…`) et, à la première connexion, ajoute la personne connectée à 4 voyages de démonstration ([`src/lib/demoData.ts`](src/lib/demoData.ts)).
 
 ### Configuration à faire une fois
 

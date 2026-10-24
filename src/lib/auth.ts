@@ -1,11 +1,12 @@
 import { createContext, useContext } from 'react';
+import { storageKey } from './env';
 import type { Account } from './types';
 
 /**
  * Connexion au compte. Le compte (email, nom) et tout ce qui s'y rattache
  * sont en base ; le navigateur ne garde que le jeton de session.
  */
-const TOKEN_KEY = 'cocovoit:token';
+const TOKEN_KEY = storageKey('token');
 
 /** Anciennes données (identité et accès par voyage) : remplacées par le compte. */
 export function forgetLegacyStorage() {

@@ -6,6 +6,8 @@ import {
   type NewTrip,
   type TripState,
 } from './types';
+import { storageKey } from './env';
+import { DEMO_PEOPLE, DEMO_TRIPS, ME } from './demoData';
 
 /**
  * Implémentation de démonstration, utilisée quand Supabase n'est pas configuré.
@@ -71,14 +73,18 @@ export interface KeyValueStore {
   setItem(key: string, value: string): void;
 }
 
-const KEY = 'cocovoit:demo-db';
+const KEY = storageKey('demo-db');
 const emptyDb = (): Db => ({ accounts: [], sessions: [], trips: [], participants: [], cars: [], legs: [], bookings: [] });
 
 /** Page de gestion des voyages en mode démo : #/x/demo, avec l'adresse ci-dessous. */
 export const DEMO_ADMIN_KEY = 'demo';
 export const DEMO_ADMIN_EMAIL = 'demo@example.com';
 
-export function createLocalApi(store: KeyValueStore, newId: () => string = () => crypto.randomUUID()): Api {
+export function createLocalApi(
+  store: KeyValueStore,
+  newId: () => string = () => crypto.randomUUID(),
+  options: { seedDemo?: boolean } = {},
+): Api {
   // Horodatage strictement croissant, pour garder l'ordre des réservations.
   let last = 0;
   const now = () => (last = Math.max(Date.now(), last + 1));
@@ -116,6 +122,41 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
       throw new ApiError('Adresse email non autorisée', 'unauthorized_email');
     }
   }
+  // Voyages de démonstration (environnement de test) : la personne connectée y
+  // prend la place de « moi ».
+  function seed(db: Db, meId: string) {
+    const accountIds: Record<string, string> = { [ME]: meId };
+    for (const [key, name] of Object.entries(DEMO_PEOPLE)) {
+      const a = { id: newId(), email: `${key}@example.com`, name };
+      db.accounts.push(a);
+      accountIds[key] = a.id;
+    }
+    for (const t of DEMO_TRIPS) {
+      const { name, destination, startsOn, endsOn } = t;
+      const trip = { id: newId(), code: newId().replace(/-/g, '').slice(0, 16), name, destination, startsOn, endsOn, createdAt: now() };
+      db.trips.push(trip);
+      const pid: Record<string, string> = {};
+      for (const who of t.people) {
+        pid[who] = newId();
+        db.participants.push({ id: pid[who], tripId: trip.id, accountId: accountIds[who], isOrganizer: who === t.organizer });
+      }
+      for (const c of t.cars) {
+        const car = { id: newId(), tripId: trip.id, driverId: pid[c.driver], seats: c.seats, createdAt: now() };
+        db.cars.push(car);
+        for (const [direction, leg] of Object.entries(c.legs)) {
+          const l = {
+            id: newId(),
+            carId: car.id,
+            direction: direction as Direction,
+            departsAt: leg.at,
+            meetingPoint: leg.rdv ?? null,
+          };
+          db.legs.push(l);
+          for (const who of leg.passengers) db.bookings.push({ legId: l.id, participantId: pid[who], createdAt: now() });
+        }
+      }
+    }
+  }
   // Petite latence pour que l'appli se comporte comme avec un vrai serveur.
   const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
@@ -131,6 +172,7 @@ export function createLocalApi(store: KeyValueStore, newId: () => string = () =>
         found = { id: newId(), email: email.trim(), name: name.trim() };
         db.accounts.push(found);
       }
+      if (options.seedDemo && db.trips.length === 0) seed(db, found.id);
       const token = newId();
       db.sessions.push({ token, accountId: found.id });
       save(db);

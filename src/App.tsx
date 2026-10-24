@@ -1,6 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { ApiContext } from './lib/api';
 import { AuthProvider } from './components/AuthProvider';
+import { IS_DEV_ENV } from './lib/env';
 import type { Api } from './lib/types';
 import { CarFormPage } from './pages/CarFormPage';
 import { HomePage } from './pages/HomePage';
@@ -15,6 +16,11 @@ export function AppRoutes() {
   return (
     <AuthProvider>
       <div className="app">
+        {IS_DEV_ENV && (
+          <p className="env-badge" title="Version de test : données de démo, stockées dans ce navigateur">
+            DEV
+          </p>
+        )}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/identification" element={<IdentifyPage />} />

@@ -2,9 +2,12 @@
 
 ## Git
 
-- Travailler **directement sur `main`** : pas de branche de fonctionnalité ni de PR.
-- **Ne pas pousser sans demande explicite** : commiter en local, puis pousser (donc déployer) seulement quand l'utilisateur le demande (« Déploie », « Go », « push »…), même si un hook réclame le push.
-- Chaque push sur `main` déclenche la CI qui teste, applique les migrations Supabase et déploie en production (GitHub Pages). L'appli a très peu de trafic : modifier la prod en continu est assumé.
+- Deux branches, pas de PR :
+  - `dev` : branche de travail, publiée en environnement de test sur `…/cocovoit/dev/` (mode démo, données dans le navigateur, badge « DEV »).
+  - `main` : production, publiée sur `…/cocovoit/` avec Supabase.
+- Développer et commiter sur `dev`. « Déploie en dev » → pousser `dev`. « Mets en prod » → fusionner `dev` dans `main` puis pousser `main`.
+- **Ne pas pousser sans demande explicite** : commiter en local, puis pousser (donc déployer) seulement quand l'utilisateur le demande (« Déploie », « Go », « push »…), même si un hook réclame le push. Sans précision, demander s'il s'agit de dev ou de prod.
+- Chaque push sur `main` déclenche la CI qui teste, applique les migrations Supabase et déploie (prod + dev) sur GitHub Pages. Un push sur `dev` relance cette CI de `main` sans toucher à la base.
 - Avant de pousser, lancer les vérifications locales : `npm run lint && npm run typecheck && npm test && npm run build`, et `scripts/test-db.sh` si `supabase/` change.
 
 ## Base de données

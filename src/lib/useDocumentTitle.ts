@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
+import { IS_DEV_ENV } from './env';
 
-export const APP_TITLE = 'Coco·Voit';
+export const APP_TITLE = IS_DEV_ENV ? 'Coco·Voit DEV' : 'Coco·Voit';
 
 /**
  * Titre de l'onglet : « nom du voyage · Coco·Voit » sur les pages d'un voyage,
