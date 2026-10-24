@@ -24,7 +24,7 @@ function role(trip: MyTrip): string {
   return trip.isDriver ? 'Conducteur' : 'Passager';
 }
 
-function TripItem({ trip, badge }: { trip: MyTrip; badge?: { label: string; full: boolean } }) {
+function TripItem({ trip, badge }: { trip: MyTrip; badge?: string }) {
   return (
     <li>
       <Link to={`/t/${trip.code}`}>
@@ -32,7 +32,7 @@ function TripItem({ trip, badge }: { trip: MyTrip; badge?: { label: string; full
           {trip.name}
           <span className="trip-list__dates">{formatTripDates(trip.startsOn, trip.endsOn)}</span>
           <span className="trip-list__roles">{role(trip)}</span>
-          {badge && <span className={badge.full ? 'trip-badge trip-badge--full' : 'trip-badge'}>{badge.label}</span>}
+          {badge && <span className="trip-badge">{badge}</span>}
         </span>
         <span aria-hidden="true">→</span>
       </Link>
@@ -113,7 +113,7 @@ function Home({ token }: { token: string }) {
           {upcoming.length > 0 && (
             <ul className="trip-list">
               {upcoming.map(({ trip, timing }) => (
-                <TripItem key={trip.code} trip={trip} badge={{ label: timing.label, full: trip.isFull }} />
+                <TripItem key={trip.code} trip={trip} badge={timing.label} />
               ))}
             </ul>
           )}

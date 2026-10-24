@@ -770,7 +770,7 @@ a {
   font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
 }
-/* Compte à rebours : vert pâle, gris clair quand le voyage est complet. */
+/* Compte à rebours des voyages à venir, toujours vert pâle. */
 .trip-badge {
   align-self: flex-start;
   margin-top: 8px;
@@ -781,10 +781,6 @@ a {
   font-size: 12px;
   line-height: 16px;
   font-weight: 700;
-}
-.trip-badge--full {
-  background: #e6e0e9;
-  color: var(--on-surface-variant);
 }
 /* Voyages passés : plus discrets. */
 .trip-list--past a {
