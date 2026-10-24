@@ -71,8 +71,8 @@ describe('Parcours organisateur et conducteur', () => {
     expect(await screen.findByRole('heading', { name: 'Voyage créé !' })).toBeInTheDocument();
     await user.click(screen.getByRole('link', { name: 'Voir le voyage' }));
     expect(await screen.findByRole('heading', { name: 'Pique-nique' })).toBeInTheDocument();
-    // Sans destination : ni adresse ni bouton Go. L'organisateur est la personne identifiée.
-    expect(screen.queryByRole('link', { name: 'Go' })).not.toBeInTheDocument();
+    // Sans destination : ni adresse ni bouton Itinéraire. L'organisateur est la personne identifiée.
+    expect(screen.queryByRole('link', { name: 'Itinéraire' })).not.toBeInTheDocument();
     expect(screen.getByText(/Connecté·e en tant que/)).toHaveTextContent('Loïc');
   });
 

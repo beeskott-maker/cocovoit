@@ -301,23 +301,45 @@ a {
   flex-direction: column;
   gap: 4px;
 }
-.trip-header__name-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.trip-header__name-row > h1 {
-  flex: 1;
-  min-width: 0;
-}
-.trip-header__bottom {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-}
 .trip-header__infos {
-  flex: 1;
   min-width: 0;
+}
+/* Itinéraire (contour blanc) et Partager (fond blanc), côte à côte. */
+.trip-header__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.header-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--bubble-radius);
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.header-btn--outline {
+  border: 1px solid #fff;
+  background: none;
+  color: var(--on-primary);
+}
+.header-btn--filled {
+  border: 0;
+  background: #fff;
+  color: var(--primary);
+}
+.header-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 .trip-header__row {
   display: flex;
@@ -336,45 +358,6 @@ a {
   min-width: 0;
 }
 /* Bouton texte blanc (« Partager ») */
-.header-text-btn {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 8px;
-  flex-shrink: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--on-primary);
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 500;
-  letter-spacing: 0.1px;
-  cursor: pointer;
-}
-.header-text-btn:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-.chip-go {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: var(--tertiary-fixed-dim);
-  color: var(--tertiary);
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 500;
-  letter-spacing: 0.1px;
-  text-decoration: none;
-  flex-shrink: 0;
-}
-.chip-go:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
 
 .trip-footer {
   display: flex;
