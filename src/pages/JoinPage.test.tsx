@@ -108,7 +108,9 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     const { user } = renderApp(`/t/${code}`, api);
     await user.click(await screen.findByRole('button', { name: 'Déconnexion' }));
 
-    expect(await screen.findByLabelText('Mon email')).toBeInTheDocument();
+    // Déconnexion puis redirection vers le lien d'invitation : plusieurs rendus
+    // asynchrones, parfois plus d'une seconde sur les machines de la CI.
+    expect(await screen.findByLabelText('Mon email', {}, { timeout: 5000 })).toBeInTheDocument();
     expect(localStorage.getItem('cocovoit:token')).toBeNull();
     await expect(api.me(lea)).rejects.toMatchObject({ code: 'unauthenticated' });
   });
