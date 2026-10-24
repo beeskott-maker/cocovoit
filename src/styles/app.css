@@ -444,10 +444,6 @@ a {
 .car__free--none {
   color: var(--outline);
 }
-.car__free--none img {
-  filter: grayscale(1);
-  opacity: 0.6;
-}
 .car__edit {
   align-self: flex-start;
   font-size: 14px;

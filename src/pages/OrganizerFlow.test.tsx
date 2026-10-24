@@ -209,4 +209,21 @@ describe('Parcours organisateur et conducteur', () => {
       vi.useRealTimers();
     }
   });
+
+  it('voiture sans place libre : « Complet » à la place du nombre de places', async () => {
+    const api = createTestApi();
+    const { code, organizer, hugo } = await seedTrip(api); // voiture de Hugo, 2 places
+    const state = await api.getTripState(hugo, code);
+    for (const [i, leg] of state.cars[0].legs.entries()) {
+      for (const email of [`a${i}@example.com`, `b${i}@example.com`]) {
+        const t = await loginAs(api, email, 'Passager');
+        await api.joinTrip(t, code);
+        await api.takeSeat(t, code, leg.id);
+      }
+    }
+    signIn(organizer);
+    renderApp(`/t/${code}`, api);
+    const car = await screen.findByRole('region', { name: 'Voiture de Hugo' });
+    expect(car.querySelector('.car__free')).toHaveTextContent(/^Complet$/);
+  });
 });

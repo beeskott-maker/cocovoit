@@ -30,14 +30,15 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
         <img src={carIcon} alt="" width={24} height={24} />
         <div className="car__title-row">
           <h2 className="car__title">{mine ? 'Ma voiture' : `Voiture de ${car.driver.name}`}</h2>
-          <span
-            className={free > 0 ? 'car__free' : 'car__free car__free--none'}
-            title={free > 0 ? `${free} place${free > 1 ? 's' : ''} libre${free > 1 ? 's' : ''}` : 'Complet'}
-          >
-            <img src={armchair} alt="" width={24} height={24} />
-            {free}
-            <span className="sr-only">{free > 1 ? 'places libres' : 'place libre'}</span>
-          </span>
+          {free > 0 ? (
+            <span className="car__free" title={`${free} place${free > 1 ? 's' : ''} libre${free > 1 ? 's' : ''}`}>
+              <img src={armchair} alt="" width={24} height={24} />
+              {free}
+              <span className="sr-only">{free > 1 ? 'places libres' : 'place libre'}</span>
+            </span>
+          ) : (
+            <span className="car__free car__free--none">Complet</span>
+          )}
         </div>
         {mine && (
           <Link className="car__edit" to={editHref}>
