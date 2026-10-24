@@ -434,11 +434,6 @@ a {
   font-size: 20px;
   color: var(--success);
 }
-.car__free--none {
-  font-size: 14px;
-  font-weight: 400;
-  color: #8c1d18; /* rouge foncé */
-}
 .car__edit {
   align-self: flex-start;
   font-size: 14px;

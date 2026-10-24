@@ -195,7 +195,7 @@ describe('Parcours organisateur et conducteur', () => {
     }
   });
 
-  it('voiture sans place libre : « Complet » à la place du nombre de places', async () => {
+  it('voiture sans place libre : ni nombre de places ni « Complet » dans l’en-tête', async () => {
     const api = createTestApi();
     const { code, organizer, hugo } = await seedTrip(api); // voiture de Hugo, 2 places
     const state = await api.getTripState(hugo, code);
@@ -209,7 +209,8 @@ describe('Parcours organisateur et conducteur', () => {
     signIn(organizer);
     renderApp(`/t/${code}`, api);
     const car = await screen.findByRole('region', { name: 'Voiture de Hugo' });
-    expect(car.querySelector('.car__free')).toHaveTextContent(/^Complet$/);
+    expect(car.querySelector('.car__free')).toBeNull();
+    expect(car).not.toHaveTextContent('Complet');
   });
 
   it('« Itinéraire » propose les applis dans un panneau', async () => {
