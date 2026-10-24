@@ -99,8 +99,8 @@ describe('Parcours organisateur et conducteur', () => {
 
     expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
     expect(document.title).toBe('Coco·Voit · Mes voyages');
-    // Le rôle d'organisateur n'est pas affiché.
-    expect(screen.getByRole('link', { name: /WE dans le Beaujolais/ })).not.toHaveTextContent(/organisateur/i);
+    // Organisateur prime sur conducteur et passager.
+    expect(screen.getByRole('link', { name: /WE dans le Beaujolais/ })).toHaveTextContent('Organisateur');
     expect(screen.queryByRole('button', { name: 'Créer' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Nouveau voyage' }));
@@ -135,5 +135,17 @@ describe('Parcours organisateur et conducteur', () => {
     expect(await screen.findByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();
     expect(await api.myTrips(organizer)).toEqual([]);
     expect(await api.myTrips(hugo)).toEqual([]);
+  });
+
+  it('« Mes voyages » : sans organiser ni conduire, on est passager', async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    const lea = await loginAs(api, 'lea@example.com', 'Léa');
+    await api.joinTrip(lea, code);
+    signIn(lea);
+    renderApp('/', api);
+    const link = await screen.findByRole('link', { name: /WE dans le Beaujolais/ });
+    expect(link).toHaveTextContent('Passager');
+    expect(link).not.toHaveTextContent(/Conducteur|Organisateur/);
   });
 });

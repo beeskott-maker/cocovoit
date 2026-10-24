@@ -18,10 +18,10 @@ export function HomePage() {
   return <RequireAccount>{(token) => <Home token={token} />}</RequireAccount>;
 }
 
-function roles(trip: MyTrip): string {
-  const list = [trip.isDriver && 'conducteur', trip.isPassenger && 'passager'];
-  const text = list.filter(Boolean).join(' · ');
-  return text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
+// Un seul rôle affiché : organisateur, sinon conducteur, sinon passager.
+function role(trip: MyTrip): string {
+  if (trip.isOrganizer) return 'Organisateur';
+  return trip.isDriver ? 'Conducteur' : 'Passager';
 }
 
 function Home({ token }: { token: string }) {
@@ -92,7 +92,7 @@ function Home({ token }: { token: string }) {
                   <span className="trip-list__text">
                     {t.name}
                     <span className="trip-list__dates">{formatTripDates(t.startsOn, t.endsOn)}</span>
-                    {roles(t) && <span className="trip-list__roles">{roles(t)}</span>}
+                    <span className="trip-list__roles">{role(t)}</span>
                   </span>
                   <span aria-hidden="true">→</span>
                 </Link>
