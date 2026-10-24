@@ -22,7 +22,7 @@ Seuls les deux premiers écrans sont maquettés dans Figma. Les autres réutilis
 
 ## Comptes
 
-Les comptes sont en base (`accounts`). On se connecte avec son email, **sans vérification** (choix assumé : priorité à la fluidité) ; un nouveau compte demande aussi le nom. La connexion crée une session (`account_sessions`) dont le jeton est la seule chose gardée par le navigateur (`localStorage`, clé `cocovoit:token`). Les voyages organisés, les voitures conduites et les places prises sont rattachés au compte (via `participants`), donc visibles depuis n'importe quel appareil. « Déconnexion » (bas de l'écran du voyage) ferme la session.
+Les comptes sont en base (`accounts`). On se connecte avec son email, **sans vérification** (choix assumé : priorité à la fluidité) ; un nouveau compte demande aussi le nom, sauf pour les comptes connus d'avance (`known_accounts` : empreinte SHA-256 de l'adresse et nom fixé, aujourd'hui celui de l'administrateur), dont le nom est lu en base. La connexion crée une session (`account_sessions`) dont le jeton est la seule chose gardée par le navigateur (`localStorage`, clé `cocovoit:token`). Les voyages organisés, les voitures conduites et les places prises sont rattachés au compte (via `participants`), donc visibles depuis n'importe quel appareil. « Déconnexion » (bas de l'écran du voyage) ferme la session.
 
 ## Règles métier
 
