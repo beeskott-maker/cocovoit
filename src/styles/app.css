@@ -442,6 +442,7 @@ a {
   color: var(--success);
 }
 .car__free--none {
+  font-size: 14px;
   color: var(--outline);
 }
 .car__edit {
