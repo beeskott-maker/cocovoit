@@ -232,4 +232,16 @@ describe('Parcours organisateur et conducteur', () => {
     await user.click(screen.getByRole('link', { name: 'Waze' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('au plus 6 places passagers par voiture', async () => {
+    const api = createTestApi();
+    const { code, organizer } = await seedTrip(api);
+    signIn(organizer);
+    const { user } = renderApp(`/t/${code}/voiture`, api);
+    const plus = await screen.findByRole('button', { name: 'Une place de plus' });
+    while (!(plus as HTMLButtonElement).disabled) await user.click(plus);
+    expect(screen.getByRole('group', { name: 'Places dispos' })).toHaveTextContent('6');
+    const legs = [{ direction: 'aller' as const, departsAt: '2026-10-10T07:00:00Z', meetingPoint: null }];
+    await expect(api.saveCar(organizer, code, { carId: null, seats: 7, legs })).rejects.toThrow('Entre 1 et 6 places');
+  });
 });

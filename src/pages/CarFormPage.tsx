@@ -17,7 +17,7 @@ interface LegForm {
   meetingPoint: string;
 }
 
-const MAX_SEATS = 8;
+const MAX_SEATS = 6;
 
 function initialForm(state: TripState, carId: string | undefined) {
   const car = state.cars.find((c) => c.id === carId);

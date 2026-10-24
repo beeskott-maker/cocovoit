@@ -173,6 +173,15 @@ begin
   st := get_trip_state(hugo, code);
   assert json_array_length(st->'cars'->0->'legs') = 1, 'retour supprimé';
   assert (st->'cars'->0->>'seats')::int = 2, 'places mises à jour';
+
+  -- Au plus 6 places passagers.
+  failed := false;
+  begin
+    perform save_car(hugo, code, car, 7, json_build_array(
+      json_build_object('direction', 'aller', 'departsAt', '2026-10-10T09:30:00+02:00')));
+  exception when check_violation then failed := true;
+  end;
+  assert failed, '7 places refusées';
   assert (st->'me'->>'name') = 'Hugo', 'me';
 
   perform delete_car(hugo, code, car);

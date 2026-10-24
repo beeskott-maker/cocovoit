@@ -316,7 +316,7 @@ export function createLocalApi(
       const db = load();
       const me = participant(db, token, code);
       if (input.legs.length === 0) throw new ApiError('Indiquez au moins un trajet', 'invalid');
-      if (input.seats < 1 || input.seats > 8) throw new ApiError('Entre 1 et 8 places', 'invalid');
+      if (input.seats < 1 || input.seats > 6) throw new ApiError('Entre 1 et 6 places', 'invalid');
 
       let car: DbCar | undefined;
       if (input.carId) {
