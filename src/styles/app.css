@@ -20,7 +20,6 @@
   --error: #b3261e;
 
   --font: 'Roboto', system-ui, sans-serif;
-  --font-title: 'Inter', system-ui, sans-serif;
 
   /* Coin « bulle » des boutons et cases de places */
   --bubble-radius: 4px 24px 24px 24px;
@@ -427,7 +426,6 @@ a {
 .car__title {
   flex: 1;
   margin: 0;
-  font-family: var(--font-title);
   font-weight: 600;
   font-size: 20px;
   line-height: normal;
@@ -436,13 +434,11 @@ a {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-title);
   font-weight: 600;
   font-size: 20px;
   color: var(--success);
 }
 .car__free--none {
-  font-family: var(--font);
   font-size: 14px;
   font-weight: 400;
   color: inherit; /* même couleur que le titre de la voiture */
@@ -668,7 +664,6 @@ a {
 .stepper__value {
   min-width: 24px;
   text-align: center;
-  font-family: var(--font-title);
   font-weight: 600;
   font-size: 36px;
   line-height: 44px;
