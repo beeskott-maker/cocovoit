@@ -13,7 +13,7 @@ describe('Parcours organisateur et conducteur', () => {
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
 
     // Formulaire de création, sans nom ni email.
-    expect(await screen.findByRole('heading', { name: 'Nouveau voyage' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Mon nom')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Mon email')).not.toBeInTheDocument();
 
@@ -21,7 +21,7 @@ describe('Parcours organisateur et conducteur', () => {
     await user.type(screen.getByLabelText('Destination'), '124 Venelle de Brouilly 69460 Odenas');
     await user.type(screen.getByLabelText(/Départ le/), '2026-10-10');
     await user.type(screen.getByLabelText(/Retour le/), '2026-10-12');
-    await user.click(screen.getByRole('button', { name: 'Créer le voyage' }));
+    await user.click(screen.getByRole('button', { name: 'Créer' }));
 
     expect(await screen.findByRole('heading', { name: 'Voyage créé !' })).toBeInTheDocument();
     expect(screen.getByText(/#\/j\/[0-9a-f]{16}$/)).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('Parcours organisateur et conducteur', () => {
     const { user, container } = renderApp('/', api);
 
     // Astérisque rouge sur les trois champs obligatoires, et eux seuls.
-    expect(await screen.findByRole('heading', { name: 'Nouveau voyage' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();
     const requiredLabels = [...container.querySelectorAll('.text-field__required')].map((el) =>
       el.parentElement!.textContent!.replace('*', '').trim(),
     );
@@ -61,7 +61,7 @@ describe('Parcours organisateur et conducteur', () => {
     expect(screen.getByLabelText(/Nom du voyage/)).toHaveAttribute('aria-required', 'true');
     expect(screen.getByLabelText('Destination')).not.toHaveAttribute('aria-required');
 
-    const create = screen.getByRole('button', { name: 'Créer le voyage' });
+    const create = screen.getByRole('button', { name: 'Créer' });
     await user.type(screen.getByLabelText(/Nom du voyage/), 'Pique-nique');
     await user.type(screen.getByLabelText(/Départ le/), '2026-11-01');
     expect(create).toBeDisabled();
@@ -101,14 +101,14 @@ describe('Parcours organisateur et conducteur', () => {
     expect(document.title).toBe('Coco·Voit · Mes voyages');
     // Le rôle d'organisateur n'est pas affiché.
     expect(screen.getByRole('link', { name: /WE dans le Beaujolais/ })).not.toHaveTextContent(/organisateur/i);
-    expect(screen.queryByRole('button', { name: 'Créer le voyage' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Créer' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Nouveau voyage' }));
-    expect(screen.getByRole('button', { name: 'Créer le voyage' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Créer' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Nouveau voyage' })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Annuler' }));
-    expect(screen.queryByRole('button', { name: 'Créer le voyage' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Créer' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Nouveau voyage' })).toBeInTheDocument();
   });
 });

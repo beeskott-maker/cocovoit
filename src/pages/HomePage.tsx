@@ -111,7 +111,7 @@ function Home({ token }: { token: string }) {
         <div className={creating ? 'new-trip new-trip--unfold' : 'new-trip'}>
           <div className="new-trip__inner">
             <div className="page-title">
-              <h1 className="display-small">Nouveau voyage</h1>
+              <h1 className="display-small">Créer un voyage</h1>
               <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
             </div>
             <form className="form form--compact" onSubmit={submit} noValidate>
@@ -150,7 +150,7 @@ function Home({ token }: { token: string }) {
                 </p>
               )}
               <button type="submit" className="btn btn--primary" disabled={!valid || busy}>
-                Créer le voyage
+                Créer
               </button>
               {myTrips && myTrips.length > 0 && (
                 <button type="button" className="btn btn--outline" onClick={() => setCreating(false)}>
