@@ -212,7 +212,7 @@ describe('Parcours organisateur et conducteur', () => {
     expect(car.querySelector('.car__free')).toHaveTextContent(/^Complet$/);
   });
 
-  it('« Itinéraire » propose les applis, et retient le choix si on coche « Toujours utiliser »', async () => {
+  it('« Itinéraire » propose les applis dans un panneau', async () => {
     const api = createTestApi();
     const { code, organizer } = await seedTrip(api);
     signIn(organizer);
@@ -222,24 +222,14 @@ describe('Parcours organisateur et conducteur', () => {
     const waze = within(sheet).getByRole('link', { name: 'Waze' });
     expect(waze).toHaveAttribute('href', expect.stringMatching(/^https:\/\/waze\.com\/ul\?q=124%20Venelle/));
     expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toBeInTheDocument();
+    expect(within(sheet).queryByRole('checkbox')).not.toBeInTheDocument();
 
     await user.click(within(sheet).getByRole('button', { name: 'Annuler' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
+    // Choisir une appli ouvre son lien et referme le panneau.
     await user.click(screen.getByRole('button', { name: 'Itinéraire' }));
-    await user.click(screen.getByRole('checkbox', { name: 'Toujours utiliser cette application' }));
     await user.click(screen.getByRole('link', { name: 'Waze' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByText(/Itinéraire avec Waze/)).toBeInTheDocument();
-
-    // Appli retenue : plus de choix, ouverture directe ; « Changer d'appli » l'oublie.
-    const open = vi.spyOn(window, 'open').mockReturnValue(null);
-    await user.click(screen.getByRole('button', { name: 'Itinéraire' }));
-    expect(open).toHaveBeenCalledWith(expect.stringContaining('waze.com'), '_blank', 'noreferrer');
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: "Changer d'appli" }));
-    await user.click(screen.getByRole('button', { name: 'Itinéraire' }));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    open.mockRestore();
   });
 });

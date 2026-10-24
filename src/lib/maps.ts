@@ -1,8 +1,6 @@
-import { useCallback, useState } from 'react';
 import applePlans from '../assets/maps/apple-plans.png';
 import googleMaps from '../assets/maps/google-maps.png';
 import waze from '../assets/maps/waze.png';
-import { storageKey } from './env';
 
 /** Applis d'itinéraire proposées. « other » : menu Android « Ouvrir avec… ». */
 export type MapsAppId = 'waze' | 'google' | 'apple' | 'other';
@@ -46,30 +44,4 @@ export function routeUrl(app: MapsAppId, address: string): string {
     case 'other':
       return `geo:0,0?q=${q}`;
   }
-}
-
-const KEY = storageKey('maps-app');
-
-function readPreference(): MapsAppId | null {
-  try {
-    const id = localStorage.getItem(KEY);
-    return id && id in APPS ? (id as MapsAppId) : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Appli choisie avec « Toujours utiliser cette application », mémorisée dans ce navigateur. */
-export function useMapsPreference() {
-  const [preference, setPreference] = useState<MapsAppId | null>(readPreference);
-  const save = useCallback((id: MapsAppId | null) => {
-    try {
-      if (id) localStorage.setItem(KEY, id);
-      else localStorage.removeItem(KEY);
-    } catch {
-      // Stockage indisponible : le choix vaut pour cette visite seulement.
-    }
-    setPreference(id);
-  }, []);
-  return { preference, app: preference ? APPS[preference] : null, save };
 }

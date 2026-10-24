@@ -984,21 +984,6 @@ a {
   font-weight: 400;
   color: var(--on-surface-variant);
 }
-/* Case centrée sous les icônes (24 + 1 + 16 + 18 = 59 px), texte aligné sur les noms (93 px). */
-.maps-remember {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  padding-left: 26px;
-  font-size: 14px;
-  color: var(--on-surface-variant);
-}
-.maps-remember input {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  accent-color: var(--primary);
-}
 .sheet__cancel {
   align-self: center;
 }
