@@ -5,7 +5,7 @@ import check from '../assets/figma/check.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
 import { formatDeparture, mapsUrl } from '../lib/format';
-import { freeSeats, freeSeatsLabel, seatCells, type SeatCell } from '../lib/seats';
+import { freeSeats, freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
 import type { Car, Direction, Leg } from '../lib/types';
 
 interface Props {
@@ -98,8 +98,8 @@ function LegSeats({
         role="list"
         aria-label={`Places ${title.toLowerCase()}`}
       >
-        {cells.map((cell, i) => (
-          <div role="listitem" key={i} style={{ display: 'contents' }}>
+        {placeSeats(cells).map(({ cell, column, row }, i) => (
+          <div role="listitem" key={i} className="seats__cell" style={{ gridColumn: column, gridRow: row }}>
             <Seat cell={cell} busy={busy} onTake={onTake} onLeave={onLeave} />
           </div>
         ))}

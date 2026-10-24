@@ -486,23 +486,16 @@ a {
 }
 
 .seats {
-  /* Comme l'auto-layout Figma (vertical, wrap, hauteur max de 3 cases) :
-     3 cases par colonne, de haut en bas, puis colonne suivante. Le bouton est
-     une case comme les autres. Deux colonnes visibles ; au-delà de 6 cases,
-     la 3e colonne se fait défiler horizontalement. */
+  /* Deux colonnes : passagers à gauche (3 au plus), suite à droite, bouton en
+     dernier à droite. Placement calculé par placeSeats (lib/seats.ts). */
   display: grid;
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column;
-  grid-auto-columns: calc((100% - 8px) / 2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  overflow-x: auto;
 }
-/* Le bouton (ou « Voiture pleine ») reste dans la colonne de droite : s'il tomberait dans la 1re
-   colonne (3 cases ou moins), il passe en haut de la 2e. */
-.seats > :nth-child(-n + 3) > .btn,
-.seats > :nth-child(-n + 3) > .seat--full {
-  grid-column: 2;
-  grid-row: 1;
+.seats__cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 .seat {
   display: flex;

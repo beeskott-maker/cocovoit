@@ -1,4 +1,4 @@
-import { bookedDirections, freeSeats, freeSeatsLabel, seatCells } from './seats';
+import { bookedDirections, freeSeats, freeSeatsLabel, placeSeats, seatCells } from './seats';
 import type { Car } from './types';
 
 const car = (passengers: string[], seats = 3): Car => ({
@@ -80,3 +80,26 @@ describe('voiture pleine', () => {
   });
 });
 
+describe('placeSeats', () => {
+  // « G1 » : colonne de gauche, ligne 1 ; « D2 » : colonne de droite, ligne 2.
+  const layout = (passengers: number, seats: number, me = 'moi') => {
+    const c = car(Array.from({ length: passengers }, (_, i) => `p${i}`), seats);
+    return placeSeats(seatCells(c, c.legs[0], me)).map(({ cell, column, row }) => `${cell.kind}:${column === 1 ? 'G' : 'D'}${row}`);
+  };
+  it('passagers à gauche (3 au plus), puis places libres et bouton à droite', () => {
+    expect(layout(1, 2)).toEqual(['occupied:G1', 'free:D1', 'take:D2']);
+    expect(layout(3, 4)).toEqual(['occupied:G1', 'occupied:G2', 'occupied:G3', 'free:D1', 'take:D2']);
+    expect(layout(4, 5)).toEqual(['occupied:G1', 'occupied:G2', 'occupied:G3', 'occupied:D1', 'free:D2', 'take:D3']);
+    expect(layout(4, 6).slice(3)).toEqual(['occupied:D1', 'free:D2', 'take:D3']);
+  });
+  it('plus de 3 lignes à droite : la case des places libres disparaît', () => {
+    expect(layout(5, 6).slice(3)).toEqual(['occupied:D1', 'occupied:D2', 'take:D3']);
+  });
+  it('voiture vide : places libres à gauche, bouton à droite', () => {
+    expect(layout(0, 4)).toEqual(['free:G1', 'take:D1']);
+  });
+  it('voiture pleine : « Voiture pleine » en dernier à droite', () => {
+    expect(layout(2, 2)).toEqual(['occupied:G1', 'occupied:G2', 'full:D1']);
+    expect(layout(6, 6).slice(3)).toEqual(['occupied:D1', 'occupied:D2', 'occupied:D3', 'full:D4']);
+  });
+});

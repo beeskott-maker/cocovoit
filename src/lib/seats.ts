@@ -36,6 +36,37 @@ export function seatCells(
   return cells;
 }
 
+export interface PlacedCell {
+  cell: SeatCell;
+  /** Colonne (1 ou 2) et ligne (à partir de 1) dans la grille. */
+  column: 1 | 2;
+  row: number;
+}
+
+const isPassenger = (c: SeatCell) => c.kind === 'occupied' || c.kind === 'me';
+
+/**
+ * Place les cases sur deux colonnes : à gauche, les passagers (3 au plus) ; à
+ * droite, les passagers suivants, puis les places libres, puis le bouton (ou
+ * « Voiture pleine »), toujours en dernier. Si la colonne de droite dépasse
+ * 3 lignes, la case des places libres disparaît : le bouton suffit. Voiture
+ * vide : places libres à gauche, bouton à droite.
+ */
+export function placeSeats(cells: SeatCell[]): PlacedCell[] {
+  const passengers = cells.filter(isPassenger);
+  // Voiture vide : places libres à gauche, bouton à droite, sur une ligne.
+  if (passengers.length === 0) {
+    return cells.map((cell, i) => ({ cell, column: i === 0 ? 1 : 2, row: 1 }));
+  }
+  let right = [...passengers.slice(3), ...cells.filter((c) => !isPassenger(c))];
+  const hasAction = right.some((c) => c.kind === 'take' || c.kind === 'leave');
+  if (right.length > 3 && hasAction) right = right.filter((c) => c.kind !== 'free');
+  return [
+    ...passengers.slice(0, 3).map((cell, i) => ({ cell, column: 1 as const, row: i + 1 })),
+    ...right.map((cell, i) => ({ cell, column: 2 as const, row: i + 1 })),
+  ];
+}
+
 /** « 1 place libre », « 3 places libres » */
 export function freeSeatsLabel(count: number): string {
   return count > 1 ? `${count} places libres` : `${count} place libre`;
