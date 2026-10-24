@@ -73,8 +73,12 @@ function Home({ token }: { token: string }) {
   // À venir (le plus proche d'abord) et passés (le plus récent d'abord).
   const today = localToday();
   const timed = (myTrips ?? []).map((trip) => ({ trip, timing: tripTiming(trip.startsOn, trip.endsOn, today) }));
-  const upcoming = timed.filter((t) => t.timing.status !== 'past');
-  const past = timed.filter((t) => t.timing.status === 'past').sort((a, b) => b.trip.endsOn.localeCompare(a.trip.endsOn));
+  const upcoming = timed
+    .filter((t) => t.timing.status !== 'past')
+    .sort((a, b) => a.trip.startsOn.localeCompare(b.trip.startsOn) || a.trip.name.localeCompare(b.trip.name));
+  const past = timed
+    .filter((t) => t.timing.status === 'past')
+    .sort((a, b) => b.trip.endsOn.localeCompare(a.trip.endsOn) || a.trip.name.localeCompare(b.trip.name));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) =>

@@ -183,4 +183,30 @@ describe('Parcours organisateur et conducteur', () => {
       vi.useRealTimers();
     }
   });
+
+  it('« Mes voyages » : le plus proche en haut, et le plus récent en haut des passés', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 9, 5, 12, 0));
+    try {
+      const api = createTestApi();
+      const me = await loginAs(api, 'loic@example.com', 'Loïc');
+      for (const [name, startsOn, endsOn] of [
+        ['Loin', '2026-12-01', '2026-12-02'],
+        ['Vieux', '2026-06-01', '2026-06-02'],
+        ['Proche', '2026-10-10', '2026-10-11'],
+        ['Récent', '2026-09-20', '2026-09-21'],
+      ]) {
+        await api.createTrip(me, { name, destination: '', startsOn, endsOn });
+      }
+      signIn(me);
+      renderApp('/', api);
+      await screen.findByRole('link', { name: /Proche/ });
+      const names = (region: string) =>
+        [...screen.getByRole('region', { name: region }).querySelectorAll('.trip-list__text')].map((el) => el.firstChild!.textContent);
+      expect(names('Mes voyages')).toEqual(['Proche', 'Loin']);
+      expect(names('Passés')).toEqual(['Récent', 'Vieux']);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
