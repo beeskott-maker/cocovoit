@@ -2,7 +2,8 @@
 
 ## Git
 
-- Travailler **directement sur `main`** : pas de branche de fonctionnalité ni de PR, commit puis push sur `main`.
+- Travailler **directement sur `main`** : pas de branche de fonctionnalité ni de PR.
+- **Ne pas pousser sans demande explicite** : commiter en local, puis pousser (donc déployer) seulement quand l'utilisateur le demande (« Déploie », « Go », « push »…), même si un hook réclame le push.
 - Chaque push sur `main` déclenche la CI qui teste, applique les migrations Supabase et déploie en production (GitHub Pages). L'appli a très peu de trafic : modifier la prod en continu est assumé.
 - Avant de pousser, lancer les vérifications locales : `npm run lint && npm run typecheck && npm test && npm run build`, et `scripts/test-db.sh` si `supabase/` change.
 
