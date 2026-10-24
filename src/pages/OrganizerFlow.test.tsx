@@ -148,4 +148,39 @@ describe('Parcours organisateur et conducteur', () => {
     expect(link).toHaveTextContent('Passager');
     expect(link).not.toHaveTextContent(/Conducteur|Organisateur/);
   });
+
+  it('« Mes voyages » : compte à rebours, gris quand complet, voyages passés à part', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 9, 5, 12, 0)); // lun 5 oct 2026
+    try {
+      const api = createTestApi();
+      const { code, organizer, hugo } = await seedTrip(api); // 10 → 12 oct, voiture de Hugo (2 places)
+      const old = await api.createTrip(organizer, { name: 'Pique-nique', destination: '', startsOn: '2026-09-01', endsOn: '2026-09-01' });
+      signIn(organizer);
+      const first = renderApp('/', api);
+      const link = await screen.findByRole('link', { name: /WE dans le Beaujolais/ });
+      expect(link).toHaveTextContent('dans 5 jours');
+      expect(link.querySelector('.trip-badge')).not.toHaveClass('trip-badge--full');
+      const past = screen.getByRole('region', { name: 'Passés' });
+      expect(past).toHaveTextContent('Pique-nique');
+      expect(screen.getByRole('link', { name: /Pique-nique/ }).querySelector('.trip-badge')).toBeNull();
+      expect(old).toBeTruthy();
+      first.unmount();
+
+      // Toutes les places prises : badge gris.
+      const state = await api.getTripState(hugo, code);
+      for (const [i, leg] of state.cars[0].legs.entries()) {
+        for (const email of [`a${i}@example.com`, `b${i}@example.com`]) {
+          const t = await loginAs(api, email, 'Passager');
+          await api.joinTrip(t, code);
+          await api.takeSeat(t, code, leg.id);
+        }
+      }
+      renderApp('/', api);
+      const full = await screen.findByRole('link', { name: /WE dans le Beaujolais/ });
+      expect(full.querySelector('.trip-badge')).toHaveClass('trip-badge--full');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

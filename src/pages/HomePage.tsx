@@ -6,7 +6,7 @@ import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { formatTripDates } from '../lib/format';
+import { formatTripDates, localToday, tripTiming } from '../lib/format';
 import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type MyTrip } from '../lib/types';
 
@@ -22,6 +22,22 @@ export function HomePage() {
 function role(trip: MyTrip): string {
   if (trip.isOrganizer) return 'Organisateur';
   return trip.isDriver ? 'Conducteur' : 'Passager';
+}
+
+function TripItem({ trip, badge }: { trip: MyTrip; badge?: { label: string; full: boolean } }) {
+  return (
+    <li>
+      <Link to={`/t/${trip.code}`}>
+        <span className="trip-list__text">
+          {trip.name}
+          <span className="trip-list__dates">{formatTripDates(trip.startsOn, trip.endsOn)}</span>
+          <span className="trip-list__roles">{role(trip)}</span>
+          {badge && <span className={badge.full ? 'trip-badge trip-badge--full' : 'trip-badge'}>{badge.label}</span>}
+        </span>
+        <span aria-hidden="true">→</span>
+      </Link>
+    </li>
+  );
 }
 
 function Home({ token }: { token: string }) {
@@ -54,6 +70,11 @@ function Home({ token }: { token: string }) {
   // Le formulaire s'ouvre sur « Créer un voyage », ou d'emblée s'il n'y a aucun voyage.
   const [creating, setCreating] = useState(false);
   const showForm = creating || (myTrips !== null && myTrips.length === 0);
+  // À venir (le plus proche d'abord) et passés (le plus récent d'abord).
+  const today = localToday();
+  const timed = (myTrips ?? []).map((trip) => ({ trip, timing: tripTiming(trip.startsOn, trip.endsOn, today) }));
+  const upcoming = timed.filter((t) => t.timing.status !== 'past');
+  const past = timed.filter((t) => t.timing.status === 'past').sort((a, b) => b.trip.endsOn.localeCompare(a.trip.endsOn));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) =>
@@ -85,20 +106,13 @@ function Home({ token }: { token: string }) {
           <h2 id="my-trips" className="title-large">
             Mes voyages
           </h2>
-          <ul className="trip-list">
-            {myTrips.map((t) => (
-              <li key={t.code}>
-                <Link to={`/t/${t.code}`}>
-                  <span className="trip-list__text">
-                    {t.name}
-                    <span className="trip-list__dates">{formatTripDates(t.startsOn, t.endsOn)}</span>
-                    <span className="trip-list__roles">{role(t)}</span>
-                  </span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {upcoming.length > 0 && (
+            <ul className="trip-list">
+              {upcoming.map(({ trip, timing }) => (
+                <TripItem key={trip.code} trip={trip} badge={{ label: timing.label, full: trip.isFull }} />
+              ))}
+            </ul>
+          )}
           {!showForm && (
             <button type="button" className="btn btn--tonal" onClick={() => setCreating(true)}>
               Créer un voyage
@@ -160,6 +174,18 @@ function Home({ token }: { token: string }) {
             </form>
           </div>
         </div>
+      )}
+      {past.length > 0 && (
+        <section className="section section--past" aria-labelledby="past-trips">
+          <h2 id="past-trips" className="title-large">
+            Passés
+          </h2>
+          <ul className="trip-list trip-list--past">
+            {past.map(({ trip }) => (
+              <TripItem key={trip.code} trip={trip} />
+            ))}
+          </ul>
+        </section>
       )}
     </>
   );

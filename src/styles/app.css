@@ -779,6 +779,35 @@ a {
   font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
 }
+/* Compte à rebours : vert, gris clair quand le voyage est complet. */
+.trip-badge {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--me);
+  color: #fff;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+}
+.trip-badge--full {
+  background: #e6e0e9;
+  color: var(--on-surface-variant);
+}
+/* Voyages passés : plus discrets. */
+.trip-list--past a {
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid var(--primary-container);
+  font-weight: 400;
+}
+.trip-list--past .trip-list__roles {
+  color: var(--on-surface-variant);
+}
+.section--past {
+  margin-top: 40px;
+}
 
 .section {
   padding: 0 32px;

@@ -157,6 +157,15 @@ export function createLocalApi(
       }
     }
   }
+  // Au moins un trajet, et plus aucune place libre (comme my_trips en SQL).
+  function isFull(db: Db, tripId: string): boolean {
+    const cars = db.cars.filter((c) => c.tripId === tripId);
+    const legs = db.legs.filter((l) => cars.some((c) => c.id === l.carId));
+    return (
+      legs.length > 0 &&
+      legs.every((l) => db.bookings.filter((b) => b.legId === l.id).length >= cars.find((c) => c.id === l.carId)!.seats)
+    );
+  }
   // Voyage et tout ce qui s'y rattache (comme la cascade SQL).
   function removeTrip(db: Db, tripId: string) {
     const carIds = new Set(db.cars.filter((c) => c.tripId === tripId).map((c) => c.id));
@@ -259,6 +268,7 @@ export function createLocalApi(
             isOrganizer: p.isOrganizer,
             isDriver: db.cars.some((c) => c.driverId === p.id),
             isPassenger: db.bookings.some((b) => b.participantId === p.id),
+            isFull: isFull(db, t.id),
           };
         })
         .sort((a, b) => a.startsOn.localeCompare(b.startsOn) || a.name.localeCompare(b.name));

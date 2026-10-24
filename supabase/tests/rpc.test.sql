@@ -76,6 +76,7 @@ begin
   perform join_trip(hugo, code); -- idempotent
   perform join_trip(lea, code);
   perform join_trip(max_, code);
+  assert not (my_trips(lea)->0->>'isFull')::boolean, 'sans voiture : pas complet';
 
   -- Hugo propose 1 place à l'aller et au retour.
   car := save_car(hugo, code, null, 1, json_build_array(
@@ -108,7 +109,9 @@ begin
   assert failed, 'conducteur passager';
 
   -- Max a une place au retour : il ne peut pas ajouter sa voiture sans la libérer.
+  assert not (my_trips(lea)->0->>'isFull')::boolean, 'place libre au retour : pas complet';
   perform take_seat(max_, code, retour);
+  assert (my_trips(lea)->0->>'isFull')::boolean, 'plus aucune place : complet';
   failed := false;
   begin
     perform save_car(max_, code, null, 3, json_build_array(

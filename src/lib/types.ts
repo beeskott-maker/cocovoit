@@ -98,6 +98,8 @@ export interface MyTrip {
   isOrganizer: boolean;
   isDriver: boolean;
   isPassenger: boolean;
+  /** Au moins un trajet, et plus aucune place libre. */
+  isFull: boolean;
 }
 
 /**

@@ -47,3 +47,23 @@ export function inviteUrl(code: string): string {
   const { origin, pathname } = window.location;
   return `${origin}${pathname}#/j/${code}`;
 }
+
+/** Date du jour de l'appareil, au format "2026-10-24". */
+export function localToday(now = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+/**
+ * Où en est un voyage par rapport à aujourd'hui : à venir (« dans 5 jours »,
+ * puis en semaines au-delà de 7 jours), en cours, ou passé.
+ */
+export function tripTiming(startsOn: string, endsOn: string, today: string): { status: 'upcoming' | 'ongoing' | 'past'; label: string } {
+  if (endsOn < today) return { status: 'past', label: 'Passé' };
+  if (startsOn <= today) return { status: 'ongoing', label: 'En cours' };
+  const days = Math.round((Date.parse(startsOn) - Date.parse(today)) / 86_400_000);
+  if (days === 1) return { status: 'upcoming', label: 'demain' };
+  if (days <= 7) return { status: 'upcoming', label: `dans ${days} jours` };
+  const weeks = Math.round(days / 7);
+  return { status: 'upcoming', label: `dans ${weeks} semaine${weeks > 1 ? 's' : ''}` };
+}

@@ -100,6 +100,24 @@ export const DEMO_TRIPS: DemoTrip[] = [
     ],
   },
   {
+    name: 'Jazz à Vienne',
+    destination: 'Théâtre antique, 38200 Vienne',
+    startsOn: '2026-07-04',
+    endsOn: '2026-07-04',
+    organizer: 'hugo',
+    people: ['hugo', ME, 'julie'],
+    cars: [
+      {
+        driver: 'hugo',
+        seats: 3,
+        legs: {
+          aller: { at: '2026-07-04T18:00:00+02:00', rdv: 'Gare Jean-Macé, Lyon', passengers: [ME, 'julie'] },
+          retour: { at: '2026-07-05T00:30:00+02:00', passengers: [ME, 'julie'] },
+        },
+      },
+    ],
+  },
+  {
     name: 'Mariage de Sarah et Antoine',
     destination: 'Domaine des Grillons, 69430 Beaujeu',
     startsOn: '2027-06-12',
