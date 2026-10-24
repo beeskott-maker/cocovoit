@@ -54,6 +54,7 @@ export function createSupabaseApi(url: string, anonKey: string): Api {
         p_legs: input.legs,
       }),
     deleteCar: (token, code, carId) => rpc('delete_car', { p_token: token, p_code: code, p_car_id: carId }),
+    deleteTrip: (token, code) => rpc('delete_trip', { p_token: token, p_code: code }),
     takeSeat: (token, code, legId) => rpc('take_seat', { p_token: token, p_code: code, p_leg_id: legId }),
     leaveSeat: (token, code, legId) => rpc('leave_seat', { p_token: token, p_code: code, p_leg_id: legId }),
     adminListTrips: (key, email) => rpc<AdminTrip[]>('admin_list_trips', { p_key: key, p_email: email }),

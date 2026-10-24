@@ -111,4 +111,29 @@ describe('Parcours organisateur et conducteur', () => {
     expect(screen.queryByRole('button', { name: 'Créer' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Nouveau voyage' })).toBeInTheDocument();
   });
+
+  it("l'organisateur peut supprimer le voyage après confirmation, pas les participants", async () => {
+    const api = createTestApi();
+    const { code, organizer, hugo } = await seedTrip(api);
+
+    signIn(hugo);
+    const first = renderApp(`/t/${code}`, api);
+    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Supprimer ce voyage' })).not.toBeInTheDocument();
+    first.unmount();
+
+    signIn(organizer);
+    const { user } = renderApp(`/t/${code}`, api);
+    const remove = await screen.findByRole('button', { name: 'Supprimer ce voyage' });
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false);
+    await user.click(remove);
+    expect(confirm).toHaveBeenCalledWith('Êtes-vous sûr de bien vouloir supprimer le voyage « WE dans le Beaujolais » ?');
+    expect(await api.myTrips(organizer)).toHaveLength(1);
+
+    confirm.mockReturnValueOnce(true);
+    await user.click(remove);
+    expect(await screen.findByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();
+    expect(await api.myTrips(organizer)).toEqual([]);
+    expect(await api.myTrips(hugo)).toEqual([]);
+  });
 });

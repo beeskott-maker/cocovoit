@@ -157,6 +157,16 @@ export function createLocalApi(
       }
     }
   }
+  // Voyage et tout ce qui s'y rattache (comme la cascade SQL).
+  function removeTrip(db: Db, tripId: string) {
+    const carIds = new Set(db.cars.filter((c) => c.tripId === tripId).map((c) => c.id));
+    const legIds = new Set(db.legs.filter((l) => carIds.has(l.carId)).map((l) => l.id));
+    db.trips = db.trips.filter((t) => t.id !== tripId);
+    db.participants = db.participants.filter((p) => p.tripId !== tripId);
+    db.cars = db.cars.filter((c) => !carIds.has(c.id));
+    db.legs = db.legs.filter((l) => !legIds.has(l.id));
+    db.bookings = db.bookings.filter((b) => !legIds.has(b.legId));
+  }
   // Petite latence pour que l'appli se comporte comme avec un vrai serveur.
   const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
@@ -343,6 +353,15 @@ export function createLocalApi(
       save(db);
     },
 
+    async deleteTrip(token, code) {
+      await tick();
+      const db = load();
+      const me = participant(db, token, code);
+      if (!me.isOrganizer) throw new ApiError("Seul l'organisateur peut supprimer ce voyage", 'forbidden');
+      removeTrip(db, me.tripId);
+      save(db);
+    },
+
     async takeSeat(token, code, legId) {
       await tick();
       const db = load();
@@ -404,13 +423,7 @@ export function createLocalApi(
       const db = load();
       const trip = db.trips.find((t) => t.code === code);
       if (!trip) throw new ApiError('Voyage introuvable', 'not_found');
-      const carIds = new Set(db.cars.filter((c) => c.tripId === trip.id).map((c) => c.id));
-      const legIds = new Set(db.legs.filter((l) => carIds.has(l.carId)).map((l) => l.id));
-      db.trips = db.trips.filter((t) => t.id !== trip.id);
-      db.participants = db.participants.filter((p) => p.tripId !== trip.id);
-      db.cars = db.cars.filter((c) => !carIds.has(c.id));
-      db.legs = db.legs.filter((l) => !legIds.has(l.id));
-      db.bookings = db.bookings.filter((b) => !legIds.has(b.legId));
+      removeTrip(db, trip.id);
       save(db);
     },
   };

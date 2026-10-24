@@ -73,6 +73,17 @@ function Trip({ token }: { token: string }) {
     }
   }
 
+  // Réservé à l'organisateur, après confirmation.
+  async function deleteTrip() {
+    if (!state || !window.confirm(`Êtes-vous sûr de bien vouloir supprimer le voyage « ${state.trip.name} » ?`)) return;
+    try {
+      await api.deleteTrip(token, code);
+      navigate('/');
+    } catch (err) {
+      setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
+    }
+  }
+
   // Déconnexion, puis connexion (éventuellement avec un autre compte) sur ce voyage.
   async function switchPerson() {
     await logout();
@@ -126,6 +137,11 @@ function Trip({ token }: { token: string }) {
               Ajouter ma voiture
             </Link>
           ))}
+        {state.me.isOrganizer && (
+          <button type="button" className="btn btn--danger" onClick={deleteTrip}>
+            Supprimer ce voyage
+          </button>
+        )}
       </main>
       <footer className="trip-footer body-medium">
         <span>Connecté·e en tant que {state.me.name}</span>

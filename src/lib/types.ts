@@ -116,6 +116,8 @@ export interface Api {
   getTripState(token: string, code: string): Promise<TripState>;
   saveCar(token: string, code: string, input: CarInput): Promise<string>;
   deleteCar(token: string, code: string, carId: string): Promise<void>;
+  /** Réservé à l'organisateur : supprime le voyage et tout ce qui s'y rattache. */
+  deleteTrip(token: string, code: string): Promise<void>;
   takeSeat(token: string, code: string, legId: string): Promise<void>;
   leaveSeat(token: string, code: string, legId: string): Promise<void>;
   /** Gestion des voyages (page #/x/<clé>) : clé de l'URL + adresse email autorisée. */

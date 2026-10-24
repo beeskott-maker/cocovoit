@@ -189,6 +189,23 @@ begin
   end;
   assert failed, 'nom du voyage obligatoire';
 
+  -- Suppression d'un voyage : réservée à l'organisateur.
+  perform join_trip(hugo, code);
+  failed := false;
+  begin
+    perform delete_trip(hugo, code);
+  exception when invalid_authorization_specification then failed := true;
+  end;
+  assert failed, 'un participant ne supprime pas le voyage';
+  perform delete_trip(orga, code);
+  assert json_array_length(my_trips(orga)) = 1, 'voyage supprimé';
+  failed := false;
+  begin
+    perform get_trip_state(orga, code);
+  exception when no_data_found then failed := true;
+  end;
+  assert failed, 'voyage introuvable après suppression';
+
   raise notice 'Tous les tests SQL passent';
 end;
 $$;
