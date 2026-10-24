@@ -111,7 +111,6 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
       <BrandHeader />
       <div className="page-title">
         <h1 className="display-small">{carId ? 'Ma voiture' : 'Ajouter ma voiture'}</h1>
-        <p className="body-medium">{state.trip.name}</p>
       </div>
       <form className="form form--compact" onSubmit={submit} noValidate>
         <div className="stepper">

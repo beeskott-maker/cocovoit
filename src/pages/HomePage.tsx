@@ -110,7 +110,7 @@ function Home({ token }: { token: string }) {
         // Dépliement animé seulement quand on ouvre via « Nouveau voyage ».
         <div className={creating ? 'new-trip new-trip--unfold' : 'new-trip'}>
           <div className="new-trip__inner">
-            <div className="page-title page-title--inset">
+            <div className="page-title">
               <h1 className="display-small">Nouveau voyage</h1>
               <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
             </div>
