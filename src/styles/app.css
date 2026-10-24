@@ -779,14 +779,14 @@ a {
   font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
 }
-/* Compte à rebours : vert, gris clair quand le voyage est complet. */
+/* Compte à rebours : vert pâle, gris clair quand le voyage est complet. */
 .trip-badge {
   align-self: flex-start;
   margin-top: 8px;
   padding: 2px 8px;
   border-radius: 12px;
-  background: var(--me);
-  color: #fff;
+  background: #cdeac0;
+  color: #2b4a1a;
   font-size: 12px;
   line-height: 16px;
   font-weight: 700;

@@ -1,9 +1,10 @@
+import { localToday } from './format';
 import { createLocalApi, memoryStore } from './localApi';
-import { DEMO_TRIPS } from './demoData';
+import { demoTrips } from './demoData';
 
 describe('Données de démo', () => {
   it('respectent les règles métier', () => {
-    for (const t of DEMO_TRIPS) {
+    for (const t of demoTrips()) {
       expect(t.people).toContain(t.organizer);
       const drivers = t.cars.map((c) => c.driver);
       expect(new Set(drivers).size).toBe(drivers.length);
@@ -27,15 +28,25 @@ describe('Données de démo', () => {
     const r = await api.login('test@example.com', 'Testeur');
     if (r.status !== 'ok') throw new Error('connexion');
     const trips = await api.myTrips(r.token);
-    expect(trips.map((t) => t.name).sort()).toEqual(DEMO_TRIPS.map((t) => t.name).sort());
+    expect(trips.map((t) => t.name).sort()).toEqual(demoTrips().map((t) => t.name).sort());
     const annecy = trips.find((t) => t.name === 'Week-end à Annecy')!;
     expect(annecy).toMatchObject({ isOrganizer: true, isDriver: true, isPassenger: false });
     const state = await api.getTripState(r.token, annecy.code);
     expect(state.cars).toHaveLength(2);
 
-    // Une seconde personne ne relance pas le jeu de données.
+    // Le voyage complet part dans 2 jours.
+    const raclette = trips.find((t) => t.name === 'Soirée raclette chez Hugo')!;
+    expect(raclette.isFull).toBe(true);
+    const inTwoDays = new Date();
+    inTwoDays.setDate(inTwoDays.getDate() + 2);
+    expect(raclette.startsOn).toBe(localToday(inTwoDays));
+
+    // Chaque nouveau compte a ses propres voyages de démo ; un compte existant non.
     const r2 = await api.login('autre@example.com', 'Autre');
     if (r2.status !== 'ok') throw new Error('connexion');
-    expect(await api.myTrips(r2.token)).toEqual([]);
+    expect(await api.myTrips(r2.token)).toHaveLength(trips.length);
+    const again = await api.login('test@example.com');
+    if (again.status !== 'ok') throw new Error('connexion');
+    expect(await api.myTrips(again.token)).toHaveLength(trips.length);
   });
 });

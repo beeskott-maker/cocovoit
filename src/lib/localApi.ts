@@ -7,7 +7,7 @@ import {
   type TripState,
 } from './types';
 import { storageKey } from './env';
-import { DEMO_PEOPLE, DEMO_TRIPS, ME } from './demoData';
+import { DEMO_PEOPLE, ME, demoTrips } from './demoData';
 
 /**
  * Implémentation de démonstration, utilisée quand Supabase n'est pas configuré.
@@ -127,11 +127,15 @@ export function createLocalApi(
   function seed(db: Db, meId: string) {
     const accountIds: Record<string, string> = { [ME]: meId };
     for (const [key, name] of Object.entries(DEMO_PEOPLE)) {
-      const a = { id: newId(), email: `${key}@example.com`, name };
-      db.accounts.push(a);
+      const email = `${key}@example.com`;
+      let a = db.accounts.find((x) => x.email === email);
+      if (!a) {
+        a = { id: newId(), email, name };
+        db.accounts.push(a);
+      }
       accountIds[key] = a.id;
     }
-    for (const t of DEMO_TRIPS) {
+    for (const t of demoTrips()) {
       const { name, destination, startsOn, endsOn } = t;
       const trip = { id: newId(), code: newId().replace(/-/g, '').slice(0, 16), name, destination, startsOn, endsOn, createdAt: now() };
       db.trips.push(trip);
@@ -190,8 +194,9 @@ export function createLocalApi(
         if (!name?.trim()) return { status: 'needs_name' };
         found = { id: newId(), email: email.trim(), name: name.trim() };
         db.accounts.push(found);
+        // Environnement de test : chaque nouveau compte a ses voyages de démo.
+        if (options.seedDemo) seed(db, found.id);
       }
-      if (options.seedDemo && db.trips.length === 0) seed(db, found.id);
       const token = newId();
       db.sessions.push({ token, accountId: found.id });
       save(db);

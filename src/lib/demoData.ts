@@ -2,8 +2,8 @@ import type { Direction } from './types';
 
 /**
  * Jeu de données de démonstration de l'environnement de test (/dev/).
- * « moi » désigne la personne connectée : elle est ajoutée aux voyages lors
- * de sa première connexion sur une base démo vide. Rien n'est inséré en production.
+ * « moi » désigne la personne connectée : chaque nouveau compte reçoit ses
+ * propres exemplaires de ces voyages. Rien n'est inséré en production.
  */
 export const DEMO_PEOPLE: Record<string, string> = {
   hugo: 'Hugo',
@@ -30,7 +30,7 @@ export interface DemoTrip {
   cars: { driver: string; seats: number; legs: Partial<Record<Direction, DemoLeg>> }[];
 }
 
-export const DEMO_TRIPS: DemoTrip[] = [
+const FIXED_TRIPS: DemoTrip[] = [
   {
     name: 'Week-end à Annecy',
     destination: '12 rue Sainte-Claire, 74000 Annecy',
@@ -127,3 +127,37 @@ export const DEMO_TRIPS: DemoTrip[] = [
     cars: [],
   },
 ];
+
+/** "2026-10-26" pour aujourd'hui + n jours (date locale). */
+function inDays(today: Date, n: number): string {
+  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + n);
+  const pad = (x: number) => String(x).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Voyages de démo, dont un complet qui part dans 2 jours (dates relatives à aujourd'hui). */
+export function demoTrips(today = new Date()): DemoTrip[] {
+  const start = inDays(today, 2);
+  const end = inDays(today, 3);
+  return [
+    ...FIXED_TRIPS,
+    {
+      name: 'Soirée raclette chez Hugo',
+      destination: '8 chemin des Vignes, 69890 La Tour-de-Salvagny',
+      startsOn: start,
+      endsOn: end,
+      organizer: 'hugo',
+      people: ['hugo', ME, 'julie', 'thomas'],
+      cars: [
+        {
+          driver: 'thomas',
+          seats: 2,
+          legs: {
+            aller: { at: `${start}T18:30:00`, rdv: 'Métro Gorge de Loup, Lyon', passengers: [ME, 'julie'] },
+            retour: { at: `${end}T11:00:00`, passengers: [ME, 'julie'] },
+          },
+        },
+      ],
+    },
+  ];
+}
