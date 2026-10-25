@@ -1,4 +1,3 @@
-import { localToday } from './format';
 import { createLocalApi, memoryStore } from './localApi';
 import { demoTrips } from './demoData';
 
@@ -33,13 +32,6 @@ describe('Données de démo', () => {
     expect(annecy).toMatchObject({ isOrganizer: true, isDriver: true, isPassenger: false });
     const state = await api.getTripState(r.token, annecy.code);
     expect(state.cars).toHaveLength(2);
-
-    // Le voyage complet part dans 2 jours.
-    const raclette = trips.find((t) => t.name === 'Soirée raclette chez Hugo')!;
-    expect(raclette.isFull).toBe(true);
-    const inTwoDays = new Date();
-    inTwoDays.setDate(inTwoDays.getDate() + 2);
-    expect(raclette.startsOn).toBe(localToday(inTwoDays));
 
     // Chaque nouveau compte a ses propres voyages de démo ; un compte existant non.
     const r2 = await api.login('autre@example.com', 'Autre');

@@ -71,7 +71,7 @@ Le workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) s'exécute à
 | Production | `main` | `/cocovoit/` | Supabase |
 | Test | `dev` | `/cocovoit/dev/` | mode démo, dans le navigateur |
 
-Chaque déploiement publie les deux : la prod à la racine, la branche `dev` sous `/dev/` (si elle existe ; un échec de sa construction ne bloque pas la prod). La version de test affiche un badge « DEV », a ses propres clés de stockage (`cocovoit-dev:…`) et donne à chaque nouveau compte ses voyages de démonstration, dont un complet qui part dans 2 jours ([`src/lib/demoData.ts`](src/lib/demoData.ts)).
+Chaque déploiement publie les deux : la prod à la racine, la branche `dev` sous `/dev/` (si elle existe ; un échec de sa construction ne bloque pas la prod). La version de test affiche un badge « DEV », a ses propres clés de stockage (`cocovoit-dev:…`) et donne à chaque nouveau compte ses voyages de démonstration, trois à venir et un passé ([`src/lib/demoData.ts`](src/lib/demoData.ts)).
 
 ### Configuration à faire une fois
 
