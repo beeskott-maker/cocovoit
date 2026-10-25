@@ -31,16 +31,19 @@ export function mapsApps(ua = navigator.userAgent): MapsApp[] {
   return list;
 }
 
-/** Liens universels : l'appli s'ouvre si elle est installée, sinon sa version web. */
+/**
+ * Liens universels vers le lieu (pas le guidage) : l'appli s'ouvre sur l'adresse
+ * si elle est installée, sinon sa version web.
+ */
 export function routeUrl(app: MapsAppId, address: string): string {
   const q = encodeURIComponent(address);
   switch (app) {
     case 'waze':
-      return `https://waze.com/ul?q=${q}&navigate=yes`;
+      return `https://waze.com/ul?q=${q}`;
     case 'google':
-      return `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+      return `https://www.google.com/maps/search/?api=1&query=${q}`;
     case 'apple':
-      return `https://maps.apple.com/?daddr=${q}`;
+      return `https://maps.apple.com/?q=${q}`;
     case 'other':
       return `geo:0,0?q=${q}`;
   }

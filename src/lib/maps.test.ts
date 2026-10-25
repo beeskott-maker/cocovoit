@@ -12,12 +12,12 @@ describe('applis d’itinéraire', () => {
     expect(names(WINDOWS)).toEqual(['Waze', 'Google Maps']);
   });
 
-  it('liens d’itinéraire vers l’adresse', () => {
+  it('liens qui ouvrent le lieu, sans lancer le guidage', () => {
     const address = '12 rue Sainte-Claire, 74000 Annecy';
     const q = encodeURIComponent(address);
-    expect(routeUrl('waze', address)).toBe(`https://waze.com/ul?q=${q}&navigate=yes`);
-    expect(routeUrl('google', address)).toBe(`https://www.google.com/maps/dir/?api=1&destination=${q}`);
-    expect(routeUrl('apple', address)).toBe(`https://maps.apple.com/?daddr=${q}`);
+    expect(routeUrl('waze', address)).toBe(`https://waze.com/ul?q=${q}`);
+    expect(routeUrl('google', address)).toBe(`https://www.google.com/maps/search/?api=1&query=${q}`);
+    expect(routeUrl('apple', address)).toBe(`https://maps.apple.com/?q=${q}`);
     expect(routeUrl('other', address)).toBe(`geo:0,0?q=${q}`);
   });
 });
