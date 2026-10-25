@@ -220,9 +220,10 @@ describe('Parcours organisateur et conducteur', () => {
     const { user } = renderApp(`/t/${code}`, api);
     await user.click(await screen.findByRole('button', { name: 'Itinéraire' }));
     const sheet = screen.getByRole('dialog', { name: "Ouvrir l'itinéraire avec" });
-    const waze = within(sheet).getByRole('link', { name: 'Waze' });
-    expect(waze).toHaveAttribute('href', expect.stringMatching(/^https:\/\/waze\.com\/ul\?q=124%20Venelle/));
-    expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toBeInTheDocument();
+    // Ordinateur (jsdom) : pas de Waze.
+    expect(within(sheet).queryByRole('link', { name: 'Waze' })).not.toBeInTheDocument();
+    const google = within(sheet).getByRole('link', { name: 'Google Maps' });
+    expect(google).toHaveAttribute('href', expect.stringContaining('query=124%20Venelle'));
     expect(within(sheet).queryByRole('checkbox')).not.toBeInTheDocument();
 
     await user.click(within(sheet).getByRole('button', { name: 'Annuler' }));
@@ -230,7 +231,7 @@ describe('Parcours organisateur et conducteur', () => {
 
     // Choisir une appli ouvre son lien et referme le panneau.
     await user.click(screen.getByRole('button', { name: 'Itinéraire' }));
-    await user.click(screen.getByRole('link', { name: 'Waze' }));
+    await user.click(screen.getByRole('link', { name: 'Google Maps' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 

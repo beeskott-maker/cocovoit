@@ -22,10 +22,16 @@ const APPS: Record<MapsAppId, MapsApp> = {
 // iPadOS se présente comme un Mac : « Macintosh » couvre les deux.
 const isApple = (ua: string) => /iPhone|iPad|iPod|Macintosh/.test(ua);
 const isAndroid = (ua: string) => /Android/.test(ua);
+// Téléphone ou tablette. Un iPad se présente comme un Mac, mais tactile.
+const isMobile = (ua: string, touchPoints: number) =>
+  /Android|iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1);
 
-/** Apple Plans seulement sur les appareils Apple, « Autre application » seulement sur Android. */
-export function mapsApps(ua = navigator.userAgent): MapsApp[] {
-  const list = [APPS.waze, APPS.google];
+/**
+ * Waze seulement sur mobile (pas d'appli sur ordinateur), Apple Plans seulement
+ * sur les appareils Apple, « Autre application » seulement sur Android.
+ */
+export function mapsApps(ua = navigator.userAgent, touchPoints = navigator.maxTouchPoints ?? 0): MapsApp[] {
+  const list = isMobile(ua, touchPoints) ? [APPS.waze, APPS.google] : [APPS.google];
   if (isApple(ua)) list.push(APPS.apple);
   if (isAndroid(ua)) list.push(APPS.other);
   return list;
