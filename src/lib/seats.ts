@@ -48,9 +48,8 @@ const isPassenger = (c: SeatCell) => c.kind === 'occupied' || c.kind === 'me';
 /**
  * Place les cases sur deux colonnes : à gauche, les passagers (3 au plus) ; à
  * droite, les passagers suivants, puis les places libres, puis le bouton (ou
- * « Voiture pleine »), toujours en dernier. Si la colonne de droite dépasse
- * 3 lignes, la case des places libres disparaît : le bouton suffit. Voiture
- * vide : places libres à gauche, bouton à droite.
+ * « Voiture pleine »), toujours en dernier, quitte à passer sur une 4e ligne.
+ * Voiture vide : places libres à gauche, bouton à droite.
  */
 export function placeSeats(cells: SeatCell[]): PlacedCell[] {
   const passengers = cells.filter(isPassenger);
@@ -58,9 +57,7 @@ export function placeSeats(cells: SeatCell[]): PlacedCell[] {
   if (passengers.length === 0) {
     return cells.map((cell, i) => ({ cell, column: i === 0 ? 1 : 2, row: 1 }));
   }
-  let right = [...passengers.slice(3), ...cells.filter((c) => !isPassenger(c))];
-  const hasAction = right.some((c) => c.kind === 'take' || c.kind === 'leave');
-  if (right.length > 3 && hasAction) right = right.filter((c) => c.kind !== 'free');
+  const right = [...passengers.slice(3), ...cells.filter((c) => !isPassenger(c))];
   return [
     ...passengers.slice(0, 3).map((cell, i) => ({ cell, column: 1 as const, row: i + 1 })),
     ...right.map((cell, i) => ({ cell, column: 2 as const, row: i + 1 })),

@@ -92,8 +92,8 @@ describe('placeSeats', () => {
     expect(layout(4, 5)).toEqual(['occupied:G1', 'occupied:G2', 'occupied:G3', 'occupied:D1', 'free:D2', 'take:D3']);
     expect(layout(4, 6).slice(3)).toEqual(['occupied:D1', 'free:D2', 'take:D3']);
   });
-  it('plus de 3 lignes à droite : la case des places libres disparaît', () => {
-    expect(layout(5, 6).slice(3)).toEqual(['occupied:D1', 'occupied:D2', 'take:D3']);
+  it('plus de 3 lignes à droite : le bouton passe sur une 4e ligne', () => {
+    expect(layout(5, 6).slice(3)).toEqual(['occupied:D1', 'occupied:D2', 'free:D3', 'take:D4']);
   });
   it('voiture vide : places libres à gauche, bouton à droite', () => {
     expect(layout(0, 4)).toEqual(['free:G1', 'take:D1']);
