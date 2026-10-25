@@ -419,8 +419,13 @@ a {
   align-items: center;
   gap: 4px;
 }
-.car__title {
+.car__title-group {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+}
+.car__title {
   margin: 0;
   font-weight: 600;
   font-size: 20px;
@@ -434,10 +439,17 @@ a {
   font-size: 20px;
   color: var(--success);
 }
+/* « Ma voiture · Modifier » */
 .car__edit {
-  align-self: flex-start;
   font-size: 14px;
   color: var(--primary);
+}
+.car__edit::before {
+  content: '·';
+  display: inline-block;
+  margin: 0 8px;
+  color: var(--on-surface-variant);
+  text-decoration: none;
 }
 .car__legs {
   display: flex;

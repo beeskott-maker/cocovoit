@@ -29,7 +29,14 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
       <div className="car__header">
         <img src={carIcon} alt="" width={24} height={24} />
         <div className="car__title-row">
-          <h2 className="car__title">{mine ? 'Ma voiture' : `Voiture de ${car.driver.name}`}</h2>
+          <div className="car__title-group">
+            <h2 className="car__title">{mine ? 'Ma voiture' : `Voiture de ${car.driver.name}`}</h2>
+            {mine && (
+              <Link className="car__edit" to={editHref} aria-label="Modifier ma voiture">
+                Modifier
+              </Link>
+            )}
+          </div>
           {/* Voiture pleine : rien ici, « Voiture pleine » apparaît déjà dans les trajets. */}
           {free > 0 && (
             <span className="car__free" title={`${free} place${free > 1 ? 's' : ''} libre${free > 1 ? 's' : ''}`}>
@@ -39,11 +46,6 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
             </span>
           )}
         </div>
-        {mine && (
-          <Link className="car__edit" to={editHref}>
-            Modifier ma voiture
-          </Link>
-        )}
       </div>
       <div className="car__legs">
         {car.legs.map((leg) => (
