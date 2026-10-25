@@ -987,3 +987,20 @@ a {
 .sheet__cancel {
   align-self: center;
 }
+
+/* Grand écran : le choix de l'appli s'ouvre en fenêtre centrée, pas en bas. */
+@media (min-width: 600px) {
+  .sheet {
+    top: 50%;
+    bottom: auto;
+    width: calc(100% - 48px);
+    max-width: 420px;
+    transform: translateY(-50%);
+    padding: 24px;
+    border-radius: 28px;
+    box-shadow: 0 8px 32px rgba(29, 27, 32, 0.24);
+  }
+  .sheet__handle {
+    display: none;
+  }
+}
