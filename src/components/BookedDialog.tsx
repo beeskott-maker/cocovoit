@@ -87,6 +87,7 @@ export function BookedDialog({ state, tripUrl, onClose }: Props) {
             })}
           </div>
         </div>
+        <p className="booked-note">Un empêchement ? Vous pourrez libérer vos places à tout moment depuis la page du voyage.</p>
         <div className="confirm__actions">
           <button type="button" className="btn btn--primary" onClick={onClose} autoFocus>
             OK

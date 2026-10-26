@@ -189,6 +189,7 @@ describe('Parcours organisateur et conducteur', () => {
     expect(retour).toHaveTextContent('Voiture de Hugo');
     expect(retour).not.toHaveTextContent('Ancien RDV retour');
     expect(within(retour).queryByRole('link')).not.toBeInTheDocument();
+    expect(dialog).toHaveTextContent('Vous pourrez libérer vos places à tout moment');
 
     await user.click(within(dialog).getByRole('button', { name: 'OK' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
