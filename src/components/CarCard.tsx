@@ -5,7 +5,7 @@ import check from '../assets/figma/check.svg';
 import seatFree from '../assets/figma/seat-free.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
-import { formatDeparture } from '../lib/format';
+import { carOf, formatDeparture } from '../lib/format';
 import { freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
 import type { Car, Direction, Leg } from '../lib/types';
 import { RdvSheet } from './RdvSheet';
@@ -28,10 +28,10 @@ interface Props {
 
 export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, onTake, onLeave, tripName, tripUrl }: Props) {
   const mine = car.driver.id === meId;
-  const carLabel = mine ? 'Ma voiture' : `Voiture de ${car.driver.name}`;
+  const carLabel = mine ? 'Ma voiture' : carOf(car.driver.name);
   const [rdvLeg, setRdvLeg] = useState<(Leg & { meetingPoint: string }) | null>(null);
   return (
-    <section className="car" aria-label={`Voiture de ${car.driver.name}`}>
+    <section className="car" aria-label={carOf(car.driver.name)}>
       <div className="car__header">
         <img src={carIcon} alt="" width={24} height={24} />
         <div className="car__title-row">

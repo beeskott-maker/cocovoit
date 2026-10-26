@@ -27,7 +27,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     // Écran du voyage
     expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
     expect(document.title).toBe('WE dans le Beaujolais · Coco·Voit');
-    expect(screen.getByRole('heading', { name: 'Voiture de Hugo' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: "Voiture d'Hugo" })).toBeInTheDocument();
     expect(screen.getByText('sam 10 → lun 12 oct 2026')).toBeInTheDocument();
     // Un seul « Point de RDV » : celui de l'aller.
     expect(screen.getAllByRole('button', { name: 'Point de RDV' })).toHaveLength(1);

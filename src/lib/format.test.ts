@@ -1,4 +1,4 @@
-import { formatDeparture, formatTripDates, isEmail, localToday, tripTiming } from './format';
+import { carOf, formatDeparture, formatTripDates, isEmail, localToday, tripTiming } from './format';
 
 describe('formatTripDates', () => {
   it('formate un week-end dans le même mois comme la maquette', () => {
@@ -47,4 +47,16 @@ describe('tripTiming', () => {
   it('date du jour locale', () => {
     expect(localToday(new Date(2026, 9, 24, 23, 30))).toBe('2026-10-24');
   });
+});
+
+describe('carOf', () => {
+  it.each([
+    ['Antoine', "Voiture d'Antoine"],
+    ['Élodie', "Voiture d'Élodie"],
+    ['Hugo', "Voiture d'Hugo"],
+    ['Yves', "Voiture d'Yves"],
+    ['Yann', 'Voiture de Yann'],
+    ['Thomas', 'Voiture de Thomas'],
+    [' inès ', "Voiture d'inès"],
+  ])('%s → %s', (name, expected) => expect(carOf(name)).toBe(expected));
 });

@@ -3,7 +3,7 @@ import carIcon from '../assets/figma/car-dark.svg';
 import calendarIcon from '../assets/figma/calendar-dark-padded.svg';
 import pin from '../assets/figma/pin-dark.svg';
 import { googleCalendarUrl, rdvEvent } from '../lib/calendar';
-import { formatDeparture } from '../lib/format';
+import { carOf, formatDeparture } from '../lib/format';
 import type { Car, Direction, Leg, TripState } from '../lib/types';
 
 /** Mes places, par sens, avec la voiture correspondante. */
@@ -61,7 +61,7 @@ export function BookedDialog({ state, tripUrl, onClose }: Props) {
                   </div>
                   <p className="booked-leg__line">
                     <img src={carIcon} alt="" width={20} height={20} />
-                    <span>Voiture de {car.driver.name}</span>
+                    <span>{carOf(car.driver.name)}</span>
                   </p>
                   {direction === 'aller' && leg.meetingPoint && (
                     <p className="booked-leg__line">

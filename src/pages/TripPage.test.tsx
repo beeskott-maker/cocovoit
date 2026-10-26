@@ -53,12 +53,12 @@ describe('Page voyage', () => {
     await user.click(screen.getByRole('button', { name: 'Prendre 1 place' }));
     const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" });
     const aller = within(dialog).getByRole('region', { name: 'Aller' });
-    expect(aller).toHaveTextContent('Voiture de Hugo');
+    expect(aller).toHaveTextContent("Voiture d'Hugo");
     expect(aller).toHaveTextContent('Gare Part-Dieu');
     const add = within(aller).getByRole('link', { name: 'Ajouter à mon agenda' });
     expect(new URL(add.getAttribute('href')!).searchParams.get('text')).toBe('Covoiturage aller · WE dans le Beaujolais');
     const retour = within(dialog).getByRole('region', { name: 'Retour' });
-    expect(retour).toHaveTextContent('Voiture de Hugo');
+    expect(retour).toHaveTextContent("Voiture d'Hugo");
     expect(retour).not.toHaveTextContent('Ancien RDV retour');
     expect(within(retour).queryByRole('link')).not.toBeInTheDocument();
     expect(dialog).toHaveTextContent('Vous pourrez libérer vos places à tout moment');
@@ -78,7 +78,7 @@ describe('Page voyage', () => {
     }
     signIn(organizer);
     renderApp(`/t/${code}`, api);
-    const car = await screen.findByRole('region', { name: 'Voiture de Hugo' });
+    const car = await screen.findByRole('region', { name: "Voiture d'Hugo" });
     expect(car.querySelector('.car__free')).toBeNull();
     expect(car).not.toHaveTextContent('Complet');
   });
@@ -129,7 +129,7 @@ describe('Page voyage', () => {
     const { user } = renderApp(`/t/${code}`, api);
     await user.click(await screen.findByRole('button', { name: 'Point de RDV' }));
     const sheet = screen.getByRole('dialog', { name: 'Point de rendez-vous' });
-    expect(sheet).toHaveTextContent('Aller · WE dans le Beaujolais · Voiture de Hugo');
+    expect(sheet).toHaveTextContent("Aller · WE dans le Beaujolais · Voiture d'Hugo");
     expect(sheet).toHaveTextContent('Gare Part-Dieu');
     expect(sheet).toHaveTextContent(/Samedi 10 octobre à \d+h00/);
 
@@ -217,13 +217,13 @@ describe('Page voyage', () => {
     signIn(julie);
     const { user } = renderApp(`/t/${code}`, api);
 
-    const order = async () => (await screen.findAllByRole('heading', { level: 2, name: /^Voiture de/ })).map((h) => h.textContent);
-    expect(await order()).toEqual(['Voiture de Zoé', 'Voiture de Hugo']);
+    const order = async () => (await screen.findAllByRole('heading', { level: 2, name: /^Voiture d/ })).map((h) => h.textContent);
+    expect(await order()).toEqual(['Voiture de Zoé', "Voiture d'Hugo"]);
 
     // Zoé complète après la réservation : sa voiture ne descend pas tout de suite.
     const zoeCar = screen.getByRole('region', { name: 'Voiture de Zoé' });
     await user.click(within(zoeCar).getByRole('button', { name: 'Prendre 1 place' }));
     expect(await within(zoeCar).findByText('Moi')).toBeInTheDocument();
-    expect(await order()).toEqual(['Voiture de Zoé', 'Voiture de Hugo']);
+    expect(await order()).toEqual(['Voiture de Zoé', "Voiture d'Hugo"]);
   });
 });

@@ -11,7 +11,7 @@ import { Sheet } from './Sheet';
 
 interface Props {
   tripName: string;
-  /** « Ma voiture » ou « Voiture de Hugo ». */
+  /** « Ma voiture » ou « Voiture d'Hugo ». */
   carLabel: string;
   driverName: string;
   /** Trajet aller, avec un point de rendez-vous. */

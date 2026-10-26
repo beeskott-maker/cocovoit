@@ -70,3 +70,13 @@ export function tripTiming(startsOn: string, endsOn: string, today: string): { s
   const weeks = Math.round(days / 7);
   return { status: 'upcoming', label: `dans ${weeks} semaine${weeks > 1 ? 's' : ''}` };
 }
+
+/**
+ * « Voiture de Thomas », « Voiture d'Antoine » : élision devant une voyelle
+ * (accentuée ou non), un H, ou un Y prononcé « i » (Yves, mais Yann).
+ */
+export function carOf(name: string): string {
+  const n = name.trim();
+  const elide = /^[aeiouhàâäéèêëîïôöùûüœæ]/i.test(n) || /^y[^aeiouyàâäéèêëîïôöùûü]/i.test(n);
+  return elide ? `Voiture d'${n}` : `Voiture de ${n}`;
+}
