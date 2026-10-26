@@ -61,7 +61,24 @@ export function googleCalendarUrl(e: CalendarEvent): string {
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
-/** Télécharge le fichier .ics : iPhone, iPad et Mac l'ouvrent dans Calendrier. */
+// iPhone, iPad (qui se présente comme un Mac, mais tactile).
+const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+
+/**
+ * Ajoute l'événement à l'agenda de l'appareil. Sur iPhone et iPad, Safari
+ * n'ouvre Calendrier que si l'on navigue vers le contenu .ics (un
+ * téléchargement le range dans Fichiers) ; ailleurs, on télécharge le fichier,
+ * que le Mac ouvre dans Calendrier.
+ */
+export function addToDeviceCalendar(e: CalendarEvent, filename: string) {
+  if (isIos()) {
+    window.location.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsFile(e))}`;
+    return;
+  }
+  downloadIcs(e, filename);
+}
+
+/** Télécharge le fichier .ics. */
 export function downloadIcs(e: CalendarEvent, filename: string) {
   const url = URL.createObjectURL(new Blob([icsFile(e)], { type: 'text/calendar;charset=utf-8' }));
   const a = document.createElement('a');

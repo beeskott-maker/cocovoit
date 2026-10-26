@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import calendar from '../assets/figma/calendar-dark.svg';
 import pin from '../assets/figma/pin-dark.svg';
-import { downloadIcs, googleCalendarUrl, type CalendarEvent } from '../lib/calendar';
+import { addToDeviceCalendar, downloadIcs, googleCalendarUrl, type CalendarEvent } from '../lib/calendar';
 import { formatLongDeparture } from '../lib/format';
 import { isApple } from '../lib/maps';
 import type { Leg } from '../lib/types';
@@ -61,8 +61,8 @@ export function RdvSheet({ tripName, carLabel, driverName, leg, tripUrl, onClose
         {mapsOpen && <MapsOptions address={leg.meetingPoint} onChoose={onClose} />}
       </div>
       {isApple() ? (
-        // iPhone, iPad, Mac : le fichier s'ouvre dans Calendrier.
-        <button type="button" className="btn btn--primary" onClick={() => downloadIcs(event, 'covoiturage-aller.ics')}>
+        // iPhone, iPad, Mac : l'événement s'ouvre dans Calendrier.
+        <button type="button" className="btn btn--primary" onClick={() => addToDeviceCalendar(event, 'covoiturage-aller.ics')}>
           Ajouter à mon agenda
         </button>
       ) : (
