@@ -399,8 +399,12 @@ a {
 .trip-body {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   padding: 16px 24px 24px;
+}
+/* Page voyage : fond gris-violet, chaque voiture dans une carte blanche. */
+.app:has(.trip-body) {
+  background: #f3f0f6;
 }
 
 /* --- Voiture --- */
@@ -408,6 +412,9 @@ a {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
 }
 .car__header {
   display: flex;
