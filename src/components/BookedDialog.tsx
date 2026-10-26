@@ -61,12 +61,14 @@ export function BookedDialog({ state, tripUrl, onClose }: Props) {
                   </div>
                   <p className="booked-leg__line">
                     <img src={carIcon} alt="" width={20} height={20} />
-                    Voiture de {car.driver.name}
+                    <span>Voiture de {car.driver.name}</span>
                   </p>
                   {direction === 'aller' && leg.meetingPoint && (
                     <p className="booked-leg__line">
                       <img src={pin} alt="" width={20} height={20} />
-                      {leg.meetingPoint}
+                      {/* Texte dans un seul élément : iOS transforme les adresses en liens,
+                          qui deviendraient sinon des colonnes séparées de la ligne flex. */}
+                      <span>{leg.meetingPoint}</span>
                     </p>
                   )}
                   {direction === 'aller' && (

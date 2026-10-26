@@ -40,7 +40,7 @@ export function RdvSheet({ tripName, carLabel, driverName, leg, tripUrl, onClose
       <div className="rdv-infos">
         <p className="rdv-info">
           <img src={calendar} alt="" width={20} height={20} />
-          {formatLongDeparture(leg.departsAt)}
+          <span>{formatLongDeparture(leg.departsAt)}</span>
         </p>
         <p className="rdv-info">
           <img src={pin} alt="" width={20} height={20} />

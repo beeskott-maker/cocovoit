@@ -5,7 +5,7 @@ import share from '../assets/figma/share-primary.svg';
 import { formatTripDates } from '../lib/format';
 import { opensMapsDirectly } from '../lib/maps';
 import type { TripPreview } from '../lib/types';
-import { GoogleMapsLink, NewTabIcon } from './ExternalLink';
+import { GoogleMapsLink } from './ExternalLink';
 
 interface Props {
   trip: TripPreview;
@@ -48,7 +48,6 @@ export function TripHeader({ trip, onShare, onRoute }: Props) {
             <GoogleMapsLink address={trip.destination} className="header-btn header-btn--outline">
               <img src={globe} alt="" width={20} height={20} />
               Itinéraire
-              <NewTabIcon />
             </GoogleMapsLink>
           ) : (
             <button type="button" className="header-btn header-btn--outline" onClick={onRoute}>
