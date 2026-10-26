@@ -20,7 +20,7 @@ const APPS: Record<MapsAppId, MapsApp> = {
 };
 
 // iPadOS se présente comme un Mac : « Macintosh » couvre les deux.
-const isApple = (ua: string) => /iPhone|iPad|iPod|Macintosh/.test(ua);
+export const isApple = (ua: string = navigator.userAgent) => /iPhone|iPad|iPod|Macintosh/.test(ua);
 const isAndroid = (ua: string) => /Android/.test(ua);
 // Téléphone ou tablette. Un iPad se présente comme un Mac, mais tactile.
 const isMobile = (ua: string, touchPoints: number) =>

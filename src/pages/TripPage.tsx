@@ -120,6 +120,8 @@ function Trip({ token }: { token: string }) {
               iDrive={!!myCar}
               onTake={(leg) => act(leg, 'take')}
               onLeave={(leg) => act(leg, 'leave')}
+              tripName={state.trip.name}
+              tripUrl={inviteUrl(code)}
             />
           ))
         )}

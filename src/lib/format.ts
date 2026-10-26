@@ -28,6 +28,14 @@ export function formatDeparture(iso: string): string {
   return `${capitalize(clean(legDay.format(d)).replace(/\./g, ''))} à ${time}`;
 }
 
+const longDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+/** Date ISO → "Samedi 14 novembre à 7h00" (fuseau du navigateur) */
+export function formatLongDeparture(iso: string): string {
+  const d = new Date(iso);
+  return `${capitalize(longDay.format(d))} à ${legTime.format(d).replace(':', 'h')}`;
+}
+
 /** Date ISO → valeur pour <input type="datetime-local"> (heure locale) */
 export function toDateTimeLocal(iso: string): string {
   const d = new Date(iso);

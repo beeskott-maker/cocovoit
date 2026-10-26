@@ -246,4 +246,35 @@ describe('Parcours organisateur et conducteur', () => {
     const legs = [{ direction: 'aller' as const, departsAt: '2026-10-10T07:00:00Z', meetingPoint: null }];
     await expect(api.saveCar(organizer, code, { carId: null, seats: 7, legs })).rejects.toThrow('Entre 1 et 6 places');
   });
+
+  it('« Point de RDV » : récapitulatif, carte repliée, ajout à l’agenda', async () => {
+    const api = createTestApi();
+    const { code, organizer } = await seedTrip(api);
+    signIn(organizer);
+    const { user } = renderApp(`/t/${code}`, api);
+    await user.click(await screen.findByRole('button', { name: 'Point de RDV' }));
+    const sheet = screen.getByRole('dialog', { name: 'Point de rendez-vous' });
+    expect(sheet).toHaveTextContent('Aller · WE dans le Beaujolais · Voiture de Hugo');
+    expect(sheet).toHaveTextContent('Gare Part-Dieu');
+    expect(sheet).toHaveTextContent(/Samedi 10 octobre à \d+h00/);
+
+    // « Voir sur une carte » est replié par défaut.
+    const toggle = within(sheet).getByRole('button', { name: 'Voir sur une carte' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(within(sheet).queryByRole('link', { name: 'Google Maps' })).not.toBeInTheDocument();
+    await user.click(toggle);
+    expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toHaveAttribute('href', expect.stringContaining('Gare%20Part-Dieu'));
+
+    // Hors appareil Apple : Google Agenda pré-rempli, ou fichier .ics.
+    const add = within(sheet).getByRole('link', { name: 'Ajouter à mon agenda' });
+    expect(add).toHaveClass('btn--primary');
+    const url = new URL(add.getAttribute('href')!);
+    expect(url.searchParams.get('text')).toBe('Covoiturage aller · WE dans le Beaujolais');
+    expect(url.searchParams.get('dates')).toBe('20261010T070000Z/20261010T073000Z');
+    expect(url.searchParams.get('location')).toBe('Gare Part-Dieu');
+    expect(within(sheet).getByRole('button', { name: 'Autre agenda (fichier .ics)' })).toBeInTheDocument();
+
+    await user.click(within(sheet).getByRole('button', { name: 'Fermer' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });

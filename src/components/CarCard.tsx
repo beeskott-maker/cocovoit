@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import check from '../assets/figma/check.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
-import { formatDeparture, mapsUrl } from '../lib/format';
+import { formatDeparture } from '../lib/format';
 import { freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
 import type { Car, Direction, Leg } from '../lib/types';
+import { RdvSheet } from './RdvSheet';
 
 interface Props {
   car: Car;
@@ -18,17 +20,22 @@ interface Props {
   iDrive: boolean;
   onTake: (leg: Leg) => void;
   onLeave: (leg: Leg) => void;
+  /** Pour l'événement d'agenda du point de rendez-vous. */
+  tripName: string;
+  tripUrl: string;
 }
 
-export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, onTake, onLeave }: Props) {
+export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, onTake, onLeave, tripName, tripUrl }: Props) {
   const mine = car.driver.id === meId;
+  const carLabel = mine ? 'Ma voiture' : `Voiture de ${car.driver.name}`;
+  const [rdvLeg, setRdvLeg] = useState<(Leg & { meetingPoint: string }) | null>(null);
   return (
     <section className="car" aria-label={`Voiture de ${car.driver.name}`}>
       <div className="car__header">
         <img src={carIcon} alt="" width={24} height={24} />
         <div className="car__title-row">
           <div className="car__title-group">
-            <h2 className="car__title">{mine ? 'Ma voiture' : `Voiture de ${car.driver.name}`}</h2>
+            <h2 className="car__title">{carLabel}</h2>
             {mine && (
               <Link className="car__edit" to={editHref} aria-label="Modifier ma voiture">
                 Modifier
@@ -46,9 +53,20 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
             busy={busyLegId === leg.id}
             onTake={() => onTake(leg)}
             onLeave={() => onLeave(leg)}
+            onRdv={() => leg.meetingPoint && setRdvLeg({ ...leg, meetingPoint: leg.meetingPoint })}
           />
         ))}
       </div>
+      {rdvLeg && (
+        <RdvSheet
+          tripName={tripName}
+          carLabel={carLabel}
+          driverName={car.driver.name}
+          leg={rdvLeg}
+          tripUrl={tripUrl}
+          onClose={() => setRdvLeg(null)}
+        />
+      )}
     </section>
   );
 }
@@ -59,12 +77,14 @@ function LegSeats({
   busy,
   onTake,
   onLeave,
+  onRdv,
 }: {
   leg: Leg;
   cells: SeatCell[];
   busy: boolean;
   onTake: () => void;
   onLeave: () => void;
+  onRdv: () => void;
 }) {
   const title = leg.direction === 'aller' ? 'Aller' : 'Retour';
   return (
@@ -73,15 +93,9 @@ function LegSeats({
         <h3 className="leg__title">{title}</h3>
         <span className="leg__date">{formatDeparture(leg.departsAt)}</span>
         {leg.direction === 'aller' && leg.meetingPoint && (
-          <a
-            className="leg__rdv"
-            href={mapsUrl(leg.meetingPoint)}
-            target="_blank"
-            rel="noreferrer"
-            title={leg.meetingPoint}
-          >
+          <button type="button" className="leg__rdv" onClick={onRdv} title={leg.meetingPoint}>
             Point de RDV
-          </a>
+          </button>
         )}
       </div>
       <div

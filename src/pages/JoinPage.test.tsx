@@ -28,11 +28,8 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     expect(document.title).toBe('WE dans le Beaujolais · Coco·Voit');
     expect(screen.getByRole('heading', { name: 'Voiture de Hugo' })).toBeInTheDocument();
     expect(screen.getByText('sam 10 → lun 12 oct 2026')).toBeInTheDocument();
-    // Un seul lien « Point de RDV » : celui de l'aller.
-    expect(screen.getByRole('link', { name: 'Point de RDV' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('Gare%20Part-Dieu'),
-    );
+    // Un seul « Point de RDV » : celui de l'aller.
+    expect(screen.getAllByRole('button', { name: 'Point de RDV' })).toHaveLength(1);
 
     // Partager : copie le lien d'invitation.
     await user.click(screen.getByRole('button', { name: 'Partager' }));

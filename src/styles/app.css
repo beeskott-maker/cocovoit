@@ -480,8 +480,13 @@ a {
 }
 .leg__rdv {
   margin-left: auto;
-  padding-left: 8px;
+  padding: 0 0 0 8px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .seats {
@@ -995,4 +1000,68 @@ a {
   .sheet__handle {
     display: none;
   }
+}
+
+/* --- Point de rendez-vous --- */
+.sheet__context {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-surface-variant);
+}
+.rdv-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rdv-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+}
+.rdv-info img {
+  flex-shrink: 0;
+}
+.disclosure {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.disclosure__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--primary-container);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--primary);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+/* Chevron vers le bas, vers le haut une fois la section ouverte. */
+.disclosure__chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+.disclosure__chevron--open {
+  transform: translateY(2px) rotate(-135deg);
+}
+.rdv-calendar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.rdv-calendar .btn--text {
+  font-size: 14px;
 }
