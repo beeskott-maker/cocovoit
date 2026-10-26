@@ -23,15 +23,18 @@ const APPS: Record<MapsAppId, MapsApp> = {
 export const isApple = (ua: string = navigator.userAgent) => /iPhone|iPad|iPod|Macintosh/.test(ua);
 const isAndroid = (ua: string) => /Android/.test(ua);
 // Téléphone ou tablette. Un iPad se présente comme un Mac, mais tactile.
-const isMobile = (ua: string, touchPoints: number) =>
-  /Android|iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1);
+const isMobile = (ua: string, touchPoints: number) => /Android|iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1);
+
+/** Sur ordinateur, pas de choix d'appli : les liens de carte ouvrent Google Maps. */
+export const opensMapsDirectly = (ua = navigator.userAgent, touchPoints = navigator.maxTouchPoints ?? 0) => !isMobile(ua, touchPoints);
 
 /**
- * Waze seulement sur mobile (pas d'appli sur ordinateur), Apple Plans seulement
- * sur les appareils Apple, « Autre application » seulement sur Android.
+ * Choix proposé sur téléphone et tablette : Waze et Google Maps, plus Apple Plans
+ * sur iPhone et iPad, « Autre application » sur Android. Sur ordinateur : Google Maps.
  */
 export function mapsApps(ua = navigator.userAgent, touchPoints = navigator.maxTouchPoints ?? 0): MapsApp[] {
-  const list = isMobile(ua, touchPoints) ? [APPS.waze, APPS.google] : [APPS.google];
+  if (!isMobile(ua, touchPoints)) return [APPS.google];
+  const list = [APPS.waze, APPS.google];
   if (isApple(ua)) list.push(APPS.apple);
   if (isAndroid(ua)) list.push(APPS.other);
   return list;

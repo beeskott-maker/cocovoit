@@ -1203,3 +1203,57 @@ a {
   line-height: 16px;
   color: var(--on-surface-variant);
 }
+
+/* --- Liens directs vers Google Maps (ordinateur) --- */
+.new-tab-icon {
+  flex-shrink: 0;
+}
+.header-btn {
+  text-decoration: none;
+}
+.rdv-maps-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+/* Info-bulle sous l'élément, au survol ou au focus clavier. */
+.tooltip {
+  position: relative;
+}
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--on-surface);
+  color: #fff;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  white-space: nowrap;
+  text-decoration: none;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s 0.3s;
+}
+.tooltip:hover::after,
+.tooltip:focus-visible::after {
+  opacity: 1;
+}
+a.trip-header__address {
+  text-decoration: none;
+}
+/* Lien en fin de ligne : info-bulle alignée à droite pour rester dans la fenêtre. */
+.rdv-maps-link.tooltip::after {
+  left: auto;
+  right: 0;
+}

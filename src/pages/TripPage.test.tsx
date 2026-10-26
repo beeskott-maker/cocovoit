@@ -1,5 +1,5 @@
 import { screen, within } from '@testing-library/react';
-import { createTestApi, joinAs, renderApp, seedTrip, signIn } from '../test/renderApp';
+import { createTestApi, joinAs, onIphone, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe('Page voyage', () => {
   it("l'organisateur peut supprimer le voyage après confirmation, pas les participants", async () => {
@@ -83,18 +83,35 @@ describe('Page voyage', () => {
     expect(car).not.toHaveTextContent('Complet');
   });
 
-  it('« Itinéraire » propose les applis dans un panneau', async () => {
+  it('ordinateur : « Itinéraire » et l’adresse ouvrent directement Google Maps', async () => {
+    const api = createTestApi();
+    const { code, organizer } = await seedTrip(api);
+    signIn(organizer);
+    renderApp(`/t/${code}`, api);
+    const route = await screen.findByRole('link', { name: 'Itinéraire' });
+    expect(route).toHaveAttribute('href', expect.stringContaining('google.com/maps/search/?api=1&query=124%20Venelle'));
+    expect(route).toHaveAttribute('target', '_blank');
+    expect(route).toHaveAttribute('data-tooltip', 'Ouvrir dans Google Maps (nouvel onglet)');
+    expect(screen.getByRole('link', { name: '124 Venelle de Brouilly 69460 Odenas' })).toHaveAttribute('href', route.getAttribute('href'));
+  });
+
+  it('mobile : « Itinéraire » propose les applis dans un panneau', async () => {
+    onIphone();
     const api = createTestApi();
     const { code, organizer } = await seedTrip(api);
     signIn(organizer);
     const { user } = renderApp(`/t/${code}`, api);
     await user.click(await screen.findByRole('button', { name: 'Itinéraire' }));
     const sheet = screen.getByRole('dialog', { name: "Ouvrir l'itinéraire avec" });
-    // Ordinateur (jsdom) : pas de Waze.
-    expect(within(sheet).queryByRole('link', { name: 'Waze' })).not.toBeInTheDocument();
-    const google = within(sheet).getByRole('link', { name: 'Google Maps' });
-    expect(google).toHaveAttribute('href', expect.stringContaining('query=124%20Venelle'));
-    expect(within(sheet).queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(
+      within(sheet)
+        .getAllByRole('link')
+        .map((a) => a.textContent),
+    ).toEqual(['Waze', 'Google Maps', 'Apple Plans']);
+    expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('query=124%20Venelle'),
+    );
 
     await user.click(within(sheet).getByRole('button', { name: 'Annuler' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -116,12 +133,9 @@ describe('Page voyage', () => {
     expect(sheet).toHaveTextContent('Gare Part-Dieu');
     expect(sheet).toHaveTextContent(/Samedi 10 octobre à \d+h00/);
 
-    // « Voir sur une carte » est replié par défaut.
-    const toggle = within(sheet).getByRole('button', { name: 'Voir sur une carte' });
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(within(sheet).queryByRole('link', { name: 'Google Maps' })).not.toBeInTheDocument();
-    await user.click(toggle);
-    expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toHaveAttribute('href', expect.stringContaining('Gare%20Part-Dieu'));
+    // Ordinateur : lien direct après l'adresse, sans choix d'appli.
+    expect(within(sheet).getByRole('link', { name: 'Itinéraire' })).toHaveAttribute('href', expect.stringContaining('Gare%20Part-Dieu'));
+    expect(within(sheet).queryByRole('button', { name: 'Voir sur une carte' })).not.toBeInTheDocument();
 
     // Hors appareil Apple : Google Agenda pré-rempli, ou fichier .ics.
     const add = within(sheet).getByRole('link', { name: 'Ajouter à mon agenda' });
@@ -169,5 +183,21 @@ describe('Page voyage', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Connexion perdue');
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(await api.myTrips(organizer)).toHaveLength(1);
+  });
+
+  it('mobile : « Point de RDV » propose les applis dans « Voir sur une carte », replié', async () => {
+    onIphone();
+    const api = createTestApi();
+    const { code, organizer } = await seedTrip(api);
+    signIn(organizer);
+    const { user } = renderApp(`/t/${code}`, api);
+    await user.click(await screen.findByRole('button', { name: 'Point de RDV' }));
+    const sheet = screen.getByRole('dialog', { name: 'Point de rendez-vous' });
+    expect(within(sheet).queryByRole('link', { name: 'Itinéraire' })).not.toBeInTheDocument();
+    const toggle = within(sheet).getByRole('button', { name: 'Voir sur une carte' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(within(sheet).queryByRole('link', { name: 'Google Maps' })).not.toBeInTheDocument();
+    await user.click(toggle);
+    expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toHaveAttribute('href', expect.stringContaining('Gare%20Part-Dieu'));
   });
 });

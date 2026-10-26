@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { AppRoutes } from '../App';
 import { ApiContext } from '../lib/api';
 import { storageKey } from '../lib/env';
@@ -28,6 +29,11 @@ export async function loginAs(api: Api, email: string, name: string): Promise<st
   const res = await api.login(email, name);
   if (res.status !== 'ok') throw new Error('login');
   return res.token;
+}
+
+/** Navigateur d'iPhone (jsdom se présente comme un ordinateur). */
+export function onIphone() {
+  vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15');
 }
 
 /** Un participant de plus dans le voyage : renvoie son jeton. */
