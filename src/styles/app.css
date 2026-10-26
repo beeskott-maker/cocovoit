@@ -1193,8 +1193,6 @@ a {
   flex-shrink: 0;
 }
 .booked-leg__calendar {
-  align-self: flex-start;
-  margin-top: 4px;
   font-weight: 500;
   color: var(--primary);
 }

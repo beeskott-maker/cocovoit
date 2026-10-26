@@ -1,6 +1,7 @@
 import { useEffect, useId } from 'react';
 import carIcon from '../assets/figma/car.svg';
-import pin from '../assets/figma/pin-dark.svg';
+import calendarIcon from '../assets/figma/calendar-primary.svg';
+import pin from '../assets/figma/pin-primary.svg';
 import { googleCalendarUrl, rdvEvent } from '../lib/calendar';
 import { formatDeparture } from '../lib/format';
 import type { Car, Direction, Leg, TripState } from '../lib/types';
@@ -69,14 +70,17 @@ export function BookedDialog({ state, tripUrl, onClose }: Props) {
                     </p>
                   )}
                   {direction === 'aller' && (
-                    <a
-                      className="booked-leg__calendar"
-                      href={googleCalendarUrl(rdvEvent(state.trip.name, car.driver.name, leg, tripUrl))}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Ajouter à mon agenda
-                    </a>
+                    <p className="booked-leg__line">
+                      <img src={calendarIcon} alt="" width={20} height={20} />
+                      <a
+                        className="booked-leg__calendar"
+                        href={googleCalendarUrl(rdvEvent(state.trip.name, car.driver.name, leg, tripUrl))}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Ajouter à mon agenda
+                      </a>
+                    </p>
                   )}
                 </section>
               );
