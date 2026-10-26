@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IdentityForm } from '../components/IdentityForm';
 import { useApi } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -15,7 +15,12 @@ export function JoinPage() {
   const { code = '' } = useParams();
   const api = useApi();
   const navigate = useNavigate();
-  const { auth, login, sessionExpired } = useAuth();
+  const location = useLocation();
+  const { auth, login, logout, sessionExpired } = useAuth();
+  // « Déconnexion » depuis la page voyage : on ferme la session ici, une fois
+  // sur le lien d'invitation, pour que la page voyage ne renvoie pas d'abord
+  // vers l'identification.
+  const switching = (location.state as { logout?: boolean } | null)?.logout === true;
   const [trip, setTrip] = useState<TripPreview | null | undefined>(undefined);
   const [joinError, setJoinError] = useState<string | null>(null);
   const joinStarted = useRef(false);
@@ -32,7 +37,13 @@ export function JoinPage() {
   }, [api, code]);
 
   useEffect(() => {
-    if (auth.status !== 'connected' || !trip || joinStarted.current) return;
+    if (!switching) return;
+    void logout();
+    navigate(location.pathname, { replace: true, state: null });
+  }, [switching, logout, navigate, location.pathname]);
+
+  useEffect(() => {
+    if (switching || auth.status !== 'connected' || !trip || joinStarted.current) return;
     joinStarted.current = true;
     api.joinTrip(auth.token, code).then(
       () => navigate(`/t/${code}`, { replace: true }),
@@ -42,7 +53,7 @@ export function JoinPage() {
         else setJoinError(err instanceof ApiError ? err.message : 'Connexion impossible, réessayez.');
       },
     );
-  }, [api, auth, code, navigate, sessionExpired, trip]);
+  }, [api, auth, code, navigate, sessionExpired, switching, trip]);
 
   if (trip === null) return <NotFoundPage />;
   if (auth.status !== 'anonymous') {

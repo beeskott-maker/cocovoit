@@ -25,7 +25,7 @@ function Trip({ token }: { token: string }) {
   const { code = '' } = useParams();
   const api = useApi();
   const navigate = useNavigate();
-  const { logout, sessionExpired } = useAuth();
+  const { sessionExpired } = useAuth();
   const { state, error, reload } = useTripState(token, code);
   const [busyLegId, setBusyLegId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -98,10 +98,9 @@ function Trip({ token }: { token: string }) {
     }
   }
 
-  // Déconnexion, puis connexion (éventuellement avec un autre compte) sur ce voyage.
-  async function switchPerson() {
-    await logout();
-    navigate(`/j/${code}`);
+  // Déconnexion, fermée par le lien d'invitation (connexion éventuellement avec un autre compte).
+  function switchPerson() {
+    navigate(`/j/${code}`, { state: { logout: true } });
   }
 
   return (
