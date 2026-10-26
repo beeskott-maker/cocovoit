@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import calendar from '../assets/figma/calendar-dark.svg';
 import pin from '../assets/figma/pin-dark.svg';
-import { addToDeviceCalendar, downloadIcs, googleCalendarUrl, type CalendarEvent } from '../lib/calendar';
+import { addToDeviceCalendar, googleCalendarUrl, type CalendarEvent } from '../lib/calendar';
 import { formatLongDeparture } from '../lib/format';
-import { isApple } from '../lib/maps';
 import type { Leg } from '../lib/types';
 import { MapsOptions } from './MapsOptions';
 import { Sheet } from './Sheet';
@@ -60,21 +59,15 @@ export function RdvSheet({ tripName, carLabel, driverName, leg, tripUrl, onClose
         </button>
         {mapsOpen && <MapsOptions address={leg.meetingPoint} onChoose={onClose} />}
       </div>
-      {isApple() ? (
-        // iPhone, iPad, Mac : l'événement s'ouvre dans Calendrier.
-        <button type="button" className="btn btn--primary" onClick={() => addToDeviceCalendar(event, 'covoiturage-aller.ics')}>
+      <div className="rdv-calendar">
+        <a className="btn btn--primary" href={googleCalendarUrl(event)} target="_blank" rel="noreferrer">
           Ajouter à mon agenda
+        </a>
+        {/* iPhone et iPad (Safari) : ouvre l'événement dans Calendrier ; ailleurs : télécharge le .ics. */}
+        <button type="button" className="btn btn--text" onClick={() => addToDeviceCalendar(event, 'covoiturage-aller.ics')}>
+          Autre agenda (fichier .ics)
         </button>
-      ) : (
-        <div className="rdv-calendar">
-          <a className="btn btn--primary" href={googleCalendarUrl(event)} target="_blank" rel="noreferrer">
-            Ajouter à mon agenda
-          </a>
-          <button type="button" className="btn btn--text" onClick={() => downloadIcs(event, 'covoiturage-aller.ics')}>
-            Autre agenda (fichier .ics)
-          </button>
-        </div>
-      )}
+      </div>
       <button type="button" className="btn btn--text sheet__cancel" onClick={onClose}>
         Fermer
       </button>
