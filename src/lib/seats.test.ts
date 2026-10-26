@@ -1,4 +1,4 @@
-import { bookedDirections, freeSeats, freeSeatsLabel, placeSeats, seatCells } from './seats';
+import { bookedDirections, freeSeatsLabel, placeSeats, seatCells } from './seats';
 import type { Car } from './types';
 
 const car = (passengers: string[], seats = 3): Car => ({
@@ -41,7 +41,6 @@ describe('seatCells', () => {
   it('voiture pleine : pas de bouton', () => {
     const c = car(['a', 'b', 'c']);
     expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'occupied', 'occupied', 'full']);
-    expect(freeSeats(c)).toBe(0);
   });
 
   it('accorde le libellé des places libres', () => {

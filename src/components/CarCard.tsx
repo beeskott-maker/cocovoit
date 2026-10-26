@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
-import armchair from '../assets/figma/armchair.svg';
 import carIcon from '../assets/figma/car.svg';
 import check from '../assets/figma/check.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
 import { formatDeparture, mapsUrl } from '../lib/format';
-import { freeSeats, freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
+import { freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
 import type { Car, Direction, Leg } from '../lib/types';
 
 interface Props {
@@ -23,7 +22,6 @@ interface Props {
 
 export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, onTake, onLeave }: Props) {
   const mine = car.driver.id === meId;
-  const free = freeSeats(car);
   return (
     <section className="car" aria-label={`Voiture de ${car.driver.name}`}>
       <div className="car__header">
@@ -37,14 +35,6 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
               </Link>
             )}
           </div>
-          {/* Voiture pleine : rien ici, « Voiture pleine » apparaît déjà dans les trajets. */}
-          {free > 0 && (
-            <span className="car__free" title={`${free} place${free > 1 ? 's' : ''} libre${free > 1 ? 's' : ''}`}>
-              <img src={armchair} alt="" width={24} height={24} />
-              {free}
-              <span className="sr-only">{free > 1 ? 'places libres' : 'place libre'}</span>
-            </span>
-          )}
         </div>
       </div>
       <div className="car__legs">

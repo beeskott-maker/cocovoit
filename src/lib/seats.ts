@@ -69,12 +69,6 @@ export function freeSeatsLabel(count: number): string {
   return count > 1 ? `${count} places libres` : `${count} place libre`;
 }
 
-/** Places encore libres dans la voiture, sur le trajet le moins rempli. */
-export function freeSeats(car: Car): number {
-  if (car.legs.length === 0) return 0;
-  return Math.max(...car.legs.map((l) => car.seats - l.passengers.length));
-}
-
 /** Sens (aller, retour) dans lesquels j'ai déjà une place de passager. */
 export function bookedDirections(cars: Car[], meId: string): Set<Direction> {
   const directions = new Set<Direction>();

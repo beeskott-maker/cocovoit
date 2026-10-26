@@ -431,14 +431,6 @@ a {
   font-size: 20px;
   line-height: normal;
 }
-.car__free {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 600;
-  font-size: 20px;
-  color: var(--success);
-}
 /* « Ma voiture · Modifier » */
 .car__edit {
   font-size: 14px;
