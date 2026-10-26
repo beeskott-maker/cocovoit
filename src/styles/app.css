@@ -432,7 +432,8 @@ a {
   flex: 1;
   min-width: 0;
   display: flex;
-  align-items: baseline;
+  /* Centré, pour s'aligner sur la pastille « Point de RDV » de la même ligne. */
+  align-items: center;
 }
 .car__title {
   margin: 0;
@@ -443,6 +444,7 @@ a {
 /* « Ma voiture · Modifier » */
 .car__edit {
   font-size: 14px;
+  line-height: 20px;
   color: var(--primary);
 }
 .car__edit::before {

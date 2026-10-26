@@ -30,6 +30,8 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
   const mine = car.driver.id === meId;
   const carLabel = mine ? 'Ma voiture' : carOf(car.driver.name);
   const [rdvLeg, setRdvLeg] = useState<(Leg & { meetingPoint: string }) | null>(null);
+  const aller = car.legs.find((leg) => leg.direction === 'aller');
+  const rdv = aller?.meetingPoint ? { ...aller, meetingPoint: aller.meetingPoint } : null;
   return (
     <section className="car" aria-label={carOf(car.driver.name)}>
       <div className="car__header">
@@ -43,6 +45,12 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
               </Link>
             )}
           </div>
+          {/* Sur la ligne du titre : le rendez-vous concerne le départ de la voiture. */}
+          {rdv && (
+            <button type="button" className="leg__rdv" onClick={() => setRdvLeg(rdv)} title={rdv.meetingPoint}>
+              Point de RDV
+            </button>
+          )}
         </div>
       </div>
       <div className="car__legs">
@@ -54,7 +62,6 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
             busy={busyLegId === leg.id}
             onTake={() => onTake(leg)}
             onLeave={() => onLeave(leg)}
-            onRdv={() => leg.meetingPoint && setRdvLeg({ ...leg, meetingPoint: leg.meetingPoint })}
           />
         ))}
       </div>
@@ -78,14 +85,12 @@ function LegSeats({
   busy,
   onTake,
   onLeave,
-  onRdv,
 }: {
   leg: Leg;
   cells: SeatCell[];
   busy: boolean;
   onTake: () => void;
   onLeave: () => void;
-  onRdv: () => void;
 }) {
   const title = leg.direction === 'aller' ? 'Aller' : 'Retour';
   return (
@@ -93,11 +98,6 @@ function LegSeats({
       <div className="leg__header">
         <h3 className="leg__title">{title}</h3>
         <span className="leg__date">{formatDeparture(leg.departsAt)}</span>
-        {leg.direction === 'aller' && leg.meetingPoint && (
-          <button type="button" className="leg__rdv" onClick={onRdv} title={leg.meetingPoint}>
-            Point de RDV
-          </button>
-        )}
       </div>
       <div
         className="seats"
