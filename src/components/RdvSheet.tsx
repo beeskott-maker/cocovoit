@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import calendar from '../assets/figma/calendar-dark.svg';
 import pin from '../assets/figma/pin-dark.svg';
-import { addToDeviceCalendar, googleCalendarUrl, type CalendarEvent } from '../lib/calendar';
+import { addToDeviceCalendar, googleCalendarUrl, rdvEvent } from '../lib/calendar';
 import { formatLongDeparture } from '../lib/format';
 import type { Leg } from '../lib/types';
 import { MapsOptions } from './MapsOptions';
@@ -21,20 +21,7 @@ interface Props {
 /** Point de rendez-vous : récapitulatif, carte (repliée) et ajout à l'agenda. */
 export function RdvSheet({ tripName, carLabel, driverName, leg, tripUrl, onClose }: Props) {
   const [mapsOpen, setMapsOpen] = useState(false);
-  const passengers = leg.passengers.map((p) => p.name);
-  const event: CalendarEvent = {
-    uid: `${leg.id}@cocovoit`,
-    title: `Covoiturage aller · ${tripName}`,
-    start: leg.departsAt,
-    durationMinutes: 30,
-    location: leg.meetingPoint,
-    description: [
-      `Conducteur : ${driverName}`,
-      `Passagers : ${passengers.length ? passengers.join(', ') : 'aucun pour l’instant'}`,
-      `Voyage : ${tripUrl}`,
-    ].join('\n'),
-    reminderMinutes: 60,
-  };
+  const event = rdvEvent(tripName, driverName, leg, tripUrl);
 
   return (
     <Sheet

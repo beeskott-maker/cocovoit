@@ -1,3 +1,5 @@
+import type { Leg } from './types';
+
 /** Événement d'agenda : rendez-vous de covoiturage. */
 export interface CalendarEvent {
   /** Identifiant stable : réimporter l'événement le met à jour au lieu de le dupliquer. */
@@ -10,6 +12,24 @@ export interface CalendarEvent {
   description: string;
   /** Rappel, en minutes avant le début. */
   reminderMinutes: number;
+}
+
+/** Rendez-vous de l'aller : 30 min, rappel 1 h avant, conducteur et passagers en description. */
+export function rdvEvent(tripName: string, driverName: string, leg: Leg, tripUrl: string): CalendarEvent {
+  const passengers = leg.passengers.map((p) => p.name);
+  return {
+    uid: `${leg.id}@cocovoit`,
+    title: `Covoiturage aller · ${tripName}`,
+    start: leg.departsAt,
+    durationMinutes: 30,
+    location: leg.meetingPoint ?? '',
+    description: [
+      `Conducteur : ${driverName}`,
+      `Passagers : ${passengers.length ? passengers.join(', ') : 'aucun pour l’instant'}`,
+      `Voyage : ${tripUrl}`,
+    ].join('\n'),
+    reminderMinutes: 60,
+  };
 }
 
 /** 2026-11-14T06:00:00Z → 20261114T060000Z */

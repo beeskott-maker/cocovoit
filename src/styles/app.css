@@ -1151,3 +1151,50 @@ a {
 .btn--destructive:disabled {
   opacity: 0.6;
 }
+
+/* --- Pop-in « C'est tout bon » : place à l'aller et au retour --- */
+.confirm__icon--success {
+  background: #cdeac0;
+  color: #2b4a1a;
+}
+.booked-legs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.booked-leg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--primary-container);
+  border-radius: 12px;
+}
+.booked-leg__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.booked-leg__head h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+.booked-leg__line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.booked-leg__line img {
+  flex-shrink: 0;
+}
+.booked-leg__calendar {
+  align-self: flex-start;
+  margin-top: 4px;
+  font-weight: 500;
+  color: var(--primary);
+}

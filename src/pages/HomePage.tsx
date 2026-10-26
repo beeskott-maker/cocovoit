@@ -44,7 +44,7 @@ function Home({ token }: { token: string }) {
   useDocumentTitle(`${APP_TITLE} · Mes voyages`);
   const api = useApi();
   const navigate = useNavigate();
-  const { sessionExpired } = useAuth();
+  const { auth, logout, sessionExpired } = useAuth();
   // « Mes voyages » : les voyages du compte, lus en base.
   const [myTrips, setMyTrips] = useState<MyTrip[] | null>(null);
   useEffect(() => {
@@ -190,6 +190,14 @@ function Home({ token }: { token: string }) {
             ))}
           </ul>
         </section>
+      )}
+      {auth.status === 'connected' && (
+        <footer className="trip-footer body-medium">
+          <span>Connecté·e en tant que {auth.account.name}</span>
+          <button type="button" className="link-btn" onClick={logout}>
+            Déconnexion
+          </button>
+        </footer>
       )}
     </>
   );

@@ -163,16 +163,52 @@ describe('Parcours organisateur et conducteur', () => {
     expect((await api.getTripState(hugo, code)).cars).toEqual([]);
   });
 
+  it('place à l’aller puis au retour : pop-in récapitulative', async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    const julie = await loginAs(api, 'julie@example.com', 'Julie');
+    await api.joinTrip(julie, code);
+    signIn(julie);
+    const { user } = renderApp(`/t/${code}`, api);
+
+    // Une seule place : simple message.
+    const [takeAller] = await screen.findAllByRole('button', { name: 'Prendre 1 place' });
+    await user.click(takeAller);
+    expect(await screen.findByRole('status')).toHaveTextContent("Place réservée pour l'aller");
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // La place du retour complète : récapitulatif.
+    await user.click(screen.getByRole('button', { name: 'Prendre 1 place' }));
+    const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" });
+    const aller = within(dialog).getByRole('region', { name: 'Aller' });
+    expect(aller).toHaveTextContent('Voiture de Hugo');
+    expect(aller).toHaveTextContent('Gare Part-Dieu');
+    const add = within(aller).getByRole('link', { name: 'Ajouter à mon agenda' });
+    expect(new URL(add.getAttribute('href')!).searchParams.get('text')).toBe('Covoiturage aller · WE dans le Beaujolais');
+    const retour = within(dialog).getByRole('region', { name: 'Retour' });
+    expect(retour).toHaveTextContent('Voiture de Hugo');
+    expect(retour).not.toHaveTextContent('Ancien RDV retour');
+    expect(within(retour).queryByRole('link')).not.toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: 'OK' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('« Mes voyages » : sans organiser ni conduire, on est passager', async () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
     const lea = await loginAs(api, 'lea@example.com', 'Léa');
     await api.joinTrip(lea, code);
     signIn(lea);
-    renderApp('/', api);
+    const { user } = renderApp('/', api);
     const link = await screen.findByRole('link', { name: /WE dans le Beaujolais/ });
     expect(link).toHaveTextContent('Passager');
     expect(link).not.toHaveTextContent(/Conducteur|Organisateur/);
+
+    // Pied de page : compte connecté et déconnexion.
+    expect(screen.getByText('Connecté·e en tant que Léa')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Déconnexion' }));
+    expect(await screen.findByLabelText('Mon email')).toBeInTheDocument();
   });
 
   it('« Mes voyages » : compte à rebours, voyages passés à part', async () => {

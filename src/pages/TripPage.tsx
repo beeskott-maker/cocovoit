@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
+import { BookedDialog } from '../components/BookedDialog';
 import { CarCard } from '../components/CarCard';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { MapsSheet } from '../components/MapsSheet';
@@ -32,6 +33,8 @@ function Trip({ token }: { token: string }) {
   const [mapsOpen, setMapsOpen] = useState(false);
   const closeMaps = useCallback(() => setMapsOpen(false), []);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [bookedBoth, setBookedBoth] = useState(false);
+  const closeBooked = useCallback(() => setBookedBoth(false), []);
   useDocumentTitle(tripTitle(state?.trip.name));
 
   if (error?.code === 'unauthenticated') {
@@ -57,15 +60,21 @@ function Trip({ token }: { token: string }) {
 
   async function act(leg: Leg, action: 'take' | 'leave') {
     setBusyLegId(leg.id);
+    let both = false;
     try {
       if (action === 'take') await api.takeSeat(token, code, leg.id);
       else await api.leaveSeat(token, code, leg.id);
-      setToast(action === 'take' ? `Place réservée pour ${leg.direction === 'aller' ? "l'aller" : 'le retour'}` : 'Place libérée');
+      const other = leg.direction === 'aller' ? 'retour' : 'aller';
+      // Place prise dans le seul sens qui manquait : récapitulatif aller + retour.
+      if (action === 'take' && myDirections.has(other)) both = true;
+      else setToast(action === 'take' ? `Place réservée pour ${leg.direction === 'aller' ? "l'aller" : 'le retour'}` : 'Place libérée');
     } catch (err) {
       setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
       setBusyLegId(null);
       await reload();
+      // Après le rechargement, pour afficher les deux trajets à jour.
+      if (both) setBookedBoth(true);
     }
   }
 
@@ -160,6 +169,7 @@ function Trip({ token }: { token: string }) {
           <Link to="/">Mes voyages</Link>
         </span>
       </footer>
+      {bookedBoth && <BookedDialog state={state} tripUrl={inviteUrl(code)} onClose={closeBooked} />}
       {confirmDelete && (
         <ConfirmDialog title="Supprimer le voyage ?" onConfirm={deleteTrip} onCancel={() => setConfirmDelete(false)}>
           <p>
