@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import { CarCard } from '../components/CarCard';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { MapsSheet } from '../components/MapsSheet';
 import { RequireAccount } from '../components/RequireAccount';
 import { Toast } from '../components/Toast';
@@ -30,6 +31,7 @@ function Trip({ token }: { token: string }) {
   const hideToast = useCallback(() => setToast(null), []);
   const [mapsOpen, setMapsOpen] = useState(false);
   const closeMaps = useCallback(() => setMapsOpen(false), []);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   useDocumentTitle(tripTitle(state?.trip.name));
 
   if (error?.code === 'unauthenticated') {
@@ -78,11 +80,11 @@ function Trip({ token }: { token: string }) {
 
   // Réservé à l'organisateur, après confirmation.
   async function deleteTrip() {
-    if (!state || !window.confirm(`Êtes-vous sûr de bien vouloir supprimer le voyage « ${state.trip.name} » ?`)) return;
     try {
       await api.deleteTrip(token, code);
       navigate('/');
     } catch (err) {
+      setConfirmDelete(false);
       setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
     }
   }
@@ -143,7 +145,7 @@ function Trip({ token }: { token: string }) {
             </Link>
           ))}
         {state.me.isOrganizer && (
-          <button type="button" className="btn btn--danger" onClick={deleteTrip}>
+          <button type="button" className="btn btn--danger" onClick={() => setConfirmDelete(true)}>
             Supprimer ce voyage
           </button>
         )}
@@ -158,6 +160,14 @@ function Trip({ token }: { token: string }) {
           <Link to="/">Mes voyages</Link>
         </span>
       </footer>
+      {confirmDelete && (
+        <ConfirmDialog title="Supprimer le voyage ?" onConfirm={deleteTrip} onCancel={() => setConfirmDelete(false)}>
+          <p>
+            Le voyage <strong>« {state.trip.name} »</strong> sera supprimé pour tous les participants, avec ses voitures et ses places. Cette
+            action est irréversible.
+          </p>
+        </ConfirmDialog>
+      )}
       {mapsOpen && state.trip.destination && (
         <MapsSheet address={state.trip.destination} onClose={closeMaps} />
       )}

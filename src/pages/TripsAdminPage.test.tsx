@@ -26,19 +26,23 @@ describe('Page de gestion des voyages (#/x/<clé>)', () => {
     expect(within(we).getByRole('link', { name: 'Ouvrir' })).toHaveAttribute('href', `/j/${code}`);
 
     // Annulation : rien n'est supprimé.
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false);
     await user.click(within(we).getByRole('button', { name: 'Supprimer' }));
-    expect(confirm).toHaveBeenCalledWith(expect.stringContaining('Supprimer « WE dans le Beaujolais »'));
+    let dialog = screen.getByRole('alertdialog', { name: 'Supprimer « WE dans le Beaujolais » ?' });
+    expect(dialog).toHaveTextContent('2 participants');
+    expect(dialog).toHaveTextContent('1 voiture');
+    await user.click(within(dialog).getByRole('button', { name: 'Annuler' }));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(screen.getByRole('article', { name: 'WE dans le Beaujolais' })).toBeInTheDocument();
 
     // Confirmation : le voyage disparaît et son lien n'existe plus.
-    confirm.mockReturnValueOnce(true);
     await user.click(within(we).getByRole('button', { name: 'Supprimer' }));
+    dialog = screen.getByRole('alertdialog', { name: 'Supprimer « WE dans le Beaujolais » ?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Supprimer' }));
     expect(await screen.findByText('1 voyage')).toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(screen.queryByRole('article', { name: 'WE dans le Beaujolais' })).not.toBeInTheDocument();
     expect(screen.getByRole('article', { name: 'Anniversaire' })).toBeInTheDocument();
     expect(await api.getTripPreview(code)).toBeNull();
-    confirm.mockRestore();
 
     // L'adresse est mémorisée jusqu'à la déconnexion.
     await user.click(screen.getByRole('button', { name: 'Se déconnecter' }));

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import mail from '../assets/figma/mail.svg';
 import { BrandHeader } from '../components/BrandHeader';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { TextField } from '../components/TextField';
 import { Toast } from '../components/Toast';
 import { useApi } from '../lib/api';
@@ -47,6 +48,7 @@ export function TripsAdminPage() {
   const [forbidden, setForbidden] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busyCode, setBusyCode] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<AdminTrip | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const hideToast = useCallback(() => setToast(null), []);
 
@@ -87,10 +89,6 @@ export function TripsAdminPage() {
   if (!email) return <EmailLogin onSubmit={load} />;
 
   async function remove(trip: AdminTrip) {
-    const details = `${plural(trip.participants, 'participant')}, ${plural(trip.cars, 'voiture')}`;
-    if (!window.confirm(`Supprimer « ${trip.name} » (${details}) ?\n\nToutes ses données seront effacées et son lien d'invitation ne marchera plus. Cette action est irréversible.`)) {
-      return;
-    }
     setBusyCode(trip.code);
     try {
       await api.adminDeleteTrip(key, email!, trip.code);
@@ -98,6 +96,7 @@ export function TripsAdminPage() {
     } catch (err) {
       setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
+      setConfirming(null);
       setBusyCode(null);
       await load(email!);
     }
@@ -136,7 +135,7 @@ export function TripsAdminPage() {
               <button
                 type="button"
                 className="btn btn--danger"
-                onClick={() => remove(trip)}
+                onClick={() => setConfirming(trip)}
                 disabled={busyCode === trip.code}
               >
                 Supprimer
@@ -164,6 +163,15 @@ export function TripsAdminPage() {
           Se déconnecter
         </button>
       </footer>
+      {confirming && (
+        <ConfirmDialog title={`Supprimer « ${confirming.name} » ?`} onConfirm={() => remove(confirming)} onCancel={() => setConfirming(null)}>
+          <ul className="confirm__list">
+            <li>👥 {plural(confirming.participants, 'participant')}</li>
+            <li>🚗 {plural(confirming.cars, 'voiture')}</li>
+          </ul>
+          <p>Toutes ses données seront effacées et son lien d'invitation ne marchera plus. Cette action est irréversible.</p>
+        </ConfirmDialog>
+      )}
       {toast && <Toast message={toast} onDone={hideToast} />}
     </>
   );

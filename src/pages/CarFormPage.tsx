@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { useApi } from '../lib/api';
@@ -18,6 +19,9 @@ interface LegForm {
 }
 
 const MAX_SEATS = 6;
+
+/** « Julie », « Julie et Sarah », « Julie, Sarah et Tom ». */
+const listNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(', ')} et ${names.at(-1)}` : names[0]);
 
 function initialForm(state: TripState, carId: string | undefined) {
   const car = state.cars.find((c) => c.id === carId);
@@ -67,7 +71,12 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
   const [form, setForm] = useState(() => initialForm(state, carId));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState(false);
   useEffect(() => setError(null), [form]);
+
+  // Passagers de la voiture (aller ou retour), pour prévenir qu'ils perdront leur place.
+  const car = state.cars.find((c) => c.id === carId);
+  const passengers = [...new Set(car?.legs.flatMap((l) => l.passengers.map((p) => p.name)) ?? [])];
 
   const legs: LegInput[] = (['aller', 'retour'] as const)
     .filter((d) => form[d].enabled)
@@ -95,12 +104,13 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
   }
 
   async function remove() {
-    if (!carId || !window.confirm('Supprimer votre voiture ? Les passagers perdront leur place.')) return;
+    if (!carId) return;
     setBusy(true);
     try {
       await api.deleteCar(token, code, carId);
       navigate(`/t/${code}`);
     } catch (err) {
+      setConfirmRemove(false);
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
       setBusy(false);
     }
@@ -183,7 +193,7 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
           {carId ? 'Enregistrer' : 'Ajouter ma voiture'}
         </button>
         {carId && (
-          <button type="button" className="btn btn--danger" onClick={remove} disabled={busy}>
+          <button type="button" className="btn btn--danger" onClick={() => setConfirmRemove(true)} disabled={busy}>
             Supprimer ma voiture
           </button>
         )}
@@ -191,6 +201,18 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
           Annuler
         </Link>
       </form>
+      {confirmRemove && (
+        <ConfirmDialog title="Supprimer votre voiture ?" icon="car" onConfirm={remove} onCancel={() => setConfirmRemove(false)}>
+          {passengers.length ? (
+            <p>
+              <strong>{listNames(passengers)}</strong> {passengers.length > 1 ? 'perdront leur place. Ils pourront' : 'perdra sa place et pourra'}{' '}
+              en reprendre une dans une autre voiture.
+            </p>
+          ) : (
+            <p>Votre voiture sera retirée du voyage.</p>
+          )}
+        </ConfirmDialog>
+      )}
     </>
   );
 }

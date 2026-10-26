@@ -1065,3 +1065,89 @@ a {
 .rdv-calendar .btn--text {
   font-size: 14px;
 }
+
+/* --- Pop-in de confirmation (suppression) --- */
+.confirm-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.confirm {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(29, 27, 32, 0.24);
+}
+.confirm__icon {
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f9dedc;
+  color: var(--error);
+}
+.confirm__title {
+  margin: 0;
+  text-align: center;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 400;
+  color: var(--on-surface);
+}
+.confirm__text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-surface-variant);
+}
+.confirm__text p {
+  margin: 0;
+}
+.confirm__text strong {
+  color: var(--on-surface);
+  font-weight: 500;
+}
+.confirm__list {
+  margin: 0;
+  padding: 12px 16px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 12px;
+  background: #f7f2fa;
+  text-align: left;
+}
+.confirm__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.confirm__actions .btn {
+  flex: 1;
+  min-width: 0;
+}
+.btn--destructive {
+  background: var(--error);
+  color: #fff;
+}
+.btn:disabled {
+  cursor: default;
+}
+.btn--destructive:disabled {
+  opacity: 0.6;
+}

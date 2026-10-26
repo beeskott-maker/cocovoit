@@ -125,16 +125,42 @@ describe('Parcours organisateur et conducteur', () => {
     signIn(organizer);
     const { user } = renderApp(`/t/${code}`, api);
     const remove = await screen.findByRole('button', { name: 'Supprimer ce voyage' });
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false);
     await user.click(remove);
-    expect(confirm).toHaveBeenCalledWith('Êtes-vous sûr de bien vouloir supprimer le voyage « WE dans le Beaujolais » ?');
+    let dialog = screen.getByRole('alertdialog', { name: 'Supprimer le voyage ?' });
+    expect(dialog).toHaveTextContent('Le voyage « WE dans le Beaujolais » sera supprimé pour tous les participants');
+    // Annuler a le focus : Entrée ne supprime rien.
+    expect(within(dialog).getByRole('button', { name: 'Annuler' })).toHaveFocus();
+    await user.click(within(dialog).getByRole('button', { name: 'Annuler' }));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(await api.myTrips(organizer)).toHaveLength(1);
 
-    confirm.mockReturnValueOnce(true);
+    // Échap ferme aussi sans supprimer.
     await user.click(remove);
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+
+    await user.click(remove);
+    dialog = screen.getByRole('alertdialog', { name: 'Supprimer le voyage ?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Supprimer' }));
     expect(await screen.findByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();
     expect(await api.myTrips(organizer)).toEqual([]);
     expect(await api.myTrips(hugo)).toEqual([]);
+  });
+
+  it('le conducteur supprime sa voiture après confirmation, en voyant qui perd sa place', async () => {
+    const api = createTestApi();
+    const { code, organizer, hugo } = await seedTrip(api);
+    const [car] = (await api.getTripState(hugo, code)).cars;
+    await api.takeSeat(organizer, code, car.legs[0].id);
+
+    signIn(hugo);
+    const { user } = renderApp(`/t/${code}/voiture/${car.id}`, api);
+    await user.click(await screen.findByRole('button', { name: 'Supprimer ma voiture' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Supprimer votre voiture ?' });
+    expect(dialog).toHaveTextContent('Loïc perdra sa place et pourra en reprendre une dans une autre voiture.');
+    await user.click(within(dialog).getByRole('button', { name: 'Supprimer' }));
+    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect((await api.getTripState(hugo, code)).cars).toEqual([]);
   });
 
   it('« Mes voyages » : sans organiser ni conduire, on est passager', async () => {
