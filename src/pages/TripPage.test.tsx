@@ -200,4 +200,30 @@ describe('Page voyage', () => {
     await user.click(toggle);
     expect(within(sheet).getByRole('link', { name: 'Google Maps' })).toHaveAttribute('href', expect.stringContaining('Gare%20Part-Dieu'));
   });
+
+  it('voitures presque pleines d’abord, et l’ordre reste le même après une réservation', async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api); // Hugo : 2 places aller + retour
+    const zoe = await joinAs(api, code, 'zoe@example.com', 'Zoé');
+    await api.saveCar(zoe, code, {
+      carId: null,
+      seats: 3,
+      legs: [{ direction: 'aller', departsAt: '2026-10-10T08:00:00Z', meetingPoint: null }],
+    });
+    // Voiture de Zoé : 1 libre ; voiture de Hugo : 4 libres.
+    const zoeAller = (await api.getTripState(zoe, code)).cars.find((c) => c.driver.name === 'Zoé')!.legs[0];
+    for (const email of ['a@example.com', 'b@example.com']) await api.takeSeat(await joinAs(api, code, email, 'P'), code, zoeAller.id);
+    const julie = await joinAs(api, code, 'julie@example.com', 'Julie');
+    signIn(julie);
+    const { user } = renderApp(`/t/${code}`, api);
+
+    const order = async () => (await screen.findAllByRole('heading', { level: 2, name: /^Voiture de/ })).map((h) => h.textContent);
+    expect(await order()).toEqual(['Voiture de Zoé', 'Voiture de Hugo']);
+
+    // Zoé complète après la réservation : sa voiture ne descend pas tout de suite.
+    const zoeCar = screen.getByRole('region', { name: 'Voiture de Zoé' });
+    await user.click(within(zoeCar).getByRole('button', { name: 'Prendre 1 place' }));
+    expect(await within(zoeCar).findByText('Moi')).toBeInTheDocument();
+    expect(await order()).toEqual(['Voiture de Zoé', 'Voiture de Hugo']);
+  });
 });

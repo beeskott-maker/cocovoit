@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import { BookedDialog } from '../components/BookedDialog';
@@ -11,7 +11,7 @@ import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
 import { useAuth } from '../lib/auth';
-import { bookedDirections } from '../lib/seats';
+import { bookedDirections, keepOrder, sortCars } from '../lib/seats';
 import type { Leg } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
 import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
@@ -35,6 +35,7 @@ function Trip({ token }: { token: string }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [bookedBoth, setBookedBoth] = useState(false);
   const closeBooked = useCallback(() => setBookedBoth(false), []);
+  const carOrder = useRef<string[] | null>(null);
   useDocumentTitle(tripTitle(state?.trip.name));
 
   if (error?.code === 'unauthenticated') {
@@ -54,6 +55,10 @@ function Trip({ token }: { token: string }) {
     );
   }
 
+  // Ordre calculé à l'arrivée sur la page, puis figé : une voiture ne saute pas
+  // ailleurs juste après qu'on y a pris ou libéré une place.
+  carOrder.current ??= sortCars(state.cars, state.me.id).map((c) => c.id);
+  const cars = keepOrder(state.cars, carOrder.current);
   const myCar = state.cars.find((c) => c.driver.id === state.me.id);
   const myDirections = bookedDirections(state.cars, state.me.id);
   const carHref = myCar ? `/t/${code}/voiture/${myCar.id}` : `/t/${code}/voiture`;
@@ -119,7 +124,7 @@ function Trip({ token }: { token: string }) {
             <p className="body-medium">Vous conduisez ? Ajoutez votre voiture pour que les autres réservent une place.</p>
           </div>
         ) : (
-          state.cars.map((car) => (
+          cars.map((car) => (
             <CarCard
               key={car.id}
               car={car}

@@ -1,4 +1,4 @@
-import { bookedDirections, freeSeatsLabel, placeSeats, seatCells } from './seats';
+import { bookedDirections, freeSeatsLabel, keepOrder, placeSeats, seatCells, sortCars } from './seats';
 import type { Car } from './types';
 
 const car = (passengers: string[], seats = 3): Car => ({
@@ -100,5 +100,47 @@ describe('placeSeats', () => {
   it('voiture pleine : « Voiture pleine » en dernier à droite', () => {
     expect(layout(2, 2)).toEqual(['occupied:G1', 'occupied:G2', 'full:D1']);
     expect(layout(6, 6).slice(3)).toEqual(['occupied:D1', 'occupied:D2', 'occupied:D3', 'full:D4']);
+  });
+});
+
+describe('ordre des voitures', () => {
+  /** Voiture `id` : places, passagers à l'aller (et au retour si précisé), heure de départ. */
+  const voiture = (id: string, seats: number, aller: number, retour?: number, at = '2026-10-10T07:00:00Z'): Car => {
+    const leg = (direction: 'aller' | 'retour', n: number) => ({
+      id: `${id}-${direction}`,
+      direction,
+      departsAt: at,
+      meetingPoint: null,
+      passengers: Array.from({ length: n }, (_, i) => ({ id: `${id}${direction}${i}`, name: 'P' })),
+    });
+    return { id, seats, driver: { id: `d-${id}`, name: id }, legs: [leg('aller', aller), ...(retour === undefined ? [] : [leg('retour', retour)])] };
+  };
+  const ids = (cars: Car[]) => cars.map((c) => c.id);
+
+  it('presque pleines d’abord (places libres aller + retour), complètes à la fin', () => {
+    const cars = [
+      voiture('complete', 3, 3, 3),
+      voiture('vide', 3, 0),
+      voiture('deux', 4, 3, 3),
+      voiture('une', 3, 2, 3),
+    ];
+    expect(ids(sortCars(cars, 'moi'))).toEqual(['une', 'deux', 'vide', 'complete']);
+  });
+
+  it('à places libres égales : la plus remplie, puis la première à partir, puis l’ordre d’ajout', () => {
+    expect(ids(sortCars([voiture('sur2', 2, 1), voiture('sur6', 6, 5)], 'moi'))).toEqual(['sur6', 'sur2']);
+    const tard = voiture('tard', 3, 2, undefined, '2026-10-10T09:00:00Z');
+    const tot = voiture('tot', 3, 2, undefined, '2026-10-10T06:00:00Z');
+    expect(ids(sortCars([tard, tot], 'moi'))).toEqual(['tot', 'tard']);
+    expect(ids(sortCars([voiture('a', 3, 1), voiture('b', 3, 1)], 'moi'))).toEqual(['a', 'b']);
+  });
+
+  it('ma voiture toujours en premier, même vide', () => {
+    expect(ids(sortCars([voiture('une', 3, 2), voiture('mienne', 3, 0)], 'd-mienne'))).toEqual(['mienne', 'une']);
+  });
+
+  it('ordre figé : les nouvelles voitures à la fin, les supprimées disparaissent', () => {
+    const [a, b, c] = [voiture('a', 3, 0), voiture('b', 3, 0), voiture('c', 3, 0)];
+    expect(ids(keepOrder([a, c, b], ['b', 'a', 'x']))).toEqual(['b', 'a', 'c']);
   });
 });

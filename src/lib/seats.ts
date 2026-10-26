@@ -79,3 +79,39 @@ export function bookedDirections(cars: Car[], meId: string): Set<Direction> {
   }
   return directions;
 }
+
+const freeSeats = (car: Car) => car.legs.reduce((n, leg) => n + Math.max(car.seats - leg.passengers.length, 0), 0);
+const fillRate = (car: Car) => car.legs.reduce((n, leg) => n + leg.passengers.length, 0) / (car.seats * car.legs.length || 1);
+const firstDeparture = (car: Car) => Math.min(...car.legs.map((leg) => new Date(leg.departsAt).getTime()));
+
+/**
+ * Ordre des voitures : la mienne d'abord ; puis celles qui ont des places
+ * libres, les plus près d'être pleines en tête (places libres sur l'aller et
+ * le retour, puis taux de remplissage) ; les complètes à la fin. À égalité,
+ * la première à partir, puis l'ordre d'ajout.
+ */
+export function sortCars(cars: Car[], meId: string): Car[] {
+  const key = (car: Car) => {
+    const free = freeSeats(car);
+    return [car.driver.id === meId ? 0 : 1, free === 0 ? 1 : 0, free, -fillRate(car), firstDeparture(car)];
+  };
+  return cars
+    .map((car, index) => ({ car, key: [...key(car), index] }))
+    .sort((a, b) => {
+      for (let i = 0; i < a.key.length; i++) if (a.key[i] !== b.key[i]) return a.key[i] - b.key[i];
+      return 0;
+    })
+    .map(({ car }) => car);
+}
+
+/**
+ * Applique un ordre déjà calculé (identifiants) : les voitures connues gardent
+ * leur place, les nouvelles s'ajoutent à la fin, les supprimées disparaissent.
+ */
+export function keepOrder(cars: Car[], order: readonly string[]): Car[] {
+  const rank = (car: Car) => {
+    const i = order.indexOf(car.id);
+    return i === -1 ? order.length : i;
+  };
+  return [...cars].sort((a, b) => rank(a) - rank(b));
+}
