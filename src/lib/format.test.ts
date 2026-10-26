@@ -1,4 +1,4 @@
-import { formatDeparture, formatTripDates, isEmail, localToday, mapsUrl, tripTiming } from './format';
+import { formatDeparture, formatTripDates, isEmail, localToday, tripTiming } from './format';
 
 describe('formatTripDates', () => {
   it('formate un week-end dans le même mois comme la maquette', () => {
@@ -26,14 +26,6 @@ describe('isEmail', () => {
     ['loic', false],
     ['loic@gmail', false],
   ])('%s → %s', (value, expected) => expect(isEmail(value)).toBe(expected));
-});
-
-describe('mapsUrl', () => {
-  it('affiche le lieu dans Google Maps, sans itinéraire', () => {
-    const url = new URL(mapsUrl('124 Venelle de Brouilly 69460 Odenas'));
-    expect(url.pathname).toBe('/maps/search/');
-    expect(url.searchParams.get('query')).toBe('124 Venelle de Brouilly 69460 Odenas');
-  });
 });
 
 describe('tripTiming', () => {

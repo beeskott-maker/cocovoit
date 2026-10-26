@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
-import { createTestApi, loginAs, renderApp, seedTrip, signIn } from '../test/renderApp';
+import { storageKey } from '../lib/env';
+import { createTestApi, joinAs, loginAs, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe("Parcours d'un invité (maquette Figma)", () => {
   it('email → nom → voyage, puis réservation d’une place', async () => {
@@ -77,10 +78,10 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
 
     // Compte en base et participation au voyage : le navigateur ne garde que le jeton.
-    const token = localStorage.getItem('cocovoit:token')!;
+    const token = localStorage.getItem(storageKey('token'))!;
     expect(await api.me(token)).toEqual({ email: 'lea@example.com', name: 'Léa' });
     expect((await api.myTrips(token)).map((t) => t.code)).toEqual([code]);
-    expect(Object.keys(localStorage).filter((k) => k !== 'cocovoit:demo-db')).toEqual(['cocovoit:token']);
+    expect(Object.keys(localStorage).filter((k) => k !== storageKey('demo-db'))).toEqual([storageKey('token')]);
   });
 
   it('déjà connecté : ajouté automatiquement au voyage, sans formulaire', async () => {
@@ -99,8 +100,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
   it("« Déconnexion » ferme la session du compte", async () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
-    const lea = await loginAs(api, 'lea@example.com', 'Léa');
-    await api.joinTrip(lea, code);
+    const lea = await joinAs(api, code, 'lea@example.com', 'Léa');
     signIn(lea);
     const { user } = renderApp(`/t/${code}`, api);
     await user.click(await screen.findByRole('button', { name: 'Déconnexion' }));
@@ -108,7 +108,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     // Directement le formulaire du lien d'invitation, sans passer par l'identification.
     expect(await screen.findByRole('heading', { name: /Rejoindre\s*WE dans le Beaujolais/ })).toBeInTheDocument();
     expect(screen.getByLabelText('Mon email')).toBeInTheDocument();
-    expect(localStorage.getItem('cocovoit:token')).toBeNull();
+    expect(localStorage.getItem(storageKey('token'))).toBeNull();
     await expect(api.me(lea)).rejects.toMatchObject({ code: 'unauthenticated' });
   });
 });

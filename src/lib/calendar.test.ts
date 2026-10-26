@@ -1,4 +1,4 @@
-import { googleCalendarUrl, icsFile, type CalendarEvent } from './calendar';
+import { googleCalendarUrl, icsFile, rdvEvent, type CalendarEvent } from './calendar';
 
 const event: CalendarEvent = {
   uid: 'leg-1@cocovoit',
@@ -33,5 +33,32 @@ describe('agenda', () => {
     expect(url.origin + url.pathname).toBe('https://calendar.google.com/calendar/render');
     expect(url.searchParams.get('dates')).toBe('20261114T060000Z/20261114T063000Z');
     expect(url.searchParams.get('location')).toBe('Gare Part-Dieu; Lyon');
+  });
+
+  it('rendez-vous de l’aller : 30 min, rappel 1 h avant, conducteur et passagers', () => {
+    const leg = {
+      id: 'leg-1',
+      direction: 'aller' as const,
+      departsAt: '2026-11-14T07:00:00+01:00',
+      meetingPoint: 'Gare Part-Dieu',
+      passengers: [
+        { id: 'j', name: 'Julie' },
+        { id: 's', name: 'Sarah' },
+      ],
+    };
+    expect(rdvEvent('Annecy', 'Hugo', leg, 'https://cocovoiturage.fr/#/j/abc')).toEqual({
+      uid: 'leg-1@cocovoit',
+      title: 'Covoiturage aller · Annecy',
+      start: '2026-11-14T07:00:00+01:00',
+      durationMinutes: 30,
+      location: 'Gare Part-Dieu',
+      description: 'Conducteur : Hugo\nPassagers : Julie, Sarah\nVoyage : https://cocovoiturage.fr/#/j/abc',
+      reminderMinutes: 60,
+    });
+    // Sans point de RDV ni passager.
+    expect(rdvEvent('Annecy', 'Hugo', { ...leg, meetingPoint: null, passengers: [] }, 'u')).toMatchObject({
+      location: '',
+      description: expect.stringContaining('Passagers : aucun pour l’instant'),
+    });
   });
 });

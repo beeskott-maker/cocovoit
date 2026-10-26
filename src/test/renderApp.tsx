@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { AppRoutes } from '../App';
 import { ApiContext } from '../lib/api';
+import { storageKey } from '../lib/env';
 import { createLocalApi, memoryStore } from '../lib/localApi';
 import type { Api } from '../lib/types';
 
@@ -29,9 +30,16 @@ export async function loginAs(api: Api, email: string, name: string): Promise<st
   return res.token;
 }
 
+/** Un participant de plus dans le voyage : renvoie son jeton. */
+export async function joinAs(api: Api, code: string, email: string, name: string): Promise<string> {
+  const token = await loginAs(api, email, name);
+  await api.joinTrip(token, code);
+  return token;
+}
+
 /** Ce navigateur est connecté avec ce jeton (comme après une connexion). */
 export function signIn(token: string) {
-  localStorage.setItem('cocovoit:token', token);
+  localStorage.setItem(storageKey('token'), token);
 }
 
 /** Un voyage organisé par Loïc, avec la voiture de Hugo (2 places, aller + retour). */

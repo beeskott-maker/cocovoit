@@ -1,3 +1,4 @@
+import { loginAs } from '../test/renderApp';
 import { createLocalApi, memoryStore } from './localApi';
 import { demoTrips } from './demoData';
 
@@ -24,21 +25,20 @@ describe('Données de démo', () => {
 
   it('environnement de test : la première connexion ajoute la personne aux voyages de démo', async () => {
     const api = createLocalApi(memoryStore(), undefined, { seedDemo: true });
-    const r = await api.login('test@example.com', 'Testeur');
-    if (r.status !== 'ok') throw new Error('connexion');
-    const trips = await api.myTrips(r.token);
-    expect(trips.map((t) => t.name).sort()).toEqual(demoTrips().map((t) => t.name).sort());
+    const token = await loginAs(api, 'test@example.com', 'Testeur');
+    const trips = await api.myTrips(token);
+    expect(trips.map((t) => t.name).sort()).toEqual(
+      demoTrips()
+        .map((t) => t.name)
+        .sort(),
+    );
     const annecy = trips.find((t) => t.name === 'Week-end à Annecy')!;
     expect(annecy).toMatchObject({ isOrganizer: true, isDriver: true, isPassenger: false });
-    const state = await api.getTripState(r.token, annecy.code);
+    const state = await api.getTripState(token, annecy.code);
     expect(state.cars).toHaveLength(2);
 
     // Chaque nouveau compte a ses propres voyages de démo ; un compte existant non.
-    const r2 = await api.login('autre@example.com', 'Autre');
-    if (r2.status !== 'ok') throw new Error('connexion');
-    expect(await api.myTrips(r2.token)).toHaveLength(trips.length);
-    const again = await api.login('test@example.com');
-    if (again.status !== 'ok') throw new Error('connexion');
-    expect(await api.myTrips(again.token)).toHaveLength(trips.length);
+    expect(await api.myTrips(await loginAs(api, 'autre@example.com', 'Autre'))).toHaveLength(trips.length);
+    expect(await api.myTrips(await loginAs(api, 'test@example.com', 'Testeur'))).toHaveLength(trips.length);
   });
 });

@@ -1,11 +1,5 @@
-import { createTestApi, loginAs, seedTrip } from '../test/renderApp';
+import { createTestApi, joinAs, loginAs, seedTrip } from '../test/renderApp';
 import { ApiError } from './types';
-
-async function join(api: ReturnType<typeof createTestApi>, code: string, email: string, name: string) {
-  const token = await loginAs(api, email, name);
-  await api.joinTrip(token, code);
-  return token;
-}
 
 describe('API démo (mêmes règles que les fonctions SQL)', () => {
   it('connexion : nom demandé uniquement pour un nouvel email', async () => {
@@ -29,7 +23,7 @@ describe('API démo (mêmes règles que les fonctions SQL)', () => {
   it('« Mes voyages » : voyages du compte avec ses rôles', async () => {
     const api = createTestApi();
     const { code, organizer, hugo } = await seedTrip(api);
-    const lea = await join(api, code, 'lea@example.com', 'Léa');
+    const lea = await joinAs(api, code, 'lea@example.com', 'Léa');
     await api.takeSeat(lea, code, (await api.getTripState(lea, code)).cars[0].legs[0].id);
     expect(await api.myTrips(organizer)).toMatchObject([{ code, isOrganizer: true, isDriver: false, isPassenger: false }]);
     expect(await api.myTrips(hugo)).toMatchObject([{ code, isOrganizer: false, isDriver: true }]);
@@ -39,9 +33,9 @@ describe('API démo (mêmes règles que les fonctions SQL)', () => {
   it('respecte le nombre de places et une place par sens', async () => {
     const api = createTestApi();
     const { code, hugo } = await seedTrip(api);
-    const lea = await join(api, code, 'lea@example.com', 'Léa');
-    const max = await join(api, code, 'max@example.com', 'Max');
-    const zoe = await join(api, code, 'zoe@example.com', 'Zoé');
+    const lea = await joinAs(api, code, 'lea@example.com', 'Léa');
+    const max = await joinAs(api, code, 'max@example.com', 'Max');
+    const zoe = await joinAs(api, code, 'zoe@example.com', 'Zoé');
 
     let st = await api.getTripState(lea, code);
     const aller = st.cars[0].legs[0];
@@ -83,8 +77,8 @@ describe('API démo (mêmes règles que les fonctions SQL)', () => {
   it('réduire les places retire les dernières réservations, supprimer un trajet aussi', async () => {
     const api = createTestApi();
     const { code, hugo } = await seedTrip(api);
-    const lea = await join(api, code, 'lea@example.com', 'Léa');
-    const max = await join(api, code, 'max@example.com', 'Max');
+    const lea = await joinAs(api, code, 'lea@example.com', 'Léa');
+    const max = await joinAs(api, code, 'max@example.com', 'Max');
     let st = await api.getTripState(hugo, code);
     const [aller, retour] = st.cars[0].legs;
     await api.takeSeat(lea, code, aller.id);
