@@ -81,6 +81,22 @@ describe('Page voyage', () => {
     const car = await screen.findByRole('region', { name: "Voiture d'Hugo" });
     expect(car.querySelector('.car__free')).toBeNull();
     expect(car).not.toHaveTextContent('Complet');
+    expect(car.querySelector('.car__icon--hop')).toBeNull();
+  });
+
+  it("l'icône voiture s'anime s'il reste de la place, sauf pour ma propre voiture", async () => {
+    const api = createTestApi();
+    const { code, organizer, hugo } = await seedTrip(api);
+    signIn(organizer);
+    const first = renderApp(`/t/${code}`, api);
+    const car = await screen.findByRole('region', { name: "Voiture d'Hugo" });
+    expect(car.querySelector('.car__icon--hop')).not.toBeNull();
+    first.unmount();
+
+    signIn(hugo);
+    renderApp(`/t/${code}`, api);
+    expect(await screen.findByRole('heading', { name: 'Ma voiture' })).toBeInTheDocument();
+    expect(document.querySelector('.car__icon--hop')).toBeNull();
   });
 
   it('ordinateur : « Itinéraire » et l’adresse ouvrent directement Google Maps', async () => {

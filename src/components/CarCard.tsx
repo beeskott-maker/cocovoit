@@ -6,7 +6,7 @@ import seatFree from '../assets/figma/seat-free.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
 import { carOf, formatDeparture } from '../lib/format';
-import { freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
+import { freeSeats, freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
 import type { Car, Direction, Leg } from '../lib/types';
 import { RdvSheet } from './RdvSheet';
 
@@ -35,7 +35,14 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
   return (
     <section className="car" aria-label={carOf(car.driver.name)}>
       <div className="car__header">
-        <img src={carIcon} alt="" width={24} height={24} />
+        {/* Petit saut de l'icône : il reste de la place (sauf dans ma voiture). */}
+        <img
+          className={!mine && freeSeats(car) > 0 ? 'car__icon car__icon--hop' : 'car__icon'}
+          src={carIcon}
+          alt=""
+          width={24}
+          height={24}
+        />
         <div className="car__title-row">
           <div className="car__title-group">
             <h2 className="car__title">{carLabel}</h2>

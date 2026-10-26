@@ -423,6 +423,38 @@ a {
   display: flex;
   flex-direction: column;
 }
+.car__icon {
+  align-self: flex-start;
+}
+/* Voiture avec des places libres : se cabre deux fois, toutes les 4 s. */
+.car__icon--hop {
+  transform-origin: 20% 80%;
+  animation: car-hop 4s ease-in-out infinite;
+}
+@keyframes car-hop {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  76% {
+    transform: rotate(-10deg);
+  }
+  82% {
+    transform: rotate(0);
+  }
+  86% {
+    transform: rotate(-4deg);
+  }
+  90% {
+    transform: rotate(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .car__icon--hop {
+    animation: none;
+  }
+}
 .car__title-row {
   display: flex;
   align-items: center;

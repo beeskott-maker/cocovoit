@@ -80,7 +80,8 @@ export function bookedDirections(cars: Car[], meId: string): Set<Direction> {
   return directions;
 }
 
-const freeSeats = (car: Car) => car.legs.reduce((n, leg) => n + Math.max(car.seats - leg.passengers.length, 0), 0);
+/** Places libres, aller et retour cumulés. */
+export const freeSeats = (car: Car) => car.legs.reduce((n, leg) => n + Math.max(car.seats - leg.passengers.length, 0), 0);
 const fillRate = (car: Car) => car.legs.reduce((n, leg) => n + leg.passengers.length, 0) / (car.seats * car.legs.length || 1);
 const firstDeparture = (car: Car) => Math.min(...car.legs.map((leg) => new Date(leg.departsAt).getTime()));
 
