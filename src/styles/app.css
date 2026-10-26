@@ -3,7 +3,6 @@
   --primary: #6750a4;
   --on-primary: #ffffff;
   --primary-container: #eaddff;
-  --primary-container-60: rgba(234, 221, 255, 0.6);
   --on-primary-container: #4f378a;
   --secondary: #625b71;
   --secondary-container: #e8def8;
@@ -530,7 +529,10 @@ a {
   border: 1px solid var(--primary-container);
 }
 .seat--free {
-  background: var(--primary-container-60);
+  /* Information, pas une action : pointillés gris, rien qui invite au clic. */
+  border: 1px dashed #cac4d0;
+  color: var(--on-surface-variant);
+  font-weight: 400;
 }
 .seat--full {
   margin: 0;

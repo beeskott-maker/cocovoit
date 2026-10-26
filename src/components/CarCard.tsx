@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import check from '../assets/figma/check.svg';
+import seatFree from '../assets/figma/seat-free.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
 import { formatDeparture } from '../lib/format';
@@ -133,7 +134,7 @@ function Seat({ cell, busy, onTake, onLeave }: { cell: SeatCell; busy: boolean; 
     case 'free':
       return (
         <div className="seat seat--free">
-          <img src={seatIcon} alt="" />
+          <img src={seatFree} alt="" />
           <span>{freeSeatsLabel(cell.count)}</span>
         </div>
       );
