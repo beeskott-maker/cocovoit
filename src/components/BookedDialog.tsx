@@ -1,7 +1,7 @@
 import { useEffect, useId } from 'react';
-import carIcon from '../assets/figma/car.svg';
-import calendarIcon from '../assets/figma/calendar-primary.svg';
-import pin from '../assets/figma/pin-primary.svg';
+import carIcon from '../assets/figma/car-dark.svg';
+import calendarIcon from '../assets/figma/calendar-dark-padded.svg';
+import pin from '../assets/figma/pin-dark.svg';
 import { googleCalendarUrl, rdvEvent } from '../lib/calendar';
 import { formatDeparture } from '../lib/format';
 import type { Car, Direction, Leg, TripState } from '../lib/types';
