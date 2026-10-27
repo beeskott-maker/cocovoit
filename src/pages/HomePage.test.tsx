@@ -7,6 +7,7 @@ describe('« Mes voyages »', () => {
     const { code } = await seedTrip(api);
     // Nouvel appareil : rien dans le navigateur, on se connecte avec son email.
     const { user } = renderApp('/', api);
+    await user.click(await screen.findByRole('link', { name: 'Se connecter' }));
     await user.type(await screen.findByLabelText('Mon email'), 'hugo@example.com');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
 
@@ -49,7 +50,8 @@ describe('« Mes voyages »', () => {
     // Pied de page : compte connecté et déconnexion.
     expect(screen.getByText('Connecté·e en tant que Léa')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Déconnexion' }));
-    expect(await screen.findByLabelText('Mon email')).toBeInTheDocument();
+    // Retour à la page de présentation.
+    expect(await screen.findByRole('heading', { name: /sans la logistique/ })).toBeInTheDocument();
   });
 
   describe('à date fixe : lun 5 oct 2026', () => {
@@ -91,5 +93,23 @@ describe('« Mes voyages »', () => {
       expect(names('Mes voyages')).toEqual(['Proche', 'Loin']);
       expect(names('Passés')).toEqual(['Récent', 'Vieux']);
     });
+  });
+});
+
+describe("Page d'accueil des visiteurs", () => {
+  it('« Organiser un voyage » : connexion, puis formulaire de création ouvert', async () => {
+    const api = createTestApi();
+    const { organizer } = await seedTrip(api);
+    const { user } = renderApp('/', api);
+    expect(await screen.findByRole('heading', { name: /sans la logistique/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Se connecter' })).toHaveAttribute('href', '/identification');
+
+    await user.click(screen.getAllByRole('link', { name: 'Organiser un voyage' })[0]);
+    await user.type(await screen.findByLabelText('Mon email'), 'loic@example.com');
+    await user.click(screen.getByRole('button', { name: 'Suivant' }));
+    // Le compte a déjà un voyage : la liste, et le formulaire déjà déplié.
+    expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();
+    expect(await api.myTrips(organizer)).toHaveLength(1);
   });
 });

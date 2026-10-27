@@ -5,7 +5,9 @@ describe('Parcours organisateur', () => {
   it("s'identifie une fois, crée un voyage, affiche le lien puis ajoute sa voiture", async () => {
     const { user } = renderApp('/');
 
-    // Pas encore identifié : on passe par l'identification avant de créer.
+    // Visiteur : page de présentation, puis identification avant de créer.
+    expect(await screen.findByRole('heading', { name: /sans la logistique/ })).toBeInTheDocument();
+    await user.click(screen.getAllByRole('link', { name: 'Organiser un voyage' })[0]);
     expect(await screen.findByRole('heading', { name: 'Qui êtes-vous ?' })).toBeInTheDocument();
     await user.type(screen.getByLabelText('Mon email'), 'loic@example.com');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));

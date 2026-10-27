@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
 import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
+import { LandingPage } from './LandingPage';
 import { useApi } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { formatTripDates, localToday, tripTiming } from '../lib/format';
@@ -11,10 +12,12 @@ import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type MyTrip } from '../lib/types';
 
 /**
- * Accueil : créer un voyage (organisateur) et retrouver ses voyages.
- * Réservé aux personnes connectées ; l'organisateur est le compte connecté.
+ * Accueil : créer un voyage (organisateur) et retrouver ses voyages, pour les
+ * personnes connectées ; page de présentation pour les visiteurs.
  */
 export function HomePage() {
+  const { auth } = useAuth();
+  if (auth.status === 'anonymous') return <LandingPage />;
   return <RequireAccount>{(token) => <Home token={token} />}</RequireAccount>;
 }
 
@@ -67,8 +70,10 @@ function Home({ token }: { token: string }) {
     startsOn: '',
     endsOn: '',
   });
-  // Le formulaire s'ouvre sur « Créer un voyage », ou d'emblée s'il n'y a aucun voyage.
-  const [creating, setCreating] = useState(false);
+  // Le formulaire s'ouvre sur « Créer un voyage », ou d'emblée s'il n'y a aucun
+  // voyage ou qu'on arrive par « Organiser un voyage » (?creer).
+  const [params] = useSearchParams();
+  const [creating, setCreating] = useState(() => params.has('creer'));
   const showForm = creating || (myTrips !== null && myTrips.length === 0);
   // À venir (le plus proche d'abord) et passés (le plus récent d'abord).
   const today = localToday();

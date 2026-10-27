@@ -1,0 +1,437 @@
+/* Page d'accueil publique (visiteurs non connectés). Classes préfixées « lp- ». */
+.app:has(.lp) {
+  max-width: none;
+  gap: 0;
+  background: #fff;
+}
+.lp {
+  --p: #6750a4;
+  --pc: #eaddff;
+  --dark: #4f378a;
+  --ink: #1d1b20;
+  --muted: #49454f;
+  --bg: #f3f0f6;
+  --rose: #ffd8e4;
+  --rose-dim: #efb8c8;
+  --on-rose: #7d5260;
+  color: var(--ink);
+  background: #fff;
+}
+.lp *,
+.lp *::before {
+  box-sizing: border-box;
+}
+.lp-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.lp-hero {
+  background: linear-gradient(-71deg, var(--p) 3%, var(--dark) 100%);
+  color: #fff;
+  border-radius: 0 0 32px 32px;
+  padding: 20px 0 0;
+}
+.lp-hero .lp-lead {
+  color: #fff;
+  margin-bottom: 28px;
+}
+.lp-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lp-logo {
+  display: inline-flex;
+}
+.lp-logo img {
+  height: 40px;
+  display: block;
+}
+.lp-nav a {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 4px 20px 20px 20px;
+  background: var(--rose);
+  color: var(--on-rose);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  transition: background-color 0.15s;
+}
+/* Survol : rose un peu plus soutenu, texte toujours lisible (contraste 4,7:1). */
+.lp-nav a:hover {
+  background: #ffcfdd;
+  box-shadow: 0 2px 8px rgba(29, 27, 32, 0.18);
+}
+.lp-nav a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.lp-hero-grid {
+  display: grid;
+  gap: 28px;
+  padding-top: 36px;
+}
+.lp h1 {
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 500;
+  margin: 0 0 14px;
+  letter-spacing: -0.3px;
+}
+.lp-lead {
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0 0 24px;
+  opacity: 0.92;
+}
+/* Boutons à leur largeur naturelle, à toutes les tailles ; passent à la ligne si besoin. */
+.lp-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.lp-ctas .lp-btn {
+  padding: 0 28px;
+}
+.lp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  border-radius: 4px 26px 26px 26px;
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+}
+.lp-btn--white {
+  background: #fff;
+  color: var(--p);
+}
+.lp-btn--ghost {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: #fff;
+}
+.lp-btn--primary {
+  background: var(--p);
+  color: #fff;
+}
+.lp-btn {
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+.lp-btn--white:hover {
+  background: var(--pc);
+  box-shadow: 0 4px 14px rgba(29, 27, 32, 0.18);
+}
+.lp-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #fff;
+}
+.lp-btn--primary:hover {
+  background: var(--dark);
+}
+.lp-btn:active {
+  transform: translateY(1px);
+}
+.lp-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-btn {
+    transition: none;
+  }
+  .lp-btn:active {
+    transform: none;
+  }
+}
+.lp-reassure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  opacity: 0.9;
+}
+.lp-reassure li::before {
+  content: "✓ ";
+  font-weight: 700;
+  color: var(--rose-dim);
+}
+.lp-phone {
+  width: 260px;
+  margin: 0 auto;
+  border-radius: 36px;
+  padding: 9px;
+  background: #1d1b20;
+  box-shadow: 0 18px 40px rgba(29, 27, 32, 0.28);
+}
+.lp-phone img {
+  width: 100%;
+  display: block;
+  border-radius: 28px;
+}
+.lp-hero .lp-phone {
+  margin-bottom: -120px;
+}
+.lp-hero-phone {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 0;
+}
+.lp section {
+  padding: 56px 0 0;
+}
+.lp-first {
+  padding-top: 150px;
+}
+#etapes .lp-kicker {
+  scroll-margin-top: 24px;
+}
+.lp-kicker,
+.lp-text .lp-kicker {
+  display: inline-block;
+  color: var(--on-rose);
+  background: var(--rose);
+  border-radius: 4px 12px 12px 12px;
+  padding: 4px 10px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+.lp h2 {
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+.lp-text p {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 0;
+}
+.lp-steps {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+}
+.lp-steps li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 16px;
+}
+.lp-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--p);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+.lp-steps strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+.lp-steps li div span {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.lp-feature {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+}
+.lp-feature .lp-phone {
+  width: 240px;
+}
+.lp-points {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.lp-points li {
+  font-size: 15px;
+  line-height: 1.45;
+  padding-left: 28px;
+  position: relative;
+}
+.lp-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rose)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%237d5260' d='M9.55 18l-5.7-5.7 1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z'/%3E%3C/svg%3E")
+    center/12px no-repeat;
+}
+.lp-trust {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+.lp-trust div {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 16px;
+}
+.lp-trust b {
+  display: block;
+  font-size: 15px;
+  margin: 12px 0 4px;
+}
+.lp-trust span {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+/* Pastille en forme de bulle, comme les boutons. */
+.lp-trust i {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px 24px 24px 24px;
+  background: var(--p);
+  color: #fff;
+}
+.lp-trust i svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.lp-final {
+  margin: 56px 0 0;
+  background: linear-gradient(-71deg, var(--p) 3%, var(--dark) 100%);
+  color: #fff;
+  border-radius: 28px;
+  padding: 32px 24px;
+  text-align: center;
+}
+.lp-final h2 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+.lp-final p {
+  margin: 0 0 20px;
+  opacity: 0.9;
+}
+.lp-final .lp-btn {
+  display: inline-flex;
+  padding: 0 28px;
+}
+.lp-footer {
+  padding: 32px 0 40px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.lp-footer a {
+  color: var(--p);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+@media (min-width: 900px) {
+  .lp-wrap {
+    padding: 0 40px;
+  }
+  .lp-hero {
+    padding-top: 28px;
+  }
+  .lp-hero-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: end;
+    padding-top: 56px;
+    gap: 48px;
+  }
+  .lp-hero-grid .lp-text {
+    padding-bottom: 96px;
+  }
+  .lp h1 {
+    font-size: 50px;
+  }
+  .lp-lead {
+    font-size: 19px;
+    max-width: 520px;
+  }
+  .lp-ctas {
+    flex-direction: row;
+  }
+  .lp-ctas .lp-btn {
+    padding: 0 28px;
+  }
+  .lp-phone {
+    width: 300px;
+  }
+  .lp-hero .lp-phone {
+    margin-bottom: -60px;
+  }
+  .lp section {
+    padding-top: 88px;
+  }
+  .lp-first {
+    padding-top: 140px;
+  }
+  .lp-steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .lp-steps li {
+    flex-direction: column;
+    padding: 22px;
+  }
+  .lp-feature {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .lp-feature.lp-rev .lp-text {
+    order: 2;
+  }
+  .lp-feature .lp-phone {
+    width: 280px;
+  }
+  .lp h2 {
+    font-size: 34px;
+  }
+  .lp-trust {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .lp-final {
+    padding: 56px;
+  }
+  .lp-final h2 {
+    font-size: 36px;
+  }
+}
