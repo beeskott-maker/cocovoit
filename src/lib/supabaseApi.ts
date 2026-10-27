@@ -30,8 +30,9 @@ export function createSupabaseApi(url: string, anonKey: string): Api {
 
   return {
     mode: 'supabase',
-    login: (email, name) => rpc<LoginResult>('login', { p_email: email, p_name: name ?? null }),
+    login: (email, name, phone) => rpc<LoginResult>('login', { p_email: email, p_name: name ?? null, p_phone: phone ?? null }),
     me: (token) => rpc<Account>('me', { p_token: token }),
+    setPhone: (token, phone) => rpc<Account>('set_phone', { p_token: token, p_phone: phone }),
     logout: (token) => rpc('logout', { p_token: token }),
     createTrip: (token, t) =>
       rpc<string>('create_trip', {

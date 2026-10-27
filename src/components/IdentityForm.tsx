@@ -1,7 +1,9 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
 import mail from '../assets/figma/mail.svg';
 import person from '../assets/figma/person.svg';
+import phoneIcon from '../assets/figma/phone.svg';
 import { isEmail } from '../lib/format';
+import { parsePhone } from '../lib/phone';
 import { AUTH_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { BrandHeader } from './BrandHeader';
 import { TextField } from './TextField';
@@ -13,15 +15,17 @@ interface Props {
   disabled?: boolean;
   /** Après l'email : « done » si la personne est reconnue, sinon on demande son nom. */
   onEmail: (email: string) => Promise<'done' | 'needs_name'>;
-  onName: (email: string, name: string) => Promise<void>;
+  onName: (email: string, name: string, phone: string | null) => Promise<void>;
 }
 
-/** Identification en deux temps (maquette « Rejoindre ») : email, puis nom si besoin. */
+/** Identification en deux temps (maquette « Rejoindre ») : email, puis nom (et téléphone facultatif) si besoin. */
 export function IdentityForm({ title, intro, disabled, onEmail, onName }: Props) {
   useDocumentTitle(AUTH_TITLE);
   const [step, setStep] = useState<'email' | 'name'>('email');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +40,12 @@ export function IdentityForm({ title, intro, disabled, onEmail, onName }: Props)
       if (step === 'email') {
         if ((await onEmail(email.trim())) === 'needs_name') setStep('name');
       } else {
-        await onName(email.trim(), name.trim());
+        const parsed = parsePhone(phone);
+        if (parsed === undefined) {
+          setPhoneError('Numéro invalide : par exemple 06 12 34 56 78');
+          return;
+        }
+        await onName(email.trim(), name.trim(), parsed);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -74,6 +83,22 @@ export function IdentityForm({ title, intro, disabled, onEmail, onName }: Props)
             hint="Le prénom que les autres verront dans les voitures"
             maxLength={80}
             autoFocus
+          />
+        )}
+        {step === 'name' && (
+          <TextField
+            label="Mon téléphone (facultatif)"
+            icon={phoneIcon}
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            value={phone}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              setPhoneError(null);
+            }}
+            error={phoneError}
+            hint="Pour vous joindre le jour du départ : visible par votre chauffeur si vous êtes passager, par le voyage si vous conduisez."
           />
         )}
         {error && (

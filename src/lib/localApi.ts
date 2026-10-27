@@ -7,7 +7,8 @@ import {
   type TripState,
 } from './types';
 import { storageKey } from './env';
-import { DEMO_PEOPLE, ME, demoTrips } from './demoData';
+import { parsePhone } from './phone';
+import { DEMO_PEOPLE, DEMO_PHONES, ME, demoTrips } from './demoData';
 
 /**
  * Implémentation de démonstration, utilisée quand Supabase n'est pas configuré.
@@ -28,6 +29,7 @@ interface DbAccount {
   id: string;
   email: string;
   name: string;
+  phone?: string | null;
 }
 interface DbSession {
   token: string;
@@ -112,10 +114,19 @@ export function createLocalApi(
     if (!p) throw new ApiError('Vous ne participez pas à ce voyage', 'forbidden');
     return p;
   }
-  const nameOf = (db: Db, participantId: string) => {
+  const accountOf = (db: Db, participantId: string) => {
     const p = db.participants.find((x) => x.id === participantId)!;
-    return db.accounts.find((a) => a.id === p.accountId)!.name;
+    return db.accounts.find((a) => a.id === p.accountId)!;
   };
+  const nameOf = (db: Db, participantId: string) => accountOf(db, participantId).name;
+  const phoneOf = (db: Db, participantId: string) => accountOf(db, participantId).phone ?? null;
+  const toAccount = (a: DbAccount) => ({ email: a.email, name: a.name, phone: a.phone ?? null });
+  // Comme la fonction SQL _phone : format international, null si vide.
+  function checkPhone(input: string | null | undefined): string | null {
+    const phone = parsePhone(input ?? '');
+    if (phone === undefined) throw new ApiError('Numéro de téléphone invalide', 'invalid');
+    return phone;
+  }
   function requireAdmin(key: string, email: string) {
     if (key !== DEMO_ADMIN_KEY) throw new ApiError('Accès refusé', 'forbidden');
     if (email.trim().toLowerCase() !== DEMO_ADMIN_EMAIL) {
@@ -130,7 +141,7 @@ export function createLocalApi(
       const email = `${key}@example.com`;
       let a = db.accounts.find((x) => x.email === email);
       if (!a) {
-        a = { id: newId(), email, name };
+        a = { id: newId(), email, name, phone: DEMO_PHONES[key] ?? null };
         db.accounts.push(a);
       }
       accountIds[key] = a.id;
@@ -186,13 +197,13 @@ export function createLocalApi(
   return {
     mode: 'demo',
 
-    async login(email, name) {
+    async login(email, name, phone) {
       await tick();
       const db = load();
       let found = db.accounts.find((a) => a.email.toLowerCase() === email.trim().toLowerCase());
       if (!found) {
         if (!name?.trim()) return { status: 'needs_name' };
-        found = { id: newId(), email: email.trim(), name: name.trim() };
+        found = { id: newId(), email: email.trim(), name: name.trim(), phone: checkPhone(phone) };
         db.accounts.push(found);
         // Environnement de test : chaque nouveau compte a ses voyages de démo.
         if (options.seedDemo) seed(db, found.id);
@@ -200,13 +211,21 @@ export function createLocalApi(
       const token = newId();
       db.sessions.push({ token, accountId: found.id });
       save(db);
-      return { status: 'ok', token, account: { email: found.email, name: found.name } };
+      return { status: 'ok', token, account: toAccount(found) };
     },
 
     async me(token) {
       await tick();
-      const { email, name } = account(load(), token);
-      return { email, name };
+      return toAccount(account(load(), token));
+    },
+
+    async setPhone(token, phone) {
+      await tick();
+      const db = load();
+      const me = account(db, token);
+      me.phone = checkPhone(phone);
+      save(db);
+      return toAccount(me);
     },
 
     async logout(token) {
@@ -286,14 +305,14 @@ export function createLocalApi(
       const trip = db.trips.find((t) => t.id === me.tripId)!;
       return {
         trip: { code: trip.code, name: trip.name, destination: trip.destination, startsOn: trip.startsOn, endsOn: trip.endsOn },
-        me: { id: me.id, name: nameOf(db, me.id), isOrganizer: me.isOrganizer },
+        me: { id: me.id, name: nameOf(db, me.id), isOrganizer: me.isOrganizer, phone: phoneOf(db, me.id) },
         cars: db.cars
           .filter((c) => c.tripId === trip.id)
           .sort((a, b) => a.createdAt - b.createdAt)
           .map((c) => ({
             id: c.id,
             seats: c.seats,
-            driver: { id: c.driverId, name: nameOf(db, c.driverId) },
+            driver: { id: c.driverId, name: nameOf(db, c.driverId), phone: phoneOf(db, c.driverId) },
             legs: db.legs
               .filter((l) => l.carId === c.id)
               .sort((a, b) => a.direction.localeCompare(b.direction))
@@ -305,7 +324,12 @@ export function createLocalApi(
                 passengers: db.bookings
                   .filter((b) => b.legId === l.id)
                   .sort((a, b) => a.createdAt - b.createdAt)
-                  .map((b) => ({ id: b.participantId, name: nameOf(db, b.participantId) })),
+                  .map((b) => ({
+                    id: b.participantId,
+                    name: nameOf(db, b.participantId),
+                    // Numéro d'un passager : pour son chauffeur seulement.
+                    phone: c.driverId === me.id ? phoneOf(db, b.participantId) : null,
+                  })),
               })),
           })),
       };

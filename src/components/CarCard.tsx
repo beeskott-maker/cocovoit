@@ -6,8 +6,11 @@ import seatFree from '../assets/figma/seat-free.svg';
 import seatIcon from '../assets/figma/seat.svg';
 import seatMe from '../assets/figma/seat-me.svg';
 import { carOf, formatDeparture } from '../lib/format';
+import { smsUrl } from '../lib/phone';
 import { freeSeats, freeSeatsLabel, placeSeats, seatCells, type SeatCell } from '../lib/seats';
 import type { Car, Direction, Leg } from '../lib/types';
+import { ContactButtons, ContactSheet } from './Contact';
+import { CallIcon, SmsIcon } from './PhoneIcons';
 import { RdvSheet } from './RdvSheet';
 
 interface Props {
@@ -32,18 +35,20 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
   const [rdvLeg, setRdvLeg] = useState<(Leg & { meetingPoint: string }) | null>(null);
   const aller = car.legs.find((leg) => leg.direction === 'aller');
   const rdv = aller?.meetingPoint ? { ...aller, meetingPoint: aller.meetingPoint } : null;
+  const driverPhone = !mine && car.driver.phone;
+  const [contact, setContact] = useState<{ name: string; phone: string } | null>(null);
   return (
     <section className="car" aria-label={carOf(car.driver.name)}>
       <div className="car__header">
-        {/* Petit saut de l'icône : il reste de la place (sauf dans ma voiture). */}
-        <img
-          className={!mine && freeSeats(car) > 0 ? 'car__icon car__icon--hop' : 'car__icon'}
-          src={carIcon}
-          alt=""
-          width={24}
-          height={24}
-        />
         <div className="car__title-row">
+          {/* Petit saut de l'icône : il reste de la place (sauf dans ma voiture). */}
+          <img
+            className={!mine && freeSeats(car) > 0 ? 'car__icon car__icon--hop' : 'car__icon'}
+            src={carIcon}
+            alt=""
+            width={24}
+            height={24}
+          />
           <div className="car__title-group">
             <h2 className="car__title">{carLabel}</h2>
             {mine && (
@@ -52,13 +57,18 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
               </Link>
             )}
           </div>
-          {/* Sur la ligne du titre : le rendez-vous concerne le départ de la voiture. */}
-          {rdv && (
-            <button type="button" className="leg__rdv" onClick={() => setRdvLeg(rdv)} title={rdv.meetingPoint}>
-              Point de RDV
-            </button>
-          )}
         </div>
+        {(rdv || driverPhone) && (
+          <div className="car__actions">
+            {/* Le rendez-vous concerne le départ de la voiture : toujours en premier. */}
+            {rdv && (
+              <button type="button" className="leg__rdv" onClick={() => setRdvLeg(rdv)} title={rdv.meetingPoint}>
+                Point de RDV
+              </button>
+            )}
+            {driverPhone && <ContactButtons name={car.driver.name} phone={driverPhone} />}
+          </div>
+        )}
       </div>
       <div className="car__legs">
         {car.legs.map((leg) => (
@@ -69,9 +79,11 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
             busy={busyLegId === leg.id}
             onTake={() => onTake(leg)}
             onLeave={() => onLeave(leg)}
+            onContact={setContact}
           />
         ))}
       </div>
+      {contact && <ContactSheet {...contact} onClose={() => setContact(null)} />}
       {rdvLeg && (
         <RdvSheet
           tripName={tripName}
@@ -92,14 +104,18 @@ function LegSeats({
   busy,
   onTake,
   onLeave,
+  onContact,
 }: {
   leg: Leg;
   cells: SeatCell[];
   busy: boolean;
   onTake: () => void;
   onLeave: () => void;
+  onContact: (person: { name: string; phone: string }) => void;
 }) {
   const title = leg.direction === 'aller' ? 'Aller' : 'Retour';
+  // Numéros visibles seulement par le chauffeur : SMS à tous ses passagers du trajet.
+  const phones = leg.passengers.flatMap((p) => (p.phone ? [p.phone] : []));
   return (
     <div className="leg">
       <div className="leg__header">
@@ -113,23 +129,57 @@ function LegSeats({
       >
         {placeSeats(cells).map(({ cell, column, row }, i) => (
           <div role="listitem" key={i} className="seats__cell" style={{ gridColumn: column, gridRow: row }}>
-            <Seat cell={cell} busy={busy} onTake={onTake} onLeave={onLeave} />
+            <Seat cell={cell} busy={busy} onTake={onTake} onLeave={onLeave} onContact={onContact} />
           </div>
         ))}
       </div>
+      {phones.length > 0 && (
+        <a className="group-sms" href={smsUrl(phones)}>
+          <SmsIcon size={20} />
+          SMS aux passagers {leg.direction === 'aller' ? "de l'aller" : 'du retour'}
+        </a>
+      )}
     </div>
   );
 }
 
-function Seat({ cell, busy, onTake, onLeave }: { cell: SeatCell; busy: boolean; onTake: () => void; onLeave: () => void }) {
+function Seat({
+  cell,
+  busy,
+  onTake,
+  onLeave,
+  onContact,
+}: {
+  cell: SeatCell;
+  busy: boolean;
+  onTake: () => void;
+  onLeave: () => void;
+  onContact: (person: { name: string; phone: string }) => void;
+}) {
   switch (cell.kind) {
-    case 'occupied':
+    case 'occupied': {
+      const { name, phone } = cell;
+      if (phone) {
+        return (
+          <button
+            type="button"
+            className="seat seat--occupied seat--contact"
+            onClick={() => onContact({ name, phone })}
+            aria-label={`Contacter ${name}`}
+          >
+            <img src={seatIcon} alt="" />
+            <span className="seat__name">{name}</span>
+            <CallIcon />
+          </button>
+        );
+      }
       return (
         <div className="seat seat--occupied">
           <img src={seatIcon} alt="" />
           <span className="seat__name">{cell.name}</span>
         </div>
       );
+    }
     case 'me':
       return (
         <div className="seat seat--me">

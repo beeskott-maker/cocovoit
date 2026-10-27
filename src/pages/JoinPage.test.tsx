@@ -79,7 +79,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
 
     // Compte en base et participation au voyage : le navigateur ne garde que le jeton.
     const token = localStorage.getItem(storageKey('token'))!;
-    expect(await api.me(token)).toEqual({ email: 'lea@example.com', name: 'Léa' });
+    expect(await api.me(token)).toEqual({ email: 'lea@example.com', name: 'Léa', phone: null });
     expect((await api.myTrips(token)).map((t) => t.code)).toEqual([code]);
     expect(Object.keys(localStorage).filter((k) => k !== storageKey('demo-db'))).toEqual([storageKey('token')]);
   });
@@ -110,5 +110,22 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     expect(screen.getByLabelText('Mon email')).toBeInTheDocument();
     expect(localStorage.getItem(storageKey('token'))).toBeNull();
     await expect(api.me(lea)).rejects.toMatchObject({ code: 'unauthenticated' });
+  });
+
+  it('numéro facultatif à la création du compte, vérifié avant envoi', async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    const { user } = renderApp(`/j/${code}`, api);
+    await user.type(await screen.findByLabelText('Mon email'), 'lea@example.com');
+    await user.click(screen.getByRole('button', { name: 'Suivant' }));
+    await user.type(await screen.findByLabelText('Mon nom'), 'Léa');
+    await user.type(screen.getByLabelText('Mon téléphone (facultatif)'), '06 12');
+    await user.click(screen.getByRole('button', { name: 'Suivant' }));
+    expect(await screen.findByText(/Numéro invalide/)).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Mon téléphone (facultatif)'), ' 34 56 78');
+    await user.click(screen.getByRole('button', { name: 'Suivant' }));
+    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect((await api.me(localStorage.getItem(storageKey('token'))!)).phone).toBe('+33612345678');
   });
 });

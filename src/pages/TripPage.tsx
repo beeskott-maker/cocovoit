@@ -5,10 +5,13 @@ import { BookedDialog } from '../components/BookedDialog';
 import { CarCard } from '../components/CarCard';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { MapsSheet } from '../components/MapsSheet';
+import { PhoneDialog } from '../components/PhoneDialog';
+import { CallIcon } from '../components/PhoneIcons';
 import { RequireAccount } from '../components/RequireAccount';
 import { Toast } from '../components/Toast';
 import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
+import { storageKey } from '../lib/env';
 import { inviteUrl } from '../lib/format';
 import { useAuth } from '../lib/auth';
 import { bookedDirections, keepOrder, sortCars } from '../lib/seats';
@@ -16,6 +19,23 @@ import type { Leg } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
 import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import { useTripState } from '../lib/useTripState';
+
+// « Plus tard » sur l'invitation à donner son numéro : mémorisé dans ce navigateur.
+const PHONE_LATER = storageKey('phone-later');
+function phoneLater(): boolean {
+  try {
+    return localStorage.getItem(PHONE_LATER) === '1';
+  } catch {
+    return false;
+  }
+}
+function setPhoneLater() {
+  try {
+    localStorage.setItem(PHONE_LATER, '1');
+  } catch {
+    // Stockage indisponible : l'invitation reviendra au prochain chargement.
+  }
+}
 
 export function TripPage() {
   return <RequireAccount>{(token) => <Trip token={token} />}</RequireAccount>;
@@ -36,6 +56,9 @@ function Trip({ token }: { token: string }) {
   const [bookedBoth, setBookedBoth] = useState(false);
   const closeBooked = useCallback(() => setBookedBoth(false), []);
   const carOrder = useRef<string[] | null>(null);
+  const [phoneOpen, setPhoneOpen] = useState(false);
+  const closePhone = useCallback(() => setPhoneOpen(false), []);
+  const [askPhoneLater, setAskPhoneLater] = useState(phoneLater);
   useDocumentTitle(tripTitle(state?.trip.name));
 
   if (error?.code === 'unauthenticated') {
@@ -62,6 +85,8 @@ function Trip({ token }: { token: string }) {
   const myCar = state.cars.find((c) => c.driver.id === state.me.id);
   const myDirections = bookedDirections(state.cars, state.me.id);
   const carHref = myCar ? `/t/${code}/voiture/${myCar.id}` : `/t/${code}/voiture`;
+  // Invitation à donner son numéro : seulement si on conduit ou qu'on a une place.
+  const askPhone = !state.me.phone && !askPhoneLater && (!!myCar || myDirections.size > 0);
 
   async function act(leg: Leg, action: 'take' | 'leave') {
     setBusyLegId(leg.id);
@@ -103,6 +128,19 @@ function Trip({ token }: { token: string }) {
     }
   }
 
+  async function savePhone(phone: string | null) {
+    await api.setPhone(token, phone);
+    setPhoneOpen(false);
+    await reload();
+    setToast(phone ? 'Numéro enregistré' : 'Numéro retiré');
+  }
+
+  function later() {
+    setPhoneLater();
+    setAskPhoneLater(true);
+    setPhoneOpen(false);
+  }
+
   // Déconnexion, fermée par le lien d'invitation (connexion éventuellement avec un autre compte).
   function switchPerson() {
     navigate(`/j/${code}`, { state: { logout: true } });
@@ -117,6 +155,30 @@ function Trip({ token }: { token: string }) {
         </p>
       )}
       <main className="trip-body">
+        {askPhone && (
+          <section className="ask-phone" aria-label="Ajoutez votre numéro">
+            <span className="ask-phone__icon" aria-hidden="true">
+              <CallIcon size={20} />
+            </span>
+            <div className="ask-phone__body">
+              <p>
+                <strong>Ajoutez votre numéro</strong>
+                <br />
+                {myCar
+                  ? 'Vos passagers pourront vous appeler ou vous écrire le jour du départ.'
+                  : 'Votre chauffeur pourra vous appeler ou vous écrire le jour du départ.'}
+              </p>
+              <div className="ask-phone__actions">
+                <button type="button" className="btn btn--text" onClick={later}>
+                  Plus tard
+                </button>
+                <button type="button" className="btn btn--primary" onClick={() => setPhoneOpen(true)}>
+                  Ajouter
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
         {state.cars.length === 0 ? (
           <div className="empty">
             <img src={carIcon} alt="" />
@@ -170,6 +232,10 @@ function Trip({ token }: { token: string }) {
             Déconnexion
           </button>
           {' · '}
+          <button type="button" className="link-btn" onClick={() => setPhoneOpen(true)}>
+            Mon numéro
+          </button>
+          {' · '}
           <Link to="/">Mes voyages</Link>
         </span>
       </footer>
@@ -181,6 +247,14 @@ function Trip({ token }: { token: string }) {
             action est irréversible.
           </p>
         </ConfirmDialog>
+      )}
+      {phoneOpen && (
+        <PhoneDialog
+          phone={state.me.phone}
+          driver={!!myCar}
+          onSave={savePhone}
+          onClose={state.me.phone ? closePhone : later}
+        />
       )}
       {mapsOpen && state.trip.destination && (
         <MapsSheet address={state.trip.destination} onClose={closeMaps} />

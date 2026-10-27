@@ -98,4 +98,23 @@ describe('API démo (mêmes règles que les fonctions SQL)', () => {
     await api.deleteCar(hugo, code, st.cars[0].id);
     expect((await api.getTripState(hugo, code)).cars).toEqual([]);
   });
+
+  it('téléphone : chauffeur visible par tout le voyage, passager par son chauffeur seulement', async () => {
+    const api = createTestApi();
+    const { code, organizer, hugo } = await seedTrip(api);
+    expect((await api.setPhone(hugo, '06 12 34 56 78')).phone).toBe('+33612345678');
+    const lea = await joinAs(api, code, 'lea@example.com', 'Léa');
+    await api.setPhone(lea, '0698765432');
+    await api.takeSeat(lea, code, (await api.getTripState(lea, code)).cars[0].legs[0].id);
+
+    const byDriver = await api.getTripState(hugo, code);
+    expect(byDriver.cars[0].legs[0].passengers[0].phone).toBe('+33698765432');
+    const byOther = await api.getTripState(organizer, code);
+    expect(byOther.cars[0].driver.phone).toBe('+33612345678');
+    expect(byOther.cars[0].legs[0].passengers[0].phone).toBeNull();
+    expect((await api.getTripState(lea, code)).me.phone).toBe('+33698765432');
+
+    await expect(api.setPhone(lea, '123')).rejects.toMatchObject({ code: 'invalid' });
+    expect((await api.setPhone(lea, null)).phone).toBeNull();
+  });
 });

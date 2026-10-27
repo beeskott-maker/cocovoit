@@ -15,6 +15,14 @@ export const DEMO_PEOPLE: Record<string, string> = {
   antoine: 'Antoine',
 };
 export const ME = 'moi';
+/** Numéros fictifs (plage réservée à la fiction par l'Arcep). Sarah n'en a pas donné. */
+export const DEMO_PHONES: Record<string, string> = {
+  hugo: '+33639980001',
+  julie: '+33639980002',
+  thomas: '+33639980003',
+  camille: '+33639980004',
+  antoine: '+33639980005',
+};
 
 export interface DemoLeg {
   at: string;

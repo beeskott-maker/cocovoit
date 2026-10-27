@@ -12,6 +12,11 @@ export interface TripPreview {
 export interface Person {
   id: string;
   name: string;
+  /**
+   * Format international (+33612345678), seulement si je peux le voir : celui
+   * d'un chauffeur pour tout le voyage, celui d'un passager pour son chauffeur.
+   */
+  phone?: string | null;
 }
 
 export interface Leg {
@@ -32,7 +37,7 @@ export interface Car {
 
 export interface TripState {
   trip: TripPreview;
-  me: Person & { isOrganizer: boolean };
+  me: Person & { isOrganizer: boolean; phone: string | null };
   cars: Car[];
 }
 
@@ -67,6 +72,7 @@ export interface CarInput {
 export interface Account {
   email: string;
   name: string;
+  phone: string | null;
 }
 
 /** Connexion par email : nom demandé si le compte n'existe pas encore. */
@@ -108,8 +114,11 @@ export interface MyTrip {
  */
 export interface Api {
   readonly mode: 'supabase' | 'demo';
-  login(email: string, name?: string): Promise<LoginResult>;
+  /** Le numéro (facultatif) n'est pris qu'à la création du compte. */
+  login(email: string, name?: string, phone?: string | null): Promise<LoginResult>;
   me(token: string): Promise<Account>;
+  /** Ajoute, change ou (null) retire le numéro du compte. */
+  setPhone(token: string, phone: string | null): Promise<Account>;
   logout(token: string): Promise<void>;
   createTrip(token: string, input: NewTrip): Promise<string>;
   getTripPreview(code: string): Promise<TripPreview | null>;

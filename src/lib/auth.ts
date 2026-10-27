@@ -42,7 +42,7 @@ export type AuthState =
 export interface AuthContextValue {
   auth: AuthState;
   /** Connexion par email : « needs_name » si le compte n'existe pas encore. */
-  login(email: string, name?: string): Promise<'done' | 'needs_name'>;
+  login(email: string, name?: string, phone?: string | null): Promise<'done' | 'needs_name'>;
   logout(): Promise<void>;
   /** À appeler quand le serveur répond que la session n'est plus valide. */
   sessionExpired(): void;

@@ -1,7 +1,8 @@
 import type { Car, Direction, Leg } from './types';
 
 export type SeatCell =
-  | { kind: 'occupied'; name: string }
+  /** phone : seulement si je peux le voir (je conduis cette voiture). */
+  | { kind: 'occupied'; name: string; phone?: string | null }
   | { kind: 'me' }
   | { kind: 'free'; count: number }
   | { kind: 'take'; disabled: boolean }
@@ -27,7 +28,7 @@ export function seatCells(
   const iAmIn = leg.passengers.some((p) => p.id === meId);
   const canTake = !iAmIn && !iDrive;
   const cells: SeatCell[] = leg.passengers.map((p) =>
-    p.id === meId ? { kind: 'me' } : { kind: 'occupied', name: p.name },
+    p.id === meId ? { kind: 'me' } : { kind: 'occupied', name: p.name, phone: p.phone },
   );
   const free = Math.max(0, car.seats - leg.passengers.length);
   if (free > 0) cells.push({ kind: 'free', count: free });

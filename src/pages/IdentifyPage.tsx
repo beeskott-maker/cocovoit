@@ -22,8 +22,8 @@ export function IdentifyPage() {
       intro="Connectez-vous avec votre email. Si c'est votre première fois, on vous demandera votre nom."
       disabled={auth.status === 'loading'}
       onEmail={(email) => login(email)}
-      onName={async (email, name) => {
-        await login(email, name);
+      onName={async (email, name, phone) => {
+        await login(email, name, phone);
         navigate(target, { replace: true });
       }}
     />

@@ -25,8 +25,11 @@ const isAndroid = (ua: string) => /Android/.test(ua);
 // Téléphone ou tablette. Un iPad se présente comme un Mac, mais tactile.
 const isMobile = (ua: string, touchPoints: number) => /Android|iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1);
 
+/** Ordinateur : ni téléphone ni tablette. */
+export const isDesktop = (ua = navigator.userAgent, touchPoints = navigator.maxTouchPoints ?? 0) => !isMobile(ua, touchPoints);
+
 /** Sur ordinateur, pas de choix d'appli : les liens de carte ouvrent Google Maps. */
-export const opensMapsDirectly = (ua = navigator.userAgent, touchPoints = navigator.maxTouchPoints ?? 0) => !isMobile(ua, touchPoints);
+export const opensMapsDirectly = isDesktop;
 
 /**
  * Choix proposé sur téléphone et tablette : Waze et Google Maps, plus Apple Plans

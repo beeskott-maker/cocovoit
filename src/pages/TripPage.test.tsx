@@ -242,4 +242,70 @@ describe('Page voyage', () => {
     expect(await within(zoeCar).findByText('Moi')).toBeInTheDocument();
     expect(await order()).toEqual(['Voiture de Zoé', "Voiture d'Hugo"]);
   });
+
+  it('téléphone : boutons Appeler / SMS du chauffeur, et ses passagers joignables', async () => {
+    const api = createTestApi();
+    const { code, hugo } = await seedTrip(api);
+    await api.setPhone(hugo, '0612345678');
+    const lea = await joinAs(api, code, 'lea@example.com', 'Léa');
+    await api.setPhone(lea, '0698765432');
+    await api.takeSeat(lea, code, (await api.getTripState(lea, code)).cars[0].legs[0].id);
+
+    signIn(lea);
+    const first = renderApp(`/t/${code}`, api);
+    const car = await screen.findByRole('region', { name: "Voiture d'Hugo" });
+    expect(within(car).getByRole('link', { name: 'Appeler Hugo' })).toHaveAttribute('href', 'tel:+33612345678');
+    expect(within(car).getByRole('link', { name: 'SMS à Hugo' })).toHaveAttribute('href', 'sms:+33612345678');
+    // « Point de RDV » d'abord, puis les boutons du chauffeur.
+    const actions = [...car.querySelector('.car__actions')!.children].map((el) => el.getAttribute('aria-label') ?? el.textContent);
+    expect(actions).toEqual(['Point de RDV', 'Appeler Hugo', 'SMS à Hugo']);
+    first.unmount();
+
+    signIn(hugo);
+    const { user } = renderApp(`/t/${code}`, api);
+    const mine = await screen.findByRole('region', { name: "Voiture d'Hugo" });
+    expect(within(mine).queryByRole('link', { name: 'Appeler Hugo' })).not.toBeInTheDocument();
+    expect(within(mine).getByRole('link', { name: "SMS aux passagers de l'aller" })).toHaveAttribute('href', 'sms:+33698765432');
+    await user.click(within(mine).getByRole('button', { name: 'Contacter Léa' }));
+    const sheet = screen.getByRole('dialog', { name: 'Léa' });
+    expect(sheet).toHaveTextContent('06 98 76 54 32');
+    expect(within(sheet).getByRole('link', { name: 'Appeler' })).toHaveAttribute('href', 'tel:+33698765432');
+  });
+
+  it('invitation à donner son numéro : « Ajouter » enregistre, « Plus tard » la masque', async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    const lea = await joinAs(api, code, 'lea@example.com', 'Léa');
+    signIn(lea);
+    const { user } = renderApp(`/t/${code}`, api);
+    // Sans place ni voiture : pas d'invitation.
+    await screen.findByText('Votre voyage');
+    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+
+    await user.click(screen.getAllByRole('button', { name: 'Prendre 1 place' })[0]);
+    const ask = await screen.findByRole('region', { name: 'Ajoutez votre numéro' });
+    expect(ask).toHaveTextContent('Votre chauffeur pourra vous appeler');
+    await user.click(within(ask).getByRole('button', { name: 'Ajouter' }));
+    const dialog = screen.getByRole('dialog', { name: 'Mon numéro de téléphone' });
+    await user.type(within(dialog).getByLabelText('Mon téléphone'), '06 98 76 54 32');
+    await user.click(within(dialog).getByRole('button', { name: 'Enregistrer' }));
+    expect(await screen.findByText('Numéro enregistré')).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+    expect((await api.me(lea)).phone).toBe('+33698765432');
+  });
+
+  it('« Plus tard » : l’invitation ne revient pas', async () => {
+    const api = createTestApi();
+    const { code, hugo } = await seedTrip(api);
+    signIn(hugo);
+    const first = renderApp(`/t/${code}`, api);
+    const ask = await screen.findByRole('region', { name: 'Ajoutez votre numéro' });
+    expect(ask).toHaveTextContent('Vos passagers pourront vous appeler');
+    await first.user.click(within(ask).getByRole('button', { name: 'Plus tard' }));
+    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+    first.unmount();
+    renderApp(`/t/${code}`, api);
+    await screen.findByText('Votre voyage');
+    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+  });
 });

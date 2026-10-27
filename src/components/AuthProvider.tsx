@@ -27,8 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [api]);
 
   const login = useCallback(
-    async (email: string, name?: string) => {
-      const res = await api.login(email, name);
+    async (email: string, name?: string, phone?: string | null) => {
+      const res = await api.login(email, name, phone);
       if (res.status === 'needs_name') return 'needs_name';
       writeToken(res.token);
       setAuth({ status: 'connected', token: res.token, account: res.account });
