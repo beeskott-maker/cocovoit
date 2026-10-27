@@ -74,7 +74,7 @@ export function LandingPage() {
       <main className="lp-wrap">
         <section className="lp-first" id="etapes">
           <p className="lp-kicker">En trois étapes</p>
-          <h2>Prêts à partir en deux minutes.</h2>
+          <h2>Prêts à partir en une minute.</h2>
           <ol className="lp-steps">
             <li>
               <span className="lp-num">1</span>
