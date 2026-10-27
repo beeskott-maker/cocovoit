@@ -1042,6 +1042,8 @@ a {
   padding: 12px 24px 32px;
   border-radius: 28px 28px 0 0;
   background: #fff;
+  /* Glisser vers le bas pour fermer : pas de défilement de la page derrière. */
+  touch-action: none;
 }
 .sheet__handle {
   align-self: center;
