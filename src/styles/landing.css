@@ -435,3 +435,33 @@
     font-size: 36px;
   }
 }
+
+/* Apparition au défilement : seulement si le script l'active (contenu visible sinon). */
+.lp-anim .lp-rv {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--d, 0s);
+}
+.lp-anim .lp-rv.lp-phone {
+  transform: translateY(36px) scale(0.97);
+}
+.lp-anim .lp-rv.lp-in {
+  opacity: 1;
+  transform: none;
+}
+/* Numéros des étapes et pastilles d'icônes : petit rebond à l'arrivée. */
+.lp-anim .lp-rv.lp-in .lp-num,
+.lp-anim .lp-trust > .lp-rv.lp-in i {
+  animation: lp-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) calc(var(--d, 0s) + 0.15s) both;
+}
+@keyframes lp-pop {
+  0% {
+    transform: scale(0.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

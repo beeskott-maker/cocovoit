@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import { useEffect, useRef, type MouseEvent, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/figma/logo.svg';
 import booked from '../assets/landing/booked.webp';
@@ -12,6 +12,72 @@ import '../styles/landing.css';
 /** Connexion, puis « Mes voyages » avec le formulaire de création ouvert. */
 const ORGANIZE = `/identification?suite=${encodeURIComponent('/?creer=1')}`;
 
+/** Éléments qui apparaissent au défilement, avec le décalage entre éléments d'un même groupe (s). */
+const REVEAL: [string, number][] = [
+  ['.lp-hero .lp-text > *', 0.08],
+  ['.lp-hero-phone .lp-phone', 0],
+  ['main .lp-kicker', 0],
+  ['main h2', 0],
+  ['.lp-feature .lp-text > p:not(.lp-kicker)', 0],
+  ['.lp-points li', 0.08],
+  ['.lp-steps li', 0.12],
+  ['.lp-feature .lp-phone', 0],
+  ['.lp-trust > div', 0.1],
+  ['.lp-final', 0],
+];
+
+/**
+ * Animations discrètes : apparition au défilement et très légère parallaxe de la
+ * capture d'accroche. Rien si « Réduire les animations » est activé.
+ */
+function useLandingMotion(root: RefObject<HTMLDivElement>) {
+  useEffect(() => {
+    const page = root.current;
+    if (!page || typeof IntersectionObserver === 'undefined') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+
+    const els: HTMLElement[] = [];
+    for (const [selector, step] of REVEAL) {
+      page.querySelectorAll<HTMLElement>(selector).forEach((el, i) => {
+        el.classList.add('lp-rv');
+        if (step) el.style.setProperty('--d', `${(i * step).toFixed(2)}s`);
+        els.push(el);
+      });
+    }
+    page.classList.add('lp-anim');
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add('lp-in');
+          io.unobserve(e.target);
+        }
+      },
+      { rootMargin: '0px 0px -8% 0px' },
+    );
+    const frame = requestAnimationFrame(() => els.forEach((el) => io.observe(el)));
+
+    // Parallaxe : la capture d'accroche remonte un peu plus vite que la page.
+    const hero = page.querySelector<HTMLElement>('.lp-hero-phone');
+    let ticking = false;
+    const move = () => {
+      ticking = false;
+      if (hero) hero.style.transform = `translateY(${(-Math.min(window.scrollY, window.innerHeight) * 0.08).toFixed(1)}px)`;
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(move);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      io.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [root]);
+}
+
 const ICON = {
   fill: 'none',
   stroke: 'currentColor',
@@ -23,6 +89,8 @@ const ICON = {
 /** Page d'accueil des visiteurs non connectés : présentation et accès à la connexion. */
 export function LandingPage() {
   useDocumentTitle(APP_TITLE);
+  const root = useRef<HTMLDivElement>(null);
+  useLandingMotion(root);
 
   // Défilement jusqu'aux trois étapes (pas d'ancre : l'appli route sur le # de l'URL).
   function toSteps(e: MouseEvent) {
@@ -32,7 +100,7 @@ export function LandingPage() {
   }
 
   return (
-    <div className="lp">
+    <div className="lp" ref={root}>
       <header className="lp-hero">
         <div className="lp-wrap">
           <nav className="lp-nav">
