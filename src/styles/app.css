@@ -289,7 +289,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 24px;
+  padding: 24px 16px;
   border-radius: 0 0 24px 24px;
   background: linear-gradient(-71deg, var(--primary) 3%, var(--on-primary-container) 100%);
   color: #fff;
@@ -376,7 +376,7 @@ a {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 8px 24px 32px;
+  padding: 8px 16px 32px;
   text-align: center;
 }
 .trip-footer a,
@@ -400,7 +400,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 24px 24px;
+  padding: 16px 16px 24px;
 }
 /* Page voyage : fond gris-violet, chaque voiture dans une carte blanche. */
 .app:has(.trip-body) {
@@ -693,6 +693,10 @@ a {
   font-size: 14px;
   line-height: 20px;
 }
+/* Page voyage : mêmes marges que l'en-tête et les cartes. */
+.app:has(.trip-body) .banner {
+  margin: 0 16px;
+}
 .banner--error {
   background: #f9dedc;
   color: #410e0b;
@@ -920,7 +924,8 @@ a {
 }
 
 .section {
-  padding: 0 32px;
+  /* Mes voyages : marges réduites pour élargir les cartes des voyages. */
+  padding: 0 20px;
 }
 .section h2 {
   margin: 0 0 12px;

@@ -17,5 +17,5 @@
 
 ## Mise en page
 
-- **Alignements gauche/droite stricts** : sur un même écran, tous les blocs (titres, textes, champs, boutons, cartes, listes) partagent les mêmes marges latérales. Écrans avec le logo (`BrandHeader`) : 32 px (`.page-title`, `.form`, `.section`, `.admin-list`) ; page voyage : 24 px (en-tête, contenu, pied de page). Seuls les éléments imbriqués dans un cadre (champs d'un trajet, contenu d'une carte) sont en retrait.
+- **Alignements gauche/droite stricts** : sur un même écran, tous les blocs (titres, textes, champs, boutons, cartes, listes) partagent les mêmes marges latérales. Écrans avec le logo (`BrandHeader`) : 32 px (`.page-title`, `.form`, `.admin-list`), sauf les listes de « Mes voyages » (`.section`) : 20 px ; page voyage : 16 px (en-tête, contenu, pied de page). Seuls les éléments imbriqués dans un cadre (champs d'un trajet, contenu d'une carte) sont en retrait.
 - Pour tout nouvel écran ou bloc, réutiliser ces conteneurs plutôt que de fixer un nouveau padding, et vérifier les bords gauche/droite (capture Playwright) avant de livrer.
