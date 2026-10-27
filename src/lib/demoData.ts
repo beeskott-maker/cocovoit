@@ -46,14 +46,14 @@ const FIXED_TRIPS: DemoTrip[] = [
     startsOn: '2026-11-14',
     endsOn: '2026-11-15',
     organizer: ME,
-    people: [ME, 'hugo', 'julie', 'sarah', 'thomas'],
+    people: [ME, 'hugo', 'julie', 'sarah', 'thomas', 'camille'],
     cars: [
       {
         driver: ME,
         seats: 3,
         legs: {
           aller: { at: '2026-11-14T08:00:00+01:00', rdv: 'Gare Part-Dieu, Lyon', passengers: ['julie', 'sarah'] },
-          retour: { at: '2026-11-15T17:00:00+01:00', passengers: ['julie'] },
+          retour: { at: '2026-11-15T17:00:00+01:00', passengers: ['julie', 'camille'] },
         },
       },
       {

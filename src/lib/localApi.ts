@@ -95,7 +95,15 @@ export function createLocalApi(
     const raw = store.getItem(KEY);
     const db = raw ? (JSON.parse(raw) as Db) : emptyDb();
     // Ancienne base démo sans comptes : on repart de zéro, comme en production.
-    return db.accounts ? db : emptyDb();
+    if (!db.accounts) return emptyDb();
+    // Base démo d'avant les numéros de téléphone : on les ajoute aux personnes de démo.
+    if (options.seedDemo) {
+      for (const a of db.accounts) {
+        const key = a.email.replace(/@example\.com$/, '');
+        if (a.phone === undefined && key in DEMO_PEOPLE) a.phone = DEMO_PHONES[key] ?? null;
+      }
+    }
+    return db;
   }
   function save(db: Db) {
     store.setItem(KEY, JSON.stringify(db));
