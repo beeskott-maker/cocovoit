@@ -53,8 +53,8 @@ describe('Données de démo : téléphones', () => {
     const mine = state.cars.find((c) => c.driver.id === state.me.id)!;
     const phones = mine.legs.map((l) => l.passengers.map((p) => `${p.name} ${p.phone ?? '-'}`));
     expect(phones).toEqual([
-      ['Julie +33639980002', 'Sarah -'],
-      ['Julie +33639980002', 'Camille +33639980004'],
+      ['Julie Bernard +33639980002', 'Sarah Dubois-Lefebvre -'],
+      ['Julie Bernard +33639980002', 'Camille Fontaine +33639980004'],
     ]);
   });
 
@@ -67,7 +67,7 @@ describe('Données de démo : téléphones', () => {
     for (const a of db.accounts) delete a.phone;
     store.setItem(key, JSON.stringify(db));
     const annecy = (await api.myTrips(token)).find((t) => t.name === 'Week-end à Annecy')!;
-    const hugo = (await api.getTripState(token, annecy.code)).cars.find((c) => c.driver.name === 'Hugo')!;
+    const hugo = (await api.getTripState(token, annecy.code)).cars.find((c) => c.driver.name === 'Hugo Martin')!;
     expect(hugo.driver.phone).toBe('+33639980001');
   });
 });

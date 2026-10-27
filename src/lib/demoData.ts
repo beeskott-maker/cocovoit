@@ -6,13 +6,14 @@ import type { Direction } from './types';
  * propres exemplaires de ces voyages. Les trois voyages à venir sont aussi
  * insérés en production pour Loic (migration 20261024150000_jeu_de_test.sql).
  */
+/** Prénom et nom, dont des noms longs, pour vérifier les retours à la ligne. */
 export const DEMO_PEOPLE: Record<string, string> = {
-  hugo: 'Hugo',
-  julie: 'Julie',
-  sarah: 'Sarah',
-  thomas: 'Thomas',
-  camille: 'Camille',
-  antoine: 'Antoine',
+  hugo: 'Hugo Martin',
+  julie: 'Julie Bernard',
+  sarah: 'Sarah Dubois-Lefebvre',
+  thomas: 'Thomas Leroy',
+  camille: 'Camille Fontaine',
+  antoine: 'Antoine de Montmorency',
 };
 export const ME = 'moi';
 /** Numéros fictifs (plage réservée à la fiction par l'Arcep). Sarah n'en a pas donné. */

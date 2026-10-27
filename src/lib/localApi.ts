@@ -96,11 +96,13 @@ export function createLocalApi(
     const db = raw ? (JSON.parse(raw) as Db) : emptyDb();
     // Ancienne base démo sans comptes : on repart de zéro, comme en production.
     if (!db.accounts) return emptyDb();
-    // Base démo d'avant les numéros de téléphone : on les ajoute aux personnes de démo.
+    // Base démo plus ancienne : les personnes de démo prennent leurs nom et numéro actuels.
     if (options.seedDemo) {
       for (const a of db.accounts) {
         const key = a.email.replace(/@example\.com$/, '');
-        if (a.phone === undefined && key in DEMO_PEOPLE) a.phone = DEMO_PHONES[key] ?? null;
+        if (!(key in DEMO_PEOPLE)) continue;
+        a.name = DEMO_PEOPLE[key];
+        if (a.phone === undefined) a.phone = DEMO_PHONES[key] ?? null;
       }
     }
     return db;
