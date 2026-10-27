@@ -20,6 +20,9 @@ import { NotFoundPage } from './NotFoundPage';
 import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import { useTripState } from '../lib/useTripState';
 
+/** Délai avant la pop-in « C'est tout bon » (ms). */
+const BOOKED_DELAY = 300;
+
 // « Plus tard » sur l'invitation à donner son numéro : mémorisé dans ce navigateur.
 const PHONE_LATER = storageKey('phone-later');
 function phoneLater(): boolean {
@@ -103,8 +106,9 @@ function Trip({ token }: { token: string }) {
     } finally {
       setBusyLegId(null);
       await reload();
-      // Après le rechargement, pour afficher les deux trajets à jour.
-      if (both) setBookedBoth(true);
+      // Après le rechargement, et un court instant plus tard : on voit d'abord
+      // « Prendre 1 place » devenir « Libérer ma place ».
+      if (both) setTimeout(() => setBookedBoth(true), BOOKED_DELAY);
     }
   }
 

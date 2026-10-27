@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { createTestApi, joinAs, onIphone, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe('Page voyage', () => {
@@ -49,8 +49,10 @@ describe('Page voyage', () => {
     expect(await screen.findByRole('status')).toHaveTextContent("Place réservée pour l'aller");
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    // La place du retour complète : récapitulatif.
+    // La place du retour complète : « Libérer ma place » d'abord, puis le récapitulatif.
     await user.click(screen.getByRole('button', { name: 'Prendre 1 place' }));
+    await waitFor(() => expect(screen.getAllByRole('button', { name: 'Libérer ma place' })).toHaveLength(2));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" });
     const aller = within(dialog).getByRole('region', { name: 'Aller' });
     expect(aller).toHaveTextContent("Voiture d'Hugo");
