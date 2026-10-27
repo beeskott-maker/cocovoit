@@ -5,7 +5,7 @@ export function BrandHeader() {
   return (
     <header className="brand-header">
       <Link to="/" className="brand-header__logo" aria-label="Coco·Voit, accueil">
-        <img src={logo} width={182} height={40} alt="coco·voit" />
+        <img src={logo} width={186} height={40} alt="coco·voit" />
       </Link>
     </header>
   );
