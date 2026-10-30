@@ -3,7 +3,7 @@ name: Supabase keep-alive
 # Les projets Supabase gratuits sont mis en pause après 7 jours sans activité.
 # Chaque jour, on liste tous les projets du compte (ceux créés plus tard compris)
 # et on exécute une vraie requête sur chacun : SQL via l'API de gestion, puis un
-# appel à l'API REST publique.
+# appel public (contrôle de santé de l'authentification, avec la clé anon).
 on:
   schedule:
     - cron: '23 4 * * *' # tous les jours vers 5 h 23 (heure de Paris en hiver)
@@ -45,17 +45,18 @@ jobs:
               sql=échec; failed=1
             fi
 
-            # 2. Appel à l'API REST publique avec la clé anon
+            # 2. Appel public avec la clé anon (la racine REST est réservée à la clé de service)
             key=$(curl -fsS "${auth[@]}" "$API/projects/$ref/api-keys" 2>/dev/null \
                     | jq -r '[.[] | select(.name == "anon")][0].api_key // empty' || true)
             if [ -n "$key" ]; then
-              rest=$(curl -sS -o /dev/null -w '%{http_code}' -H "apikey: $key" -H "Authorization: Bearer $key" \
-                       "https://$ref.supabase.co/rest/v1/" || echo "injoignable")
+              rest=$(curl -sS -o /dev/null -w '%{http_code}' -H "apikey: $key" \
+                       "https://$ref.supabase.co/auth/v1/health" || echo "injoignable")
+              [ "$rest" = "200" ] || failed=1
             else
               rest="ignoré (pas de clé anon)"
             fi
 
-            echo "$name ($ref) : SQL $sql, REST $rest"
+            echo "$name ($ref) : SQL $sql, API $rest"
           done < projects.tsv
 
           exit $failed
