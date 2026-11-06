@@ -105,7 +105,7 @@ export function LandingPage() {
         <div className="lp-wrap">
           <nav className="lp-nav">
             <span className="lp-logo">
-              <img src={logo} width={186} height={40} alt="Coco·Voit" />
+              <img src={logo} width={174} height={40} alt="Coco·Voit" />
             </span>
             <Link to="/identification">Se connecter</Link>
           </nav>
