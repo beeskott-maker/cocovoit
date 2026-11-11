@@ -110,7 +110,7 @@ export function TripsAdminPage() {
         {trips && <p className="body-medium">{plural(trips.length, 'voyage')}</p>}
       </div>
       <main className="admin-list">
-        <Link className="btn btn--primary" to="/">
+        <Link className="btn btn--primary" to="/voyages?creer=1">
           Créer un voyage
         </Link>
         {error && (

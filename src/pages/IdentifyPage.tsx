@@ -12,7 +12,7 @@ export function IdentifyPage() {
   const [params] = useSearchParams();
   const next = params.get('suite');
   // Uniquement une page de l'appli, jamais une adresse externe.
-  const target = next?.startsWith('/') && !next.startsWith('//') ? next : '/';
+  const target = next?.startsWith('/') && !next.startsWith('//') ? next : '/voyages';
 
   if (auth.status === 'connected') return <Navigate to={target} replace />;
 

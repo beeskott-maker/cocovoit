@@ -125,7 +125,7 @@ function Trip({ token }: { token: string }) {
   async function deleteTrip() {
     try {
       await api.deleteTrip(token, code);
-      navigate('/');
+      navigate('/voyages');
     } catch (err) {
       setConfirmDelete(false);
       setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -240,7 +240,7 @@ function Trip({ token }: { token: string }) {
             Mon numéro
           </button>
           {' · '}
-          <Link to="/">Mes voyages</Link>
+          <Link to="/voyages">Mes voyages</Link>
         </span>
       </footer>
       {bookedBoth && <BookedDialog state={state} tripUrl={inviteUrl(code)} onClose={closeBooked} />}

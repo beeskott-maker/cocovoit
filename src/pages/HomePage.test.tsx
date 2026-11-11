@@ -112,4 +112,12 @@ describe("Page d'accueil des visiteurs", () => {
     expect(screen.getByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();
     expect(await api.myTrips(organizer)).toHaveLength(1);
   });
+
+  it('« Mes voyages » a sa propre adresse : #/ y mène une fois connecté', async () => {
+    const api = createTestApi();
+    const { organizer } = await seedTrip(api);
+    signIn(organizer);
+    renderApp('/voyages', api);
+    expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
+  });
 });

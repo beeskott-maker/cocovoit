@@ -12,7 +12,7 @@ export function NotFoundPage() {
         </p>
       </div>
       <div className="form">
-        <Link className="btn btn--outline" to="/">
+        <Link className="btn btn--outline" to="/voyages?creer=1">
           Créer un voyage
         </Link>
       </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
 import { RequireAccount } from '../components/RequireAccount';
@@ -12,12 +12,19 @@ import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type MyTrip } from '../lib/types';
 
 /**
- * Accueil : créer un voyage (organisateur) et retrouver ses voyages, pour les
- * personnes connectées ; page de présentation pour les visiteurs.
+ * Adresse du site (#/) : page de présentation pour les visiteurs, « Mes
+ * voyages » (#/voyages) pour les personnes connectées.
  */
 export function HomePage() {
   const { auth } = useAuth();
+  const { search } = useLocation();
   if (auth.status === 'anonymous') return <LandingPage />;
+  if (auth.status === 'loading') return <p className="loading">Chargement…</p>;
+  return <Navigate to={`/voyages${search}`} replace />;
+}
+
+/** « Mes voyages » : créer un voyage (organisateur) et retrouver ses voyages. */
+export function MyTripsPage() {
   return <RequireAccount>{(token) => <Home token={token} />}</RequireAccount>;
 }
 
@@ -199,7 +206,7 @@ function Home({ token }: { token: string }) {
       {auth.status === 'connected' && (
         <footer className="trip-footer body-medium">
           <span>Connecté·e en tant que {auth.account.name}</span>
-          <button type="button" className="link-btn" onClick={logout}>
+          <button type="button" className="link-btn" onClick={() => void logout().then(() => navigate('/'))}>
             Déconnexion
           </button>
         </footer>

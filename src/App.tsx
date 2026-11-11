@@ -4,7 +4,7 @@ import { AuthProvider } from './components/AuthProvider';
 import { IS_DEV_ENV } from './lib/env';
 import type { Api } from './lib/types';
 import { CarFormPage } from './pages/CarFormPage';
-import { HomePage } from './pages/HomePage';
+import { HomePage, MyTripsPage } from './pages/HomePage';
 import { IdentifyPage } from './pages/IdentifyPage';
 import { InvitePage } from './pages/InvitePage';
 import { JoinPage } from './pages/JoinPage';
@@ -23,6 +23,7 @@ export function AppRoutes() {
         )}
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/voyages" element={<MyTripsPage />} />
           <Route path="/identification" element={<IdentifyPage />} />
           <Route path="/j/:code" element={<JoinPage />} />
           <Route path="/t/:code" element={<TripPage />} />

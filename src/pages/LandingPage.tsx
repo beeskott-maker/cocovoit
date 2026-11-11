@@ -6,7 +6,7 @@ import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import '../styles/landing.css';
 
 /** Connexion, puis « Mes voyages » avec le formulaire de création ouvert. */
-const ORGANIZE = `/identification?suite=${encodeURIComponent('/?creer=1')}`;
+const ORGANIZE = `/identification?suite=${encodeURIComponent('/voyages?creer=1')}`;
 
 /** Éléments qui apparaissent au défilement, avec le décalage entre éléments d'un même groupe (s). */
 const REVEAL: [string, number][] = [
