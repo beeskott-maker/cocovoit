@@ -1652,6 +1652,13 @@ body {
 }
 .car__title {
   font-size: 22px;
+  line-height: 26px;
+}
+/* Boutons dans la grille des places : même hauteur que les cases (48 px). */
+.seats .btn {
+  height: 48px;
+  padding: 0 12px;
+  font-size: 15px;
 }
 .leg__title {
   font-weight: 700;
