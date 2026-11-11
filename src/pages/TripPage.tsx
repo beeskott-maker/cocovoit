@@ -21,8 +21,8 @@ import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import { useTripState } from '../lib/useTripState';
 import { Loading } from '../components/Delight';
 
-/** Délai avant la pop-in « C'est tout bon » (ms) : le temps de voir la case « Moi » et les confettis. */
-const BOOKED_DELAY = 1100;
+/** Délai avant la pop-in « C'est tout bon » (ms). */
+const BOOKED_DELAY = 300;
 
 // « Plus tard » sur l'invitation à donner son numéro : mémorisé dans ce navigateur.
 const PHONE_LATER = storageKey('phone-later');
@@ -58,8 +58,9 @@ function Trip({ token }: { token: string }) {
   const closeMaps = useCallback(() => setMapsOpen(false), []);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [bookedBoth, setBookedBoth] = useState(false);
-  // Trajet où l'on vient de prendre une place : case « Moi » qui rebondit, confettis.
-  const [justTaken, setJustTaken] = useState<string | null>(null);
+  // Trajet où l'on vient de prendre une place : case « Moi » qui rebondit, avec des
+  // confettis seulement pour le premier des deux sens (le second ouvre la pop-in).
+  const [justTaken, setJustTaken] = useState<{ legId: string; confetti: boolean } | null>(null);
   const closeBooked = useCallback(() => setBookedBoth(false), []);
   const carOrder = useRef<string[] | null>(null);
   const [phoneOpen, setPhoneOpen] = useState(false);
@@ -98,16 +99,16 @@ function Trip({ token }: { token: string }) {
     setBusyLegId(leg.id);
     let both = false;
     try {
-      if (action === 'take') {
-        await api.takeSeat(token, code, leg.id);
-        setJustTaken(leg.id);
-        setTimeout(() => setJustTaken((id) => (id === leg.id ? null : id)), 1500);
-      }
+      if (action === 'take') await api.takeSeat(token, code, leg.id);
       else await api.leaveSeat(token, code, leg.id);
       const other = leg.direction === 'aller' ? 'retour' : 'aller';
       // Place prise dans le seul sens qui manquait : récapitulatif aller + retour.
       if (action === 'take' && myDirections.has(other)) both = true;
       else setToast(action === 'take' ? `Place réservée pour ${leg.direction === 'aller' ? "l'aller" : 'le retour'}` : 'Place libérée');
+      if (action === 'take') {
+        setJustTaken({ legId: leg.id, confetti: !both });
+        setTimeout(() => setJustTaken((t) => (t?.legId === leg.id ? null : t)), 1500);
+      }
     } catch (err) {
       setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
@@ -204,7 +205,7 @@ function Trip({ token }: { token: string }) {
               meId={state.me.id}
               editHref={`/t/${code}/voiture/${car.id}`}
               busyLegId={busyLegId}
-              celebrateLegId={justTaken}
+              celebrate={justTaken}
               myDirections={myDirections}
               iDrive={!!myCar}
               onTake={(leg) => act(leg, 'take')}

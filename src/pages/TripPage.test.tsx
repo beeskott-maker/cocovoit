@@ -48,12 +48,17 @@ describe('Page voyage', () => {
     await user.click(takeAller);
     expect(await screen.findByRole('status')).toHaveTextContent("Place réservée pour l'aller");
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // Premier sens réservé : confettis.
+    expect(document.querySelector('.confetti')).toBeInTheDocument();
 
     // La place du retour complète : « Libérer ma place » d'abord, puis le récapitulatif.
     await user.click(screen.getByRole('button', { name: 'Prendre 1 place' }));
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Libérer ma place' })).toHaveLength(2));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" }, { timeout: 3000 });
+    // Second sens : pas de confettis, la pop-in s'en charge.
+    await waitFor(() => expect(document.querySelector('.confetti')).not.toBeInTheDocument());
+    expect(document.querySelector('.seat--pop')).toBeInTheDocument();
+    const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" });
     const aller = within(dialog).getByRole('region', { name: 'Aller' });
     expect(aller).toHaveTextContent("Voiture d'Hugo");
     expect(aller).toHaveTextContent('Gare Part-Dieu');
@@ -183,7 +188,7 @@ describe('Page voyage', () => {
     const { user } = renderApp(`/t/${code}`, api);
 
     await user.click(await screen.findByRole('button', { name: 'Prendre 1 place' }));
-    const aller = within(await screen.findByRole('dialog', {}, { timeout: 3000 })).getByRole('region', { name: 'Aller' });
+    const aller = within(await screen.findByRole('dialog')).getByRole('region', { name: 'Aller' });
     expect(aller).not.toHaveTextContent('Gare Part-Dieu');
     expect(aller.querySelectorAll('.booked-leg__line')).toHaveLength(2); // voiture + agenda
     expect(within(aller).getByRole('link', { name: 'Ajouter à mon agenda' })).toBeInTheDocument();

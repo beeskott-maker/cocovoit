@@ -19,8 +19,8 @@ interface Props {
   meId: string;
   editHref: string;
   busyLegId: string | null;
-  /** Trajet où je viens de prendre une place : petite fête sur ma case. */
-  celebrateLegId?: string | null;
+  /** Trajet où je viens de prendre une place : rebond de ma case, et confettis si demandé. */
+  celebrate?: { legId: string; confetti: boolean } | null;
   /** Sens dans lesquels j'ai déjà une place (dans n'importe quelle voiture). */
   myDirections: ReadonlySet<Direction>;
   /** Je conduis une voiture de ce voyage : pas de place passager pour moi. */
@@ -32,7 +32,7 @@ interface Props {
   tripUrl: string;
 }
 
-export function CarCard({ car, meId, editHref, busyLegId, celebrateLegId, myDirections, iDrive, onTake, onLeave, tripName, tripUrl }: Props) {
+export function CarCard({ car, meId, editHref, busyLegId, celebrate, myDirections, iDrive, onTake, onLeave, tripName, tripUrl }: Props) {
   const mine = car.driver.id === meId;
   const carLabel = mine ? 'Ma voiture' : carOf(car.driver.name);
   const [rdvLeg, setRdvLeg] = useState<(Leg & { meetingPoint: string }) | null>(null);
@@ -80,7 +80,7 @@ export function CarCard({ car, meId, editHref, busyLegId, celebrateLegId, myDire
             leg={leg}
             cells={seatCells(car, leg, meId, myDirections, iDrive)}
             busy={busyLegId === leg.id}
-            celebrate={celebrateLegId === leg.id}
+            celebrate={celebrate?.legId === leg.id ? (celebrate.confetti ? 'confetti' : 'pop') : null}
             onTake={() => onTake(leg)}
             onLeave={() => onLeave(leg)}
             onContact={setContact}
@@ -102,6 +102,9 @@ export function CarCard({ car, meId, editHref, busyLegId, celebrateLegId, myDire
   );
 }
 
+/** Place tout juste prise : rebond seul, ou rebond et confettis. */
+type Celebration = 'pop' | 'confetti' | null;
+
 function LegSeats({
   leg,
   cells,
@@ -114,7 +117,7 @@ function LegSeats({
   leg: Leg;
   cells: SeatCell[];
   busy: boolean;
-  celebrate: boolean;
+  celebrate: Celebration;
   onTake: () => void;
   onLeave: () => void;
   onContact: (person: { name: string; phone: string }) => void;
@@ -159,7 +162,7 @@ function Seat({
 }: {
   cell: SeatCell;
   busy: boolean;
-  celebrate: boolean;
+  celebrate: Celebration;
   onTake: () => void;
   onLeave: () => void;
   onContact: (person: { name: string; phone: string }) => void;
@@ -196,7 +199,7 @@ function Seat({
             <span>Moi</span>
             <img src={check} alt="" />
           </div>
-          {celebrate && <Confetti />}
+          {celebrate === 'confetti' && <Confetti />}
         </>
       );
     case 'free':
