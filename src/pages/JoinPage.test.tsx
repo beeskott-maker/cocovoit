@@ -64,7 +64,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
 
   it('affiche une erreur pour un lien inconnu', async () => {
     renderApp('/j/inconnu');
-    expect(await screen.findByRole('heading', { name: 'Lien introuvable' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Ce voyage est tombé du cocotier !' })).toBeInTheDocument();
   });
 
   it("crée le compte depuis un lien d'invitation et le garde connecté", async () => {

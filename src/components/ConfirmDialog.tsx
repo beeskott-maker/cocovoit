@@ -2,6 +2,7 @@ import { useEffect, useId, useState, type ReactNode } from 'react';
 
 const ICONS = {
   trash: 'M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zM9 17h2V8H9zm4 0h2V8h-2z',
+  person: 'M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9m0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5',
   car: 'M5 11l1.5-4.5h11L19 11m-1.5 5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m-11 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3M18.92 6c-.2-.58-.76-1-1.42-1h-11c-.66 0-1.22.42-1.42 1L3 12v8a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-8z',
 };
 
@@ -12,6 +13,8 @@ interface Props {
   children: ReactNode;
   confirmLabel?: string;
   busyLabel?: string;
+  /** Bouton de confirmation inactif (ex. : email à retaper qui ne correspond pas encore). */
+  confirmDisabled?: boolean;
   /** L'action confirmée ; la fenêtre reste ouverte (bouton désactivé) pendant qu'elle s'exécute. */
   onConfirm: () => Promise<void> | void;
   onCancel: () => void;
@@ -24,6 +27,7 @@ export function ConfirmDialog({
   children,
   confirmLabel = 'Supprimer',
   busyLabel = 'Suppression…',
+  confirmDisabled = false,
   onConfirm,
   onCancel,
 }: Props) {
@@ -67,7 +71,7 @@ export function ConfirmDialog({
           <button type="button" className="btn btn--outline" onClick={cancel} disabled={busy} autoFocus>
             Annuler
           </button>
-          <button type="button" className="btn btn--destructive" onClick={confirm} disabled={busy}>
+          <button type="button" className="btn btn--destructive" onClick={confirm} disabled={busy || confirmDisabled}>
             {busy ? busyLabel : confirmLabel}
           </button>
         </div>

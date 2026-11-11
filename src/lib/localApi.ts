@@ -245,6 +245,66 @@ export function createLocalApi(
       save(db);
     },
 
+    // Comme les fonctions SQL account_deletion_preview et delete_account.
+    async accountDeletionPreview(token) {
+      await tick();
+      const db = load();
+      const me = account(db, token);
+      const mine = db.participants.filter((p) => p.accountId === me.id);
+      const tripOf = (id: string) => db.trips.find((t) => t.id === id)!;
+      const byDate = (a: DbTrip, b: DbTrip) => a.startsOn.localeCompare(b.startsOn) || a.name.localeCompare(b.name);
+      const others = (p: DbParticipant) => db.participants.filter((o) => o.tripId === p.tripId && o.id !== p.id);
+      const organized = mine.filter((p) => p.isOrganizer).sort((a, b) => byDate(tripOf(a.tripId), tripOf(b.tripId)));
+      const cars = db.cars
+        .filter((c) => mine.some((p) => p.id === c.driverId && others(p).length > 0))
+        .sort((a, b) => byDate(tripOf(a.tripId), tripOf(b.tripId)));
+      const seats = new Map<string, { trip: string; driver: string }>();
+      for (const p of mine) {
+        for (const b of db.bookings.filter((x) => x.participantId === p.id)) {
+          const car = db.cars.find((c) => c.id === db.legs.find((l) => l.id === b.legId)!.carId)!;
+          seats.set(car.id, { trip: tripOf(car.tripId).name, driver: nameOf(db, car.driverId) });
+        }
+      }
+      return {
+        transferred: organized
+          .filter((p) => others(p).length > 0)
+          .map((p) => ({ trip: tripOf(p.tripId).name, to: nameOf(db, others(p)[0].id) })),
+        deletedTrips: organized.filter((p) => others(p).length === 0).map((p) => tripOf(p.tripId).name),
+        cars: cars.map((c) => {
+          const legIds = new Set(db.legs.filter((l) => l.carId === c.id).map((l) => l.id));
+          const names = db.bookings.filter((b) => legIds.has(b.legId)).map((b) => nameOf(db, b.participantId));
+          return { trip: tripOf(c.tripId).name, passengers: [...new Set(names)].sort((a, b) => a.localeCompare(b)) };
+        }),
+        seats: [...seats.values()],
+      };
+    },
+
+    async deleteAccount(token, email) {
+      await tick();
+      const db = load();
+      const me = account(db, token);
+      if (email.trim().toLowerCase() !== me.email.trim().toLowerCase()) {
+        throw new ApiError("Cet email n'est pas celui du compte", 'invalid');
+      }
+      const mine = db.participants.filter((p) => p.accountId === me.id);
+      for (const p of mine.filter((x) => x.isOrganizer)) {
+        const heir = db.participants.find((o) => o.tripId === p.tripId && o.id !== p.id);
+        if (heir) heir.isOrganizer = true;
+        else removeTrip(db, p.tripId);
+      }
+      // Ses voitures (et leurs places), ses places, ses participations, ses sessions.
+      const ids = new Set(mine.map((p) => p.id));
+      const carIds = new Set(db.cars.filter((c) => ids.has(c.driverId)).map((c) => c.id));
+      const legIds = new Set(db.legs.filter((l) => carIds.has(l.carId)).map((l) => l.id));
+      db.cars = db.cars.filter((c) => !carIds.has(c.id));
+      db.legs = db.legs.filter((l) => !legIds.has(l.id));
+      db.bookings = db.bookings.filter((b) => !legIds.has(b.legId) && !ids.has(b.participantId));
+      db.participants = db.participants.filter((p) => !ids.has(p.id));
+      db.sessions = db.sessions.filter((s) => s.accountId !== me.id);
+      db.accounts = db.accounts.filter((a) => a.id !== me.id);
+      save(db);
+    },
+
     async createTrip(token, t: NewTrip) {
       await tick();
       const db = load();

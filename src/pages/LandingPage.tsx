@@ -1,5 +1,6 @@
 import { useEffect, useRef, type MouseEvent, type RefObject } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Toast } from '../components/Toast';
 import icon from '../assets/brand/icon.svg';
 import logo from '../assets/brand/logo.svg';
 import { useAuth } from '../lib/auth';
@@ -131,6 +132,10 @@ export function LandingPage() {
   const root = useRef<HTMLDivElement>(null);
   useLandingMotion(root);
   const { auth } = useAuth();
+  // Message laissé par la page précédente (ex. : « Compte supprimé »).
+  const location = useLocation();
+  const navigate = useNavigate();
+  const toast = (location.state as { toast?: string } | null)?.toast;
   // Connecté : création directe ; sinon connexion d'abord, puis création.
   const organize = auth.status === 'connected' ? CREATE : `/identification?suite=${encodeURIComponent(CREATE)}`;
 
@@ -474,6 +479,7 @@ export function LandingPage() {
           </span>
         </div>
       </main>
+      {toast && <Toast message={toast} onDone={() => navigate('.', { replace: true, state: null })} />}
       <footer className="lp-footer">
         <img src={icon} width={52} height={52} alt="" />
         Cocovoit · Le covoiturage entre amis

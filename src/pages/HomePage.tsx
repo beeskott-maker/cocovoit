@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
+import { DeleteAccountDialog } from '../components/DeleteAccountDialog';
 import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { LandingPage } from './LandingPage';
@@ -57,6 +58,7 @@ function Home({ token }: { token: string }) {
   const api = useApi();
   const navigate = useNavigate();
   const { auth, logout, sessionExpired } = useAuth();
+  const [deleting, setDeleting] = useState(false);
   // « Mes voyages » : les voyages du compte, lus en base.
   const [myTrips, setMyTrips] = useState<MyTrip[] | null>(null);
   useEffect(() => {
@@ -211,7 +213,20 @@ function Home({ token }: { token: string }) {
           <button type="button" className="link-btn" onClick={() => void logout().then(() => navigate('/'))}>
             Déconnexion
           </button>
+          <button type="button" className="link-btn link-btn--danger" onClick={() => setDeleting(true)}>
+            Supprimer mon compte
+          </button>
         </footer>
+      )}
+      {deleting && auth.status === 'connected' && (
+        <DeleteAccountDialog
+          token={token}
+          email={auth.account.email}
+          onCancel={() => setDeleting(false)}
+          onDeleted={() =>
+            void logout().then(() => navigate('/', { state: { toast: 'Compte supprimé. Bonne route ! 🥥' } }))
+          }
+        />
       )}
     </>
   );

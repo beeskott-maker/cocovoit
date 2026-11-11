@@ -7,3 +7,6 @@ afterEach(() => {
   localStorage.clear();
   vi.restoreAllMocks();
 });
+
+// jsdom n'implémente pas le défilement : les pages qui remontent en haut ne font rien en test.
+window.scrollTo = () => undefined;

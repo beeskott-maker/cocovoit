@@ -68,11 +68,11 @@ describe('Page de gestion des voyages (#/x/<clé>)', () => {
     expect(await screen.findByText('1 voyage')).toBeInTheDocument();
   });
 
-  it('affiche « Lien introuvable » avec une mauvaise clé, sans formulaire', async () => {
+  it('affiche la page introuvable avec une mauvaise clé, sans formulaire', async () => {
     const api = createTestApi();
     await seedTrip(api);
     renderApp('/x/mauvaise-cle', api);
-    expect(await screen.findByRole('heading', { name: 'Lien introuvable' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Ce voyage est tombé du cocotier !' })).toBeInTheDocument();
     expect(screen.queryByText('WE dans le Beaujolais')).not.toBeInTheDocument();
   });
 });

@@ -79,7 +79,10 @@ export function PrivacyPage() {
           <h2>Durée de conservation</h2>
           <p>
             Un voyage est conservé jusqu'à ce que son organisateur, ou l'administrateur du site, le supprime : ses voitures et ses places sont alors
-            effacées avec lui. Votre compte est conservé tant que vous ne demandez pas sa suppression.
+            effacées avec lui. Votre compte est conservé jusqu'à ce que vous le supprimiez, avec « Supprimer mon compte » en
+            bas de Mes voyages : votre email, votre nom et votre numéro sont alors effacés, ainsi que vos voitures
+            et vos places. Les voyages que vous organisez passent au participant arrivé le plus tôt, ou sont
+            supprimés si vous y étiez seul·e.
           </p>
         </section>
 

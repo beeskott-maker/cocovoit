@@ -1856,3 +1856,135 @@ body {
   font-size: 14px;
   color: var(--on-surface-variant);
 }
+
+/* --- Suppression du compte --- */
+.link-btn--danger {
+  color: var(--error);
+}
+.trip-footer .link-btn--danger {
+  margin-top: 8px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.deletion-list {
+  gap: 8px;
+}
+.deletion-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.deletion-tag {
+  flex-shrink: 0;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 700;
+}
+.deletion-tag--pass {
+  background: #d9f0c8;
+  color: #2b4a1a;
+}
+.deletion-tag--del {
+  background: #ffe1ea;
+  color: var(--error);
+}
+.deletion-tag--free {
+  background: var(--lilas);
+  color: var(--violet);
+}
+.confirm__text .text-field {
+  text-align: left;
+}
+.confirm__text .field-hint {
+  text-align: left;
+}
+
+/* --- Voyage introuvable : la noix de coco sonnée --- */
+.app:has(.lost) {
+  background: var(--blush);
+}
+.lost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 32px 40px;
+  text-align: center;
+}
+.lost__coco {
+  max-width: 100%;
+  height: auto;
+}
+.lost__title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 800;
+  color: var(--violet);
+  text-wrap: balance;
+}
+.lost .body-large {
+  color: var(--on-surface-variant);
+}
+.lost__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+}
+.lost__bob {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: lost-bob 3s ease-in-out infinite;
+}
+@keyframes lost-bob {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-3px);
+  }
+}
+.lost__stars {
+  transform-box: view-box;
+  transform-origin: 105px 40px;
+  animation: lost-spin 6s linear infinite;
+}
+@keyframes lost-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lost__bob,
+  .lost__stars {
+    animation: none;
+  }
+}
+
+/* --- Confidentialité : largeur ordinateur (le texte reste à ~70 caractères) --- */
+.app:has(.legal) {
+  max-width: none;
+}
+.app:has(.legal) .page-title,
+.legal {
+  width: 100%;
+  max-width: 824px;
+  margin-inline: auto;
+}
+@media (min-width: 900px) {
+  .app:has(.legal) .page-title {
+    padding-top: 24px;
+  }
+}
+/* Longue liste de conséquences : la pop-in défile au lieu de sortir de l'écran. */
+.confirm {
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}

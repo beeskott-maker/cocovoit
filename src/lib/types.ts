@@ -95,6 +95,18 @@ export class ApiError extends Error {
   }
 }
 
+/** Ce que la suppression du compte va changer, montré avant de confirmer. */
+export interface AccountDeletionPreview {
+  /** Voyages organisés transmis au participant arrivé le plus tôt. */
+  transferred: { trip: string; to: string }[];
+  /** Voyages organisés où la personne est seule : supprimés. */
+  deletedTrips: string[];
+  /** Ses voitures (dans les voyages qui restent) et les passagers qui perdent leur place. */
+  cars: { trip: string; passengers: string[] }[];
+  /** Ses places de passager, libérées. */
+  seats: { trip: string; driver: string }[];
+}
+
 /** Voyage de « Mes voyages » : ceux auxquels participe le compte. */
 export interface MyTrip {
   code: string;
@@ -120,6 +132,9 @@ export interface Api {
   /** Ajoute, change ou (null) retire le numéro du compte. */
   setPhone(token: string, phone: string | null): Promise<Account>;
   logout(token: string): Promise<void>;
+  accountDeletionPreview(token: string): Promise<AccountDeletionPreview>;
+  /** Supprime le compte, confirmé en retapant son email (casse et espaces ignorés). */
+  deleteAccount(token: string, email: string): Promise<void>;
   createTrip(token: string, input: NewTrip): Promise<string>;
   getTripPreview(code: string): Promise<TripPreview | null>;
   joinTrip(token: string, code: string): Promise<void>;
