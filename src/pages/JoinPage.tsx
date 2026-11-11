@@ -76,9 +76,9 @@ export function JoinPage() {
         </>
       }
       disabled={!trip}
-      onEmail={(email) => login(email)}
-      onName={async (email, name, phone) => {
-        await login(email, name, phone);
+      onEmail={(email) => login(email, undefined, undefined, null, `/j/${code}`)}
+      onName={async (email, name, phone, request) => {
+        await login(email, name, phone, request);
       }}
     />
   );

@@ -76,7 +76,19 @@ export interface Account {
 }
 
 /** Connexion par email : nom demandé si le compte n'existe pas encore. */
-export type LoginResult = { status: 'needs_name' } | { status: 'ok'; token: string; account: Account };
+export type LoginResult =
+  | { status: 'needs_name' }
+  | { status: 'ok'; token: string; account: Account }
+  /** Adresse inconnue : un lien de vérification vient de partir (ou part dans la minute). */
+  | { status: 'verification_sent'; request: string; email: string };
+
+/** Clic sur le lien de vérification (#/verifier/<jeton>). */
+export type EmailVerification =
+  | { status: 'verified'; email: string; request: string; next: string | null }
+  | { status: 'expired'; email: string; next: string | null }
+  | { status: 'invalid' };
+
+export type EmailVerificationStatus = 'pending' | 'verified' | 'expired';
 
 /** Erreur métier affichable telle quelle à l'utilisateur. */
 export class ApiError extends Error {
@@ -127,7 +139,16 @@ export interface MyTrip {
 export interface Api {
   readonly mode: 'supabase' | 'demo';
   /** Le numéro (facultatif) n'est pris qu'à la création du compte. */
-  login(email: string, name?: string, phone?: string | null): Promise<LoginResult>;
+  /**
+   * Connexion. Adresse inconnue : lien de vérification envoyé (si la vérification
+   * est active), puis création du compte avec `request` une fois le lien cliqué.
+   * `next` : page où reprendre après le clic sur le lien.
+   */
+  login(email: string, name?: string, phone?: string | null, request?: string | null, next?: string | null): Promise<LoginResult>;
+  verifyEmail(token: string): Promise<EmailVerification>;
+  emailVerificationStatus(request: string): Promise<EmailVerificationStatus>;
+  /** Mode démo seulement : jeton du lien « envoyé », pour simuler le clic. */
+  demoVerificationToken?(request: string): Promise<string | null>;
   me(token: string): Promise<Account>;
   /** Ajoute, change ou (null) retire le numéro du compte. */
   setPhone(token: string, phone: string | null): Promise<Account>;

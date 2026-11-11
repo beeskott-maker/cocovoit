@@ -8,8 +8,8 @@ import { storageKey } from '../lib/env';
 import { createLocalApi, memoryStore } from '../lib/localApi';
 import type { Api } from '../lib/types';
 
-export function createTestApi(): Api {
-  return createLocalApi(memoryStore());
+export function createTestApi(options: { emailVerification?: boolean } = {}): Api {
+  return createLocalApi(memoryStore(), undefined, options);
 }
 
 export function renderApp(path: string, api: Api = createTestApi()) {

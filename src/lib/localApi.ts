@@ -60,7 +60,18 @@ interface DbBooking {
   participantId: string;
   createdAt: number;
 }
+interface DbVerification {
+  id: string;
+  email: string;
+  token: string;
+  next: string | null;
+  createdAt: number;
+  expiresAt: number;
+  verifiedAt?: number;
+}
 interface Db {
+  /** Liens de vérification d'email (mode démo : le jeton est gardé pour simuler le clic). */
+  verifications?: DbVerification[];
   accounts: DbAccount[];
   sessions: DbSession[];
   trips: DbTrip[];
@@ -85,7 +96,11 @@ export const DEMO_ADMIN_EMAIL = 'demo@example.com';
 export function createLocalApi(
   store: KeyValueStore,
   newId: () => string = () => crypto.randomUUID(),
-  options: { seedDemo?: boolean } = {},
+  options: {
+    seedDemo?: boolean;
+    /** Vérification de l'email des nouvelles adresses (comme la base quand elle est activée). */
+    emailVerification?: boolean;
+  } = {},
 ): Api {
   // Horodatage strictement croissant, pour garder l'ordre des réservations.
   let last = 0;
@@ -207,11 +222,30 @@ export function createLocalApi(
   return {
     mode: 'demo',
 
-    async login(email, name, phone) {
+    async login(email, name, phone, request, next) {
       await tick();
       const db = load();
       let found = db.accounts.find((a) => a.email.toLowerCase() === email.trim().toLowerCase());
       if (!found) {
+        // Comme la fonction SQL login : adresse inconnue, lien de vérification d'abord.
+        const same = (v: DbVerification) => v.email.toLowerCase() === email.trim().toLowerCase();
+        const list = (db.verifications ??= []);
+        const proof = list.find((v) => v.id === request && same(v) && v.verifiedAt && v.expiresAt > Date.now());
+        if (options.emailVerification && !proof) {
+          const recent = list.find((v) => same(v) && !v.verifiedAt && v.expiresAt > Date.now() && Date.now() - v.createdAt < 60_000);
+          if (recent) return { status: 'verification_sent', request: recent.id, email: recent.email };
+          const v: DbVerification = {
+            id: newId(),
+            email: email.trim(),
+            token: newId().replace(/-/g, ''),
+            next: next?.startsWith('/') && !next.startsWith('//') ? next : null,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 24 * 3600_000,
+          };
+          list.push(v);
+          save(db);
+          return { status: 'verification_sent', request: v.id, email: v.email };
+        }
         if (!name?.trim()) return { status: 'needs_name' };
         found = { id: newId(), email: email.trim(), name: name.trim(), phone: checkPhone(phone) };
         db.accounts.push(found);
@@ -222,6 +256,29 @@ export function createLocalApi(
       db.sessions.push({ token, accountId: found.id });
       save(db);
       return { status: 'ok', token, account: toAccount(found) };
+    },
+
+    async verifyEmail(token) {
+      await tick();
+      const db = load();
+      const v = db.verifications?.find((x) => x.token === token);
+      if (!v) return { status: 'invalid' };
+      if (v.expiresAt <= Date.now()) return { status: 'expired', email: v.email, next: v.next };
+      v.verifiedAt ??= Date.now();
+      save(db);
+      return { status: 'verified', email: v.email, request: v.id, next: v.next };
+    },
+
+    async emailVerificationStatus(request) {
+      await tick();
+      const v = load().verifications?.find((x) => x.id === request);
+      if (!v || v.expiresAt <= Date.now()) return 'expired';
+      return v.verifiedAt ? 'verified' : 'pending';
+    },
+
+    async demoVerificationToken(request) {
+      await tick();
+      return load().verifications?.find((x) => x.id === request)?.token ?? null;
     },
 
     async me(token) {

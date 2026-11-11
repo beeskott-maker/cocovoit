@@ -33,7 +33,8 @@ export function PrivacyPage() {
           <p>
             Pour vous connecter, vous indiquez votre adresse email ; la première fois, votre prénom (ou le nom que vous
             voulez montrer), et si vous le souhaitez votre numéro de téléphone. Aucun mot de passe n'est créé ni
-            conservé.
+            conservé. À la première connexion, un lien envoyé par email permet de vérifier que l'adresse est bien
+            la vôtre : il est valable 24 heures, et sans clic aucun compte n'est créé.
           </p>
           <p>
             Votre session est gardée dans votre navigateur (stockage local) jusqu'à ce que vous vous déconnectiez. Le
@@ -70,6 +71,7 @@ export function PrivacyPage() {
           <ul>
             <li>Supabase : base de données, hébergée dans l'Union européenne.</li>
             <li>GitHub Pages : hébergement des pages du site, qui ne contiennent aucune donnée personnelle.</li>
+            <li>Brevo : envoi de l'email de vérification de l'adresse (France).</li>
             <li>Google Fonts : polices de caractères du site.</li>
           </ul>
           <p>Les données ne sont ni vendues, ni cédées, ni utilisées à d'autres fins que le fonctionnement du site.</p>
@@ -82,7 +84,7 @@ export function PrivacyPage() {
             effacées avec lui. Votre compte est conservé jusqu'à ce que vous le supprimiez, avec « Supprimer mon compte » en
             bas de Mes voyages : votre email, votre nom et votre numéro sont alors effacés, ainsi que vos voitures
             et vos places. Les voyages que vous organisez passent au participant arrivé le plus tôt, ou sont
-            supprimés si vous y étiez seul·e.
+            supprimés si vous y étiez seul·e. Les demandes de vérification d'adresse sont effacées au bout de 7 jours.
           </p>
         </section>
 

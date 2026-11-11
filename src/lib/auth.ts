@@ -34,6 +34,8 @@ export function writeToken(token: string | null) {
   }
 }
 
+export type LoginOutcome = 'done' | 'needs_name' | { request: string };
+
 export type AuthState =
   | { status: 'loading' }
   | { status: 'anonymous' }
@@ -41,8 +43,11 @@ export type AuthState =
 
 export interface AuthContextValue {
   auth: AuthState;
-  /** Connexion par email : « needs_name » si le compte n'existe pas encore. */
-  login(email: string, name?: string, phone?: string | null): Promise<'done' | 'needs_name'>;
+  /**
+   * Connexion par email : « needs_name » si le compte n'existe pas encore,
+   * `{ request }` si un lien de vérification vient d'être envoyé.
+   */
+  login(email: string, name?: string, phone?: string | null, request?: string | null, next?: string | null): Promise<LoginOutcome>;
   logout(): Promise<void>;
   /** À appeler quand le serveur répond que la session n'est plus valide. */
   sessionExpired(): void;

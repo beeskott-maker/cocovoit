@@ -12,6 +12,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TripPage } from './pages/TripPage';
 import { TripsAdminPage } from './pages/TripsAdminPage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
 
 export function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export function AppRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/voyages" element={<MyTripsPage />} />
           <Route path="/identification" element={<IdentifyPage />} />
+          <Route path="/verifier/:token" element={<VerifyEmailPage />} />
           <Route path="/confidentialite" element={<PrivacyPage />} />
           <Route path="/j/:code" element={<JoinPage />} />
           <Route path="/t/:code" element={<TripPage />} />

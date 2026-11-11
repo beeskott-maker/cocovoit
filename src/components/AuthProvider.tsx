@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useApi } from '../lib/api';
-import { AuthContext, forgetLegacyStorage, readToken, writeToken, type AuthState } from '../lib/auth';
+import { AuthContext, forgetLegacyStorage, readToken, writeToken, type AuthState, type LoginOutcome } from '../lib/auth';
 import { ApiError } from '../lib/types';
 
 /** Charge le compte de la session mémorisée et expose connexion / déconnexion. */
@@ -27,9 +27,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [api]);
 
   const login = useCallback(
-    async (email: string, name?: string, phone?: string | null) => {
-      const res = await api.login(email, name, phone);
+    async (email: string, name?: string, phone?: string | null, request?: string | null, next?: string | null): Promise<LoginOutcome> => {
+      const res = await api.login(email, name, phone, request, next);
       if (res.status === 'needs_name') return 'needs_name';
+      if (res.status === 'verification_sent') return { request: res.request };
       writeToken(res.token);
       setAuth({ status: 'connected', token: res.token, account: res.account });
       return 'done';

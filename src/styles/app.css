@@ -2340,3 +2340,223 @@ body {
   font-weight: 700;
   color: var(--encre);
 }
+
+/* --- Vérification de l'email --- */
+.verify {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 32px 32px;
+  text-align: center;
+}
+.app:has(.verify) {
+  background: var(--blush);
+}
+.verify__title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 800;
+  color: var(--violet);
+  text-wrap: balance;
+}
+.verify__text {
+  margin: 0;
+  max-width: 32ch;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--encre);
+}
+.verify__small {
+  margin: 0;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+.verify__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+.verify__live::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--violet);
+  animation: verify-blink 1.4s ease-in-out infinite;
+}
+@keyframes verify-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+.verify__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+}
+.verified-chip {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 3px 12px 3px 10px;
+  border-radius: 999px;
+  background: var(--citron);
+  box-shadow: 2px 3px 0 var(--ombre);
+  font-size: 13px;
+  font-weight: 700;
+}
+.mail-scene {
+  max-width: 100%;
+  height: auto;
+}
+.plane {
+  offset-path: path('M92 70 C 130 20, 190 10, 250 40');
+  offset-rotate: auto;
+  animation: plane-fly 3.2s ease-in-out infinite;
+}
+@keyframes plane-fly {
+  0%,
+  20% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  22%,
+  70% {
+    opacity: 1;
+  }
+  85%,
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+.plane-trail {
+  stroke-dasharray: 4 7;
+  animation: plane-trail 3.2s ease-in-out infinite;
+}
+@keyframes plane-trail {
+  0%,
+  20% {
+    opacity: 0;
+  }
+  30%,
+  75% {
+    opacity: 0.5;
+  }
+  90%,
+  100% {
+    opacity: 0;
+  }
+}
+.plane-arm {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: plane-throw 3.2s ease-in-out infinite;
+}
+@keyframes plane-throw {
+  0%,
+  10% {
+    transform: rotate(30deg);
+  }
+  22% {
+    transform: rotate(-55deg);
+  }
+  34%,
+  100% {
+    transform: rotate(30deg);
+  }
+}
+.plane-hop {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: plane-hop 3.2s ease-in-out infinite;
+}
+@keyframes plane-hop {
+  0%,
+  16% {
+    transform: none;
+  }
+  22% {
+    transform: translateY(-4px) rotate(-3deg);
+  }
+  30%,
+  100% {
+    transform: none;
+  }
+}
+.mailbox__door {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: mailbox-door 0.7s 0.4s cubic-bezier(0.5, 0, 0.3, 1.4) both;
+}
+@keyframes mailbox-door {
+  to {
+    transform: scaleY(-0.35) skewX(-6deg);
+  }
+}
+.mailbox__peek {
+  animation: mailbox-peek 0.6s 1s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+@keyframes mailbox-peek {
+  from {
+    transform: translateY(40px);
+  }
+}
+.mailbox__flag {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: mailbox-flag 0.6s 1.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes mailbox-flag {
+  from {
+    transform: rotate(90deg);
+  }
+}
+.mailbox__spark {
+  animation: mailbox-spark 0.5s 1.8s both;
+}
+@keyframes mailbox-spark {
+  from {
+    opacity: 0;
+  }
+}
+.crashed {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: crashed-sway 4s ease-in-out infinite;
+}
+@keyframes crashed-sway {
+  50% {
+    transform: rotate(-4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .verify__live::before,
+  .plane-trail,
+  .plane-arm,
+  .plane-hop,
+  .crashed,
+  .mailbox__peek,
+  .mailbox__flag,
+  .mailbox__spark {
+    animation: none;
+  }
+  .plane {
+    animation: none;
+    offset-distance: 45%;
+  }
+  .mailbox__door {
+    animation: none;
+    transform: scaleY(-0.35) skewX(-6deg);
+  }
+}

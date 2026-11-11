@@ -1,5 +1,5 @@
 import { createClient, type PostgrestError } from '@supabase/supabase-js';
-import { ApiError, type Account, type AccountDeletionPreview, type AdminTrip, type Api, type LoginResult, type MyTrip, type TripPreview, type TripState } from './types';
+import { ApiError, type Account, type AccountDeletionPreview, type AdminTrip, type EmailVerification, type EmailVerificationStatus, type Api, type LoginResult, type MyTrip, type TripPreview, type TripState } from './types';
 
 function toApiError(error: PostgrestError): ApiError {
   switch (error.code) {
@@ -30,7 +30,17 @@ export function createSupabaseApi(url: string, anonKey: string): Api {
 
   return {
     mode: 'supabase',
-    login: (email, name, phone) => rpc<LoginResult>('login', { p_email: email, p_name: name ?? null, p_phone: phone ?? null }),
+    login: (email, name, phone, request, next) =>
+      rpc<LoginResult>('login', {
+        p_email: email,
+        p_name: name ?? null,
+        p_phone: phone ?? null,
+        p_request: request ?? null,
+        p_next: next ?? null,
+      }),
+    verifyEmail: (token) => rpc<EmailVerification>('verify_email', { p_token: token }),
+    emailVerificationStatus: (request) =>
+      rpc<EmailVerificationStatus>('email_verification_status', { p_request: request }),
     me: (token) => rpc<Account>('me', { p_token: token }),
     setPhone: (token, phone) => rpc<Account>('set_phone', { p_token: token, p_phone: phone }),
     logout: (token) => rpc('logout', { p_token: token }),

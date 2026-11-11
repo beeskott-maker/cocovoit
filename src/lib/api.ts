@@ -8,7 +8,7 @@ import type { Api } from './types';
 export function createDefaultApi(): Api {
   const url = import.meta.env.VITE_SUPABASE_URL;
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  return url && key ? createSupabaseApi(url, key) : createLocalApi(window.localStorage, undefined, { seedDemo: IS_DEV_ENV });
+  return url && key ? createSupabaseApi(url, key) : createLocalApi(window.localStorage, undefined, { seedDemo: IS_DEV_ENV, emailVerification: IS_DEV_ENV });
 }
 
 export const ApiContext = createContext<Api | null>(null);
