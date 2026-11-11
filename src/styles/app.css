@@ -1,27 +1,36 @@
 /* Tokens issus du fichier Figma « Coco-voit » (Material 3). */
 :root {
-  --primary: #6750a4;
+  /* DA « Pop entre potes » (logo, icône et moodboard). */
+  --violet: #5b3cc4;
+  --rose: #ff7ab6;
+  --citron: #e8f04a;
+  --encre: #1b1b1b;
+  --blush: #ffeaf3;
+  --ombre: #390175;
+  --lilas: #efeaff;
+
+  --primary: var(--violet);
   --on-primary: #ffffff;
-  --primary-container: #eaddff;
-  --on-primary-container: #4f378a;
-  --secondary: #625b71;
-  --secondary-container: #e8def8;
-  --on-secondary-container: #4a4458;
-  --tertiary: #7d5260;
-  --tertiary-container: #ffd8e4;
-  --tertiary-fixed-dim: #efb8c8;
-  --surface: #fef7ff;
-  --on-surface: #1d1b20;
-  --on-surface-variant: #49454f;
-  --outline: #79747e;
+  --primary-container: #d9cff7;
+  --on-primary-container: var(--ombre);
+  --secondary: var(--violet);
+  --secondary-container: var(--lilas);
+  --on-secondary-container: var(--ombre);
+  --tertiary: var(--rose);
+  --tertiary-container: var(--blush);
+  --tertiary-fixed-dim: var(--rose);
+  --surface: #faf8ff;
+  --on-surface: var(--encre);
+  --on-surface-variant: #4a3f46;
+  --outline: #8c829c;
   --success: #587527;
-  --me: #579e36;
-  --error: #b3261e;
+  --me: #3f7a22;
+  --error: #c62a22;
 
-  --font: 'Roboto', system-ui, sans-serif;
+  --font: 'DM Sans', system-ui, sans-serif;
+  --display: 'Baloo 2', system-ui, sans-serif;
 
-  /* Coin « bulle » des boutons et cases de places */
-  --bubble-radius: 4px 24px 24px 24px;
+  --bubble-radius: 999px;
 
   color-scheme: light;
 }
@@ -1435,4 +1444,358 @@ a.trip-header__address {
 .rdv-maps-link.tooltip::after {
   left: auto;
   right: 0;
+}
+
+/* ============================================================
+   DA « Pop entre potes » : surcharges des composants.
+   ============================================================ */
+html,
+body {
+  background: var(--blush);
+  color: var(--encre);
+}
+.display-small,
+.title-large,
+.sheet__title,
+.confirm__title,
+.car__title,
+.section h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+.display-small {
+  font-size: 38px;
+  line-height: 42px;
+  color: var(--violet);
+}
+.title-large {
+  font-size: 26px;
+  line-height: 30px;
+}
+.section h2 {
+  font-size: 26px;
+  line-height: 30px;
+  color: var(--encre);
+}
+
+/* En-tête avec le logo : bandeau violet, arrondi comme la home. */
+.brand-header {
+  background: var(--violet);
+  border-radius: 0 0 32px 32px;
+  padding: 12px 0 14px;
+}
+.brand-header__logo img {
+  width: 120px;
+  height: auto;
+}
+
+/* Champs : coins arrondis, contour plus franc. */
+.text-field {
+  border: 2px solid #cfc6e4;
+  border-radius: 14px;
+  padding: 0 15px 0 11px;
+}
+.text-field:focus-within {
+  border-color: var(--violet);
+}
+.text-field__label {
+  font-weight: 600;
+}
+
+/* --- Boutons : trois niveaux ---
+   Primaire : rose, ombre portée du logo (l'action principale de l'écran).
+   Secondaire : violet plein.
+   Tertiaire : contour violet sur blanc. Texte : lien violet. */
+.btn {
+  height: 52px;
+  border-radius: 999px;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0;
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+.btn--primary {
+  background: var(--rose);
+  color: var(--encre);
+  box-shadow: 3px 4px 0 var(--ombre);
+}
+.btn--primary:disabled {
+  background: #f6d3e3;
+  color: rgba(27, 27, 27, 0.45);
+  box-shadow: none;
+}
+.btn--secondary,
+.btn--tonal {
+  background: var(--violet);
+  color: #fff;
+}
+.btn--tertiary,
+.btn--outline {
+  background: #fff;
+  color: var(--violet);
+  border: 0;
+  box-shadow: inset 0 0 0 2.5px var(--violet);
+}
+.btn--tertiary:disabled {
+  opacity: 0.45;
+}
+.btn--danger {
+  background: #fff;
+  color: var(--error);
+  border: 0;
+  box-shadow: inset 0 0 0 2px #f2b8b5;
+}
+.admin-trip__actions .btn--danger {
+  color: var(--error);
+}
+.btn--destructive {
+  background: var(--error);
+}
+.btn--text {
+  height: auto;
+  color: var(--violet);
+  font-size: 16px;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.btn:focus-visible {
+  outline: 3px solid var(--violet);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .btn:not(.btn--text):not(:disabled):hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 5px 0 var(--ombre);
+  }
+  .btn--primary:not(:disabled):hover {
+    box-shadow: 5px 6px 0 var(--ombre);
+  }
+  .btn--tertiary:not(:disabled):hover,
+  .btn--outline:hover {
+    box-shadow:
+      inset 0 0 0 2.5px var(--violet),
+      4px 5px 0 var(--ombre);
+  }
+  .btn--danger:hover {
+    box-shadow:
+      inset 0 0 0 2px var(--error),
+      4px 5px 0 var(--ombre);
+  }
+}
+.btn:not(:disabled):active {
+  transform: translate(2px, 3px);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+  .btn:not(:disabled):hover,
+  .btn:not(:disabled):active {
+    transform: none;
+  }
+}
+
+/* --- Page voyage --- */
+.app:has(.trip-body) {
+  background: var(--blush);
+}
+.trip-header {
+  background: var(--violet);
+  border-radius: 0 0 32px 32px;
+  filter: none;
+  padding: 24px 16px 20px;
+}
+.trip-header .title-small {
+  font-weight: 600;
+}
+.trip-header__titles > .title-small {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--citron);
+  color: var(--encre);
+  font-weight: 700;
+}
+.header-btn {
+  height: 40px;
+  border-radius: 999px;
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+.header-btn--outline {
+  border: 2.5px solid rgba(255, 255, 255, 0.75);
+}
+.header-btn--filled {
+  background: var(--citron);
+  color: var(--encre);
+}
+.header-btn--filled img {
+  filter: brightness(0);
+}
+.car,
+.ask-phone {
+  border-radius: 24px;
+  box-shadow: none;
+}
+.car__title {
+  font-size: 22px;
+}
+.leg__title {
+  font-weight: 700;
+}
+.leg__date {
+  color: var(--violet);
+  font-weight: 600;
+}
+.leg__rdv,
+.icon-btn {
+  border: 2px solid var(--violet);
+  color: var(--violet);
+  font-weight: 700;
+}
+.seat {
+  border-radius: 14px;
+  color: var(--violet);
+  font-weight: 600;
+}
+.seat--occupied {
+  border: 2px solid #d9cff7;
+}
+.seat--free {
+  border: 2px dashed #d4cbe2;
+}
+.seat--me {
+  border: 0;
+  background: var(--citron);
+  color: var(--encre);
+}
+.seat--me img {
+  filter: brightness(0);
+}
+.group-sms,
+.car__edit {
+  font-weight: 700;
+}
+
+.banner {
+  border-radius: 16px;
+  background: var(--citron);
+  color: var(--encre);
+}
+.banner--error {
+  background: #f9dedc;
+  color: #410e0b;
+}
+.trip-footer a,
+.link-btn {
+  color: var(--violet);
+  font-weight: 600;
+}
+
+/* --- Mes voyages --- */
+.trip-list a {
+  border-radius: 24px;
+  background: var(--violet);
+  font-family: var(--display);
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 800;
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+.trip-list__dates,
+.trip-list__roles {
+  font-family: var(--font);
+}
+.trip-list__dates {
+  font-weight: 600;
+}
+.trip-badge {
+  background: var(--citron);
+  color: var(--encre);
+  font-family: var(--font);
+}
+.trip-list--past a {
+  background: #fff;
+  color: var(--violet);
+  border: 2px solid #d9cff7;
+}
+@media (hover: hover) {
+  .trip-list a:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 5px 0 var(--ombre);
+  }
+}
+
+/* --- Formulaire voiture --- */
+.stepper__btn {
+  border-color: var(--violet);
+  color: var(--violet);
+}
+.stepper__value {
+  font-family: var(--display);
+  font-weight: 800;
+  color: var(--violet);
+}
+.leg-fieldset {
+  border: 2px solid #d9cff7;
+  border-radius: 24px;
+}
+.switch input {
+  border-color: var(--outline);
+}
+.switch input:checked {
+  background: var(--violet);
+  border-color: var(--violet);
+}
+.switch input:checked::after {
+  background: var(--citron);
+}
+.invite-link {
+  border: 2px solid #d9cff7;
+  border-radius: 16px;
+}
+.admin-trip,
+.booked-leg {
+  border: 2px solid #d9cff7;
+  border-radius: 24px;
+}
+
+/* --- Panneaux et pop-ins --- */
+.sheet,
+.confirm {
+  border-radius: 32px 32px 0 0;
+}
+.confirm {
+  border-radius: 32px;
+  box-shadow: 6px 8px 0 var(--ombre);
+}
+.sheet-scrim {
+  background: rgba(57, 1, 117, 0.45);
+}
+.maps-option,
+.disclosure__toggle {
+  border: 2px solid #d9cff7;
+  border-radius: 16px;
+}
+.toast {
+  border-radius: 999px;
+  background: var(--encre);
+  color: #fff;
+  font-weight: 600;
+}
+@media (min-width: 600px) {
+  .sheet {
+    border-radius: 32px;
+    box-shadow: 6px 8px 0 var(--ombre);
+  }
 }
