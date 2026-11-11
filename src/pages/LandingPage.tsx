@@ -101,15 +101,23 @@ const Sms = () => (
   </svg>
 );
 
+/** Carrosserie du van : tous les angles arrondis. */
+const VAN_BODY = 'M30 40a20 20 0 0 1 20-20h230c18 0 30 8 38 22l34 59.5q6 11 6 22.5v28a12 12 0 0 1-12 12H42a12 12 0 0 1-12-12z';
+
 /** Van du moodboard, sur la route du rendez-vous. */
 const Van = () => (
   <svg className="lp-van" viewBox="0 0 400 200" aria-hidden="true">
+    <defs>
+      <clipPath id="lp-van-body">
+        <path d={VAN_BODY} />
+      </clipPath>
+    </defs>
     <rect x="70" y="0" width="240" height="18" rx="9" fill="#E8F04A" />
-    <path d="M30 40a20 20 0 0 1 20-20h230c18 0 30 8 38 22l40 70v52H30z" fill="#5B3CC4" />
+    <path d={VAN_BODY} fill="#5B3CC4" />
     <rect x="50" y="45" width="78" height="50" rx="8" fill="#FFEAF3" />
     <rect x="140" y="45" width="78" height="50" rx="8" fill="#FFEAF3" />
-    <path d="M230 45h70l30 50H230z" fill="#FFEAF3" />
-    <rect x="30" y="110" width="328" height="12" fill="#E8F04A" />
+    <path d="M238 45H292Q300 45 304 51.7L326 88.3Q330 95 322 95H238Q230 95 230 87V53Q230 45 238 45Z" fill="#FFEAF3" />
+    <rect x="30" y="110" width="328" height="12" fill="#E8F04A" clipPath="url(#lp-van-body)" />
     <circle cx="95" cy="166" r="30" fill="#1B1B1B" />
     <circle cx="95" cy="166" r="12" fill="#E8F04A" />
     <circle cx="290" cy="166" r="30" fill="#1B1B1B" />

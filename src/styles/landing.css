@@ -611,7 +611,9 @@
 .lp-road::after {
   bottom: 24px;
   height: 7px;
-  background: repeating-linear-gradient(90deg, var(--citron) 0 34px, transparent 34px 60px);
+  /* Pointillés aux bouts arrondis. */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='7'%3E%3Crect width='34' height='7' rx='3.5' fill='%23e8f04a'/%3E%3C/svg%3E")
+    0 0 / 60px 7px repeat-x;
 }
 .lp-van {
   position: absolute;
