@@ -1811,3 +1811,48 @@ body {
     box-shadow: 6px 8px 0 var(--ombre);
   }
 }
+
+/* --- Confidentialité --- */
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 32px 32px 48px;
+  font-size: 16px;
+  line-height: 24px;
+}
+.legal section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.legal h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 22px;
+  line-height: 26px;
+  font-weight: 800;
+  color: var(--violet);
+}
+.legal p,
+.legal ul {
+  margin: 0;
+}
+.legal ul {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.legal a {
+  color: var(--violet);
+  font-weight: 600;
+}
+.legal .btn {
+  color: var(--violet);
+  font-weight: 800;
+}
+.legal__date {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}

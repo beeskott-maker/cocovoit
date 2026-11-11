@@ -9,6 +9,7 @@ import { IdentifyPage } from './pages/IdentifyPage';
 import { InvitePage } from './pages/InvitePage';
 import { JoinPage } from './pages/JoinPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 import { TripPage } from './pages/TripPage';
 import { TripsAdminPage } from './pages/TripsAdminPage';
 
@@ -25,6 +26,7 @@ export function AppRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/voyages" element={<MyTripsPage />} />
           <Route path="/identification" element={<IdentifyPage />} />
+          <Route path="/confidentialite" element={<PrivacyPage />} />
           <Route path="/j/:code" element={<JoinPage />} />
           <Route path="/t/:code" element={<TripPage />} />
           <Route path="/t/:code/inviter" element={<InvitePage />} />

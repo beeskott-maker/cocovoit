@@ -452,6 +452,7 @@ export function LandingPage() {
       <footer className="lp-footer">
         <img src={icon} width={52} height={52} alt="" />
         Cocovoit · Le covoiturage entre amis
+        <Link to="/confidentialite">Confidentialité</Link>
       </footer>
     </div>
   );

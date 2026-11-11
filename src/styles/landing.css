@@ -737,6 +737,11 @@
   font-size: 15px;
   color: #6b5a66;
 }
+.lp-footer a {
+  color: var(--violet);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
 .lp-footer img {
   width: 52px;
   height: 52px;

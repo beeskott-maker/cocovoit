@@ -97,6 +97,13 @@ describe('« Mes voyages »', () => {
 });
 
 describe("Page d'accueil des visiteurs", () => {
+  it('lien vers la page Confidentialité', async () => {
+    const { user } = renderApp('/', createTestApi());
+    await user.click(await screen.findByRole('link', { name: 'Confidentialité' }));
+    expect(await screen.findByRole('heading', { name: 'Confidentialité' })).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'contact@cocovoiturage.fr' })[0]).toHaveAttribute('href', 'mailto:contact@cocovoiturage.fr');
+  });
+
   it('« Organiser un voyage » : connexion, puis formulaire de création ouvert', async () => {
     const api = createTestApi();
     const { organizer } = await seedTrip(api);
