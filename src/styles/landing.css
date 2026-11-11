@@ -11,6 +11,7 @@
   --citron: #e8f04a;
   --encre: #1b1b1b;
   --blush: #ffeaf3;
+  --ombre: #390175;
   --lilas: #efeaff;
   --muted: #4a3f46;
   --display: 'Baloo 2', system-ui, sans-serif;
@@ -83,7 +84,6 @@
   text-decoration: none;
   white-space: nowrap;
   transition:
-    background-color 0.15s,
     box-shadow 0.15s,
     transform 0.15s;
 }
@@ -91,28 +91,29 @@
   background: var(--rose);
   color: var(--encre);
 }
-.lp-btn--rose:hover {
-  background: #ff94c4;
-  box-shadow: 0 6px 18px rgba(27, 27, 27, 0.25);
-}
 .lp-btn--ghost {
   color: #fff;
   box-shadow: inset 0 0 0 2.5px rgba(255, 255, 255, 0.7);
-}
-.lp-btn--ghost:hover {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 0 0 2.5px #fff;
 }
 .lp-btn--violet {
   background: var(--violet);
   color: #fff;
 }
-.lp-btn--violet:hover {
-  background: #4a2fb0;
-  box-shadow: 0 6px 18px rgba(57, 1, 117, 0.3);
+/* Survol : l'ombre portée des lettres du logo, le bouton se soulève. */
+.lp-btn:hover,
+.lp-nav a:hover {
+  box-shadow: 4px 5px 0 var(--ombre);
+  transform: translate(-2px, -2px);
 }
-.lp-btn:active {
-  transform: translateY(1px);
+.lp-btn--ghost:hover {
+  box-shadow:
+    inset 0 0 0 2.5px #fff,
+    4px 5px 0 var(--ombre);
+}
+.lp-btn:active,
+.lp-nav a:active {
+  box-shadow: none;
+  transform: none;
 }
 .lp-btn:focus-visible,
 .lp-nav a:focus-visible {
@@ -152,10 +153,9 @@
   color: var(--encre);
   font: 800 16px var(--display);
   text-decoration: none;
-  transition: background-color 0.15s;
-}
-.lp-nav a:hover {
-  background: var(--citron);
+  transition:
+    box-shadow 0.15s,
+    transform 0.15s;
 }
 .lp-hero-grid {
   display: grid;
@@ -351,6 +351,7 @@
   padding: 0 14px;
   border-radius: 999px;
   background: var(--rose);
+  box-shadow: 3px 4px 0 var(--ombre);
   font-weight: 700;
   font-size: 15px;
   margin: 0;
@@ -373,6 +374,7 @@
   align-items: flex-start;
   border-radius: 28px;
   padding: 24px;
+  box-shadow: 6px 8px 0 var(--ombre);
 }
 .lp-num {
   font: 800 64px/0.8 var(--display);
@@ -954,10 +956,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-btn {
+  .lp-btn,
+  .lp-nav a {
     transition: none;
   }
-  .lp-btn:active {
+  .lp-btn:hover,
+  .lp-nav a:hover {
     transform: none;
   }
 }
