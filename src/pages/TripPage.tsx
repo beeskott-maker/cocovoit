@@ -19,9 +19,10 @@ import type { Leg } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
 import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import { useTripState } from '../lib/useTripState';
+import { Loading } from '../components/Delight';
 
-/** Délai avant la pop-in « C'est tout bon » (ms). */
-const BOOKED_DELAY = 300;
+/** Délai avant la pop-in « C'est tout bon » (ms) : le temps de voir la case « Moi » et les confettis. */
+const BOOKED_DELAY = 1100;
 
 // « Plus tard » sur l'invitation à donner son numéro : mémorisé dans ce navigateur.
 const PHONE_LATER = storageKey('phone-later');
@@ -57,6 +58,8 @@ function Trip({ token }: { token: string }) {
   const closeMaps = useCallback(() => setMapsOpen(false), []);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [bookedBoth, setBookedBoth] = useState(false);
+  // Trajet où l'on vient de prendre une place : case « Moi » qui rebondit, confettis.
+  const [justTaken, setJustTaken] = useState<string | null>(null);
   const closeBooked = useCallback(() => setBookedBoth(false), []);
   const carOrder = useRef<string[] | null>(null);
   const [phoneOpen, setPhoneOpen] = useState(false);
@@ -77,7 +80,7 @@ function Trip({ token }: { token: string }) {
         {error.message}
       </p>
     ) : (
-      <p className="loading">Chargement du voyage…</p>
+      <Loading label="Chargement du voyage…" />
     );
   }
 
@@ -95,7 +98,11 @@ function Trip({ token }: { token: string }) {
     setBusyLegId(leg.id);
     let both = false;
     try {
-      if (action === 'take') await api.takeSeat(token, code, leg.id);
+      if (action === 'take') {
+        await api.takeSeat(token, code, leg.id);
+        setJustTaken(leg.id);
+        setTimeout(() => setJustTaken((id) => (id === leg.id ? null : id)), 1500);
+      }
       else await api.leaveSeat(token, code, leg.id);
       const other = leg.direction === 'aller' ? 'retour' : 'aller';
       // Place prise dans le seul sens qui manquait : récapitulatif aller + retour.
@@ -197,6 +204,7 @@ function Trip({ token }: { token: string }) {
               meId={state.me.id}
               editHref={`/t/${code}/voiture/${car.id}`}
               busyLegId={busyLegId}
+              celebrateLegId={justTaken}
               myDirections={myDirections}
               iDrive={!!myCar}
               onTake={(leg) => act(leg, 'take')}

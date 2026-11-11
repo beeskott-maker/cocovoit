@@ -1988,3 +1988,341 @@ body {
   max-height: calc(100dvh - 48px);
   overflow-y: auto;
 }
+
+/* ============================================================
+   Petites animations (toutes coupées avec « Réduire les animations »)
+   ============================================================ */
+
+/* Chargement : noix de coco qui roule. */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.loading__roller {
+  position: relative;
+  display: block;
+  width: 104px;
+  height: 58px;
+}
+.loading__roller::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 0;
+  height: 5px;
+  border-radius: 3px;
+  background: #d9cff7;
+}
+.loading__roller svg {
+  position: absolute;
+  left: 0;
+  bottom: 6px;
+  animation: coco-roll 1.6s ease-in-out infinite alternate;
+}
+@keyframes coco-roll {
+  to {
+    transform: translateX(56px) rotate(340deg);
+  }
+}
+
+/* Place réservée : la case « Moi » arrive avec un rebond, et des confettis. */
+.seats__cell {
+  position: relative;
+}
+.seat--pop {
+  animation: seat-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes seat-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+.confetti {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+.confetti i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--ombre);
+  border-radius: 2px;
+  opacity: 0;
+  animation: confetti-fly 0.9s 0.1s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.confetti i:nth-child(odd) {
+  border-radius: 50%;
+}
+.confetti i:nth-child(1) { background: var(--rose); --x: -70px; --y: -60px; --r: 200deg; }
+.confetti i:nth-child(2) { background: var(--citron); --x: -30px; --y: -85px; --r: -160deg; }
+.confetti i:nth-child(3) { background: var(--violet); --x: 15px; --y: -80px; --r: 120deg; }
+.confetti i:nth-child(4) { background: var(--rose); --x: 55px; --y: -65px; --r: -220deg; }
+.confetti i:nth-child(5) { background: var(--citron); --x: 80px; --y: -25px; --r: 180deg; }
+.confetti i:nth-child(6) { background: var(--violet); --x: -85px; --y: -15px; --r: -140deg; }
+.confetti i:nth-child(7) { background: var(--citron); --x: 35px; --y: -105px; --r: 260deg; }
+@keyframes confetti-fly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), calc(var(--y) + 30px)) rotate(var(--r));
+  }
+}
+
+/* « C'est tout bon » : la noix de coco agite les bras et fait un clin d'œil. */
+.cheer {
+  align-self: center;
+  animation: cheer-hop 0.5s 0.3s ease-out 2 alternate;
+}
+@keyframes cheer-hop {
+  to {
+    transform: translateY(-6px);
+  }
+}
+.cheer__arm {
+  transform-box: fill-box;
+}
+.cheer__arm--l {
+  transform-origin: 100% 50%;
+  animation: cheer-wave-l 0.5s 0.3s ease-in-out 3 alternate both;
+}
+.cheer__arm--r {
+  transform-origin: 0% 50%;
+  animation: cheer-wave-r 0.5s 0.3s ease-in-out 3 alternate both;
+}
+@keyframes cheer-wave-l {
+  from {
+    transform: rotate(30deg);
+  }
+  to {
+    transform: rotate(-25deg);
+  }
+}
+@keyframes cheer-wave-r {
+  from {
+    transform: rotate(-30deg);
+  }
+  to {
+    transform: rotate(25deg);
+  }
+}
+.cheer__wink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cheer-wink 2.4s 0.7s both;
+}
+@keyframes cheer-wink {
+  0%,
+  8% {
+    transform: scaleY(1);
+  }
+  12%,
+  30% {
+    transform: scaleY(0.1);
+  }
+  36%,
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+/* Jour du départ : étiquette, et le van qui traverse l'en-tête. */
+.trip-header__titles {
+  position: relative;
+}
+.trip-header__day {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--citron);
+  color: var(--encre);
+  box-shadow: 3px 4px 0 var(--ombre);
+  font: 800 15px/22px var(--display);
+  rotate: 4deg;
+  animation: seat-pop 0.5s 1s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.departure-van {
+  position: relative;
+  height: 56px;
+  margin: 4px -16px -8px;
+  overflow: hidden;
+  animation: van-band 2.9s 0.3s both;
+}
+@keyframes van-band {
+  0%,
+  88% {
+    height: 56px;
+  }
+  100% {
+    height: 0;
+  }
+}
+.departure-van svg {
+  position: absolute;
+  bottom: 9px;
+  left: 0;
+  transform: translateX(-120px);
+  animation: van-drive 2.6s 0.3s cubic-bezier(0.45, 0, 0.4, 1) forwards;
+}
+@keyframes van-drive {
+  45% {
+    transform: translateX(calc(50vw - 64px));
+  }
+  55% {
+    transform: translateX(calc(50vw - 64px)) rotate(-3deg);
+  }
+  62% {
+    transform: translateX(calc(50vw - 64px));
+  }
+  100% {
+    transform: translateX(110vw);
+  }
+}
+@media (min-width: 480px) {
+  @keyframes van-drive {
+    45% {
+      transform: translateX(176px);
+    }
+    55% {
+      transform: translateX(176px) rotate(-3deg);
+    }
+    62% {
+      transform: translateX(176px);
+    }
+    100% {
+      transform: translateX(520px);
+    }
+  }
+}
+.departure-van__road {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 2px;
+  height: 5px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0 18px, transparent 18px 30px);
+}
+.departure-van__puff {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  animation: van-puff 2.6s 0.3s forwards;
+}
+@keyframes van-puff {
+  0%,
+  40% {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.5);
+  }
+  46% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 0;
+    transform: translateX(-84px) scale(1.6);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading__roller svg,
+  .seat--pop,
+  .cheer,
+  .cheer__arm,
+  .cheer__wink,
+  .trip-header__day {
+    animation: none;
+  }
+  .confetti,
+  .departure-van {
+    display: none;
+  }
+}
+
+/* Mes voyages vide : sieste au soleil. */
+.sleepy {
+  display: block;
+  margin: 8px auto 0;
+  max-width: 100%;
+  height: auto;
+}
+.sleepy__sun {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sleepy-spin 18s linear infinite;
+}
+@keyframes sleepy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.sleepy__z {
+  font: 800 22px var(--display);
+  fill: var(--violet);
+  opacity: 0;
+  animation: sleepy-z 3s ease-out infinite;
+}
+.sleepy__z--2 {
+  animation-delay: 1s;
+}
+.sleepy__z--3 {
+  animation-delay: 2s;
+}
+@keyframes sleepy-z {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(14px, -34px) scale(1.2);
+  }
+}
+.sleepy__breath {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sleepy-breath 3s ease-in-out infinite;
+}
+@keyframes sleepy-breath {
+  50% {
+    transform: scale(1.03, 0.97);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sleepy__sun,
+  .sleepy__breath {
+    animation: none;
+  }
+  .sleepy__z {
+    animation: none;
+    opacity: 1;
+  }
+}
+.trip-header__titles:has(.trip-header__day) > .title-small {
+  margin-bottom: 6px;
+}

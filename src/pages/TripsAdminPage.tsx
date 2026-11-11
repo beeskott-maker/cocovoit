@@ -11,6 +11,7 @@ import { formatTripDates, isEmail } from '../lib/format';
 import { AUTH_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type AdminTrip } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
+import { Loading } from '../components/Delight';
 
 const createdFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
 const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`;
@@ -85,7 +86,7 @@ export function TripsAdminPage() {
   }, [load]);
 
   if (forbidden) return <NotFoundPage />;
-  if (!checked) return <p className="loading">Chargement…</p>;
+  if (!checked) return <Loading />;
   if (!email) return <EmailLogin onSubmit={load} />;
 
   async function remove(trip: AdminTrip) {
@@ -118,7 +119,7 @@ export function TripsAdminPage() {
             {error}
           </p>
         )}
-        {!trips && !error && <p className="loading">Chargement…</p>}
+        {!trips && !error && <Loading />}
         {trips?.length === 0 && <p className="body-large empty">Aucun voyage pour l'instant.</p>}
         {trips?.map((trip) => (
           <article key={trip.code} className="admin-trip" aria-label={trip.name}>

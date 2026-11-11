@@ -53,7 +53,7 @@ describe('Page voyage', () => {
     await user.click(screen.getByRole('button', { name: 'Prendre 1 place' }));
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Libérer ma place' })).toHaveLength(2));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" });
+    const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" }, { timeout: 3000 });
     const aller = within(dialog).getByRole('region', { name: 'Aller' });
     expect(aller).toHaveTextContent("Voiture d'Hugo");
     expect(aller).toHaveTextContent('Gare Part-Dieu');
@@ -183,7 +183,7 @@ describe('Page voyage', () => {
     const { user } = renderApp(`/t/${code}`, api);
 
     await user.click(await screen.findByRole('button', { name: 'Prendre 1 place' }));
-    const aller = within(await screen.findByRole('dialog')).getByRole('region', { name: 'Aller' });
+    const aller = within(await screen.findByRole('dialog', {}, { timeout: 3000 })).getByRole('region', { name: 'Aller' });
     expect(aller).not.toHaveTextContent('Gare Part-Dieu');
     expect(aller.querySelectorAll('.booked-leg__line')).toHaveLength(2); // voiture + agenda
     expect(within(aller).getByRole('link', { name: 'Ajouter à mon agenda' })).toBeInTheDocument();

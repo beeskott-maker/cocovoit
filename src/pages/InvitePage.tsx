@@ -7,6 +7,7 @@ import { inviteUrl } from '../lib/format';
 import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import type { TripPreview } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
+import { Loading } from '../components/Delight';
 
 /** Partage du lien unique d'invitation. */
 export function InvitePage() {
@@ -28,7 +29,7 @@ export function InvitePage() {
     };
   }, [api, code]);
   if (trip === null) return <NotFoundPage />;
-  if (!trip) return <p className="loading">Chargement…</p>;
+  if (!trip) return <Loading />;
 
   const url = inviteUrl(code);
   const text = `Rejoins « ${trip.name} » sur Coco·Voit pour t'organiser en covoiturage :`;

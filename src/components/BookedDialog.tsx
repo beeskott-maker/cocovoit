@@ -2,6 +2,7 @@ import { useEffect, useId } from 'react';
 import carIcon from '../assets/figma/car-dark.svg';
 import calendarIcon from '../assets/figma/calendar-dark-padded.svg';
 import pin from '../assets/figma/pin-dark.svg';
+import { CheerCoconut } from './Delight';
 import { googleCalendarUrl, rdvEvent } from '../lib/calendar';
 import { carOf, formatDeparture } from '../lib/format';
 import type { Car, Direction, Leg, TripState } from '../lib/types';
@@ -38,11 +39,7 @@ export function BookedDialog({ state, tripUrl, onClose }: Props) {
     <div className="confirm-layer">
       <div className="sheet-scrim" onClick={onClose} aria-hidden="true" />
       <div className="confirm" role="dialog" aria-modal="true" aria-labelledby={titleId}>
-        <div className="confirm__icon confirm__icon--success" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9.55 18l-5.7-5.7 1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z" />
-          </svg>
-        </div>
+        <CheerCoconut />
         <h2 id={titleId} className="confirm__title">
           C'est tout bon, {state.me.name} !
         </h2>

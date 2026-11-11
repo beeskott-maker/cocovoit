@@ -11,6 +11,7 @@ import { useAuth } from '../lib/auth';
 import type { Direction, LegInput, TripState } from '../lib/types';
 import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import { useTripState } from '../lib/useTripState';
+import { Loading } from '../components/Delight';
 
 interface LegForm {
   enabled: boolean;
@@ -53,7 +54,7 @@ function CarFormLoader({ token }: { token: string }) {
     return null;
   }
   if (error?.code === 'forbidden' || error?.code === 'not_found') return <Navigate to={`/j/${code}`} replace />;
-  if (!state) return <p className="loading">Chargement…</p>;
+  if (!state) return <Loading />;
   const car = state.cars.find((c) => c.id === carId);
   if (carId && (!car || car.driver.id !== state.me.id)) return <Navigate to={`/t/${code}`} replace />;
   // Garde-fou : une seule voiture par personne.

@@ -2,7 +2,8 @@ import calendar from '../assets/figma/calendar.svg';
 import globe from '../assets/figma/globe-white.svg';
 import pin from '../assets/figma/pin.svg';
 import share from '../assets/figma/share-primary.svg';
-import { formatTripDates } from '../lib/format';
+import { formatTripDates, localToday } from '../lib/format';
+import { DepartureVan } from './Delight';
 import { opensMapsDirectly } from '../lib/maps';
 import type { TripPreview } from '../lib/types';
 import { GoogleMapsLink } from './ExternalLink';
@@ -16,11 +17,13 @@ interface Props {
 
 export function TripHeader({ trip, onShare, onRoute }: Props) {
   const direct = opensMapsDirectly();
+  const departureDay = trip.startsOn === localToday();
   return (
     <header className="trip-header">
       <div className="trip-header__titles">
         <p className="title-small">Votre voyage</p>
         <h1 className="title-large">{trip.name}</h1>
+        {departureDay && <p className="trip-header__day">C'est le grand jour !</p>}
       </div>
       <div className="trip-header__infos">
         <div className="trip-header__row">
@@ -60,6 +63,7 @@ export function TripHeader({ trip, onShare, onRoute }: Props) {
           Partager
         </button>
       </div>
+      {departureDay && <DepartureVan code={trip.code} />}
     </header>
   );
 }

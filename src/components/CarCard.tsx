@@ -12,12 +12,15 @@ import type { Car, Direction, Leg } from '../lib/types';
 import { ContactButtons, ContactSheet } from './Contact';
 import { CallIcon, SmsIcon } from './PhoneIcons';
 import { RdvSheet } from './RdvSheet';
+import { Confetti } from './Delight';
 
 interface Props {
   car: Car;
   meId: string;
   editHref: string;
   busyLegId: string | null;
+  /** Trajet où je viens de prendre une place : petite fête sur ma case. */
+  celebrateLegId?: string | null;
   /** Sens dans lesquels j'ai déjà une place (dans n'importe quelle voiture). */
   myDirections: ReadonlySet<Direction>;
   /** Je conduis une voiture de ce voyage : pas de place passager pour moi. */
@@ -29,7 +32,7 @@ interface Props {
   tripUrl: string;
 }
 
-export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, onTake, onLeave, tripName, tripUrl }: Props) {
+export function CarCard({ car, meId, editHref, busyLegId, celebrateLegId, myDirections, iDrive, onTake, onLeave, tripName, tripUrl }: Props) {
   const mine = car.driver.id === meId;
   const carLabel = mine ? 'Ma voiture' : carOf(car.driver.name);
   const [rdvLeg, setRdvLeg] = useState<(Leg & { meetingPoint: string }) | null>(null);
@@ -77,6 +80,7 @@ export function CarCard({ car, meId, editHref, busyLegId, myDirections, iDrive, 
             leg={leg}
             cells={seatCells(car, leg, meId, myDirections, iDrive)}
             busy={busyLegId === leg.id}
+            celebrate={celebrateLegId === leg.id}
             onTake={() => onTake(leg)}
             onLeave={() => onLeave(leg)}
             onContact={setContact}
@@ -102,6 +106,7 @@ function LegSeats({
   leg,
   cells,
   busy,
+  celebrate,
   onTake,
   onLeave,
   onContact,
@@ -109,6 +114,7 @@ function LegSeats({
   leg: Leg;
   cells: SeatCell[];
   busy: boolean;
+  celebrate: boolean;
   onTake: () => void;
   onLeave: () => void;
   onContact: (person: { name: string; phone: string }) => void;
@@ -129,7 +135,7 @@ function LegSeats({
       >
         {placeSeats(cells).map(({ cell, column, row }, i) => (
           <div role="listitem" key={i} className="seats__cell" style={{ gridColumn: column, gridRow: row }}>
-            <Seat cell={cell} busy={busy} onTake={onTake} onLeave={onLeave} onContact={onContact} />
+            <Seat cell={cell} busy={busy} celebrate={celebrate} onTake={onTake} onLeave={onLeave} onContact={onContact} />
           </div>
         ))}
       </div>
@@ -146,12 +152,14 @@ function LegSeats({
 function Seat({
   cell,
   busy,
+  celebrate,
   onTake,
   onLeave,
   onContact,
 }: {
   cell: SeatCell;
   busy: boolean;
+  celebrate: boolean;
   onTake: () => void;
   onLeave: () => void;
   onContact: (person: { name: string; phone: string }) => void;
@@ -182,11 +190,14 @@ function Seat({
     }
     case 'me':
       return (
-        <div className="seat seat--me">
-          <img src={seatMe} alt="" />
-          <span>Moi</span>
-          <img src={check} alt="" />
-        </div>
+        <>
+          <div className={celebrate ? 'seat seat--me seat--pop' : 'seat seat--me'}>
+            <img src={seatMe} alt="" />
+            <span>Moi</span>
+            <img src={check} alt="" />
+          </div>
+          {celebrate && <Confetti />}
+        </>
       );
     case 'free':
       return (

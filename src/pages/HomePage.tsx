@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react
 import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog';
+import { SleepyCoconut } from '../components/Delight';
 import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
 import { LandingPage } from './LandingPage';
@@ -144,6 +145,7 @@ function Home({ token }: { token: string }) {
         // Dépliement animé seulement quand on ouvre via « Créer un voyage ».
         <div className={creating ? 'new-trip new-trip--unfold' : 'new-trip'}>
           <div className="new-trip__inner">
+            {myTrips?.length === 0 && <SleepyCoconut />}
             <div className="page-title">
               <h1 className="display-small">Créer un voyage</h1>
               <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
