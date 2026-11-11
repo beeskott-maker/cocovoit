@@ -1,11 +1,7 @@
 import { useEffect, useRef, type MouseEvent, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/figma/logo.svg';
-import booked from '../assets/landing/booked.webp';
-import contact from '../assets/landing/contact.webp';
-import home from '../assets/landing/home.webp';
-import rdv from '../assets/landing/rdv.webp';
-import trip from '../assets/landing/trip.webp';
+import icon from '../assets/brand/icon.svg';
+import logo from '../assets/brand/logo.svg';
 import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import '../styles/landing.css';
 
@@ -15,20 +11,21 @@ const ORGANIZE = `/identification?suite=${encodeURIComponent('/?creer=1')}`;
 /** Éléments qui apparaissent au défilement, avec le décalage entre éléments d'un même groupe (s). */
 const REVEAL: [string, number][] = [
   ['.lp-hero .lp-text > *', 0.08],
-  ['.lp-hero-phone .lp-phone', 0],
+  ['.lp-hero-art .lp-phone', 0],
+  ['.lp-hero-art .lp-sticker', 0.12],
   ['main .lp-kicker', 0],
   ['main h2', 0],
   ['.lp-feature .lp-text > p:not(.lp-kicker)', 0],
   ['.lp-points li', 0.08],
   ['.lp-steps li', 0.12],
-  ['.lp-feature .lp-phone', 0],
+  ['.lp-panel', 0],
   ['.lp-trust > div', 0.1],
   ['.lp-final', 0],
 ];
 
 /**
- * Animations discrètes : apparition au défilement et très légère parallaxe de la
- * capture d'accroche. Rien si « Réduire les animations » est activé.
+ * Animations discrètes : apparition au défilement et très légère parallaxe du
+ * téléphone d'accroche. Rien si « Réduire les animations » est activé.
  */
 function useLandingMotion(root: RefObject<HTMLDivElement>) {
   useEffect(() => {
@@ -57,8 +54,8 @@ function useLandingMotion(root: RefObject<HTMLDivElement>) {
     );
     const frame = requestAnimationFrame(() => els.forEach((el) => io.observe(el)));
 
-    // Parallaxe : la capture d'accroche remonte un peu plus vite que la page.
-    const hero = page.querySelector<HTMLElement>('.lp-hero-phone');
+    // Parallaxe : le téléphone d'accroche remonte un peu plus vite que la page.
+    const hero = page.querySelector<HTMLElement>('.lp-hero-art');
     let ticking = false;
     const move = () => {
       ticking = false;
@@ -86,6 +83,39 @@ const ICON = {
   strokeLinejoin: 'round',
 } as const;
 
+const Pin = () => (
+  <svg viewBox="0 0 24 24" {...ICON} strokeWidth={2.4}>
+    <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+    <circle cx="12" cy="9.5" r="2.4" fill="currentColor" stroke="none" />
+  </svg>
+);
+const Call = () => (
+  <svg viewBox="0 0 24 24" {...ICON} strokeWidth={2.4}>
+    <path d="M5 4h3.5l1.8 4.6-2.3 1.5a10.5 10.5 0 0 0 5.9 5.9l1.5-2.3L20 15.5V19a1.6 1.6 0 0 1-1.7 1.6A16 16 0 0 1 3.4 5.7 1.6 1.6 0 0 1 5 4z" />
+  </svg>
+);
+const Sms = () => (
+  <svg viewBox="0 0 24 24" {...ICON} strokeWidth={2.4}>
+    <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z" />
+  </svg>
+);
+
+/** Van du moodboard, sur la route du rendez-vous. */
+const Van = () => (
+  <svg className="lp-van" viewBox="0 0 400 200" aria-hidden="true">
+    <rect x="70" y="0" width="240" height="18" rx="9" fill="#E8F04A" />
+    <path d="M30 40a20 20 0 0 1 20-20h230c18 0 30 8 38 22l40 70v52H30z" fill="#5B3CC4" />
+    <rect x="50" y="45" width="78" height="50" rx="8" fill="#FFEAF3" />
+    <rect x="140" y="45" width="78" height="50" rx="8" fill="#FFEAF3" />
+    <path d="M230 45h70l30 50H230z" fill="#FFEAF3" />
+    <rect x="30" y="110" width="328" height="12" fill="#E8F04A" />
+    <circle cx="95" cy="166" r="30" fill="#1B1B1B" />
+    <circle cx="95" cy="166" r="12" fill="#E8F04A" />
+    <circle cx="290" cy="166" r="30" fill="#1B1B1B" />
+    <circle cx="290" cy="166" r="12" fill="#E8F04A" />
+  </svg>
+);
+
 /** Page d'accueil des visiteurs non connectés : présentation et accès à la connexion. */
 export function LandingPage() {
   useDocumentTitle(APP_TITLE);
@@ -105,7 +135,7 @@ export function LandingPage() {
         <div className="lp-wrap">
           <nav className="lp-nav">
             <span className="lp-logo">
-              <img src={logo} width={174} height={40} alt="Coco·Voit" />
+              <img src={logo} width={230} height={147} alt="Coco·Voit" />
             </span>
             <Link to="/identification">Se connecter</Link>
           </nav>
@@ -117,7 +147,7 @@ export function LandingPage() {
                 sait où et quand il part.
               </p>
               <div className="lp-ctas">
-                <Link className="lp-btn lp-btn--white" to={ORGANIZE}>
+                <Link className="lp-btn lp-btn--rose" to={ORGANIZE}>
                   Organiser un voyage
                 </Link>
                 <a className="lp-btn lp-btn--ghost" href="#etapes" onClick={toSteps}>
@@ -130,9 +160,70 @@ export function LandingPage() {
                 <li>Sans mot de passe</li>
               </ul>
             </div>
-            <div className="lp-hero-phone">
-              <div className="lp-phone">
-                <img src={trip} alt="La page d'un voyage : les voitures, les places prises et les places libres" />
+            <div className="lp-hero-art">
+              <span className="lp-sticker lp-s-citron lp-tl lp-st1" aria-hidden="true">
+                je conduis
+              </span>
+              <span className="lp-sticker lp-s-rose lp-tr lp-st2" aria-hidden="true">
+                place dispo
+              </span>
+              <span className="lp-sticker lp-s-encre lp-tr lp-st3" aria-hidden="true">
+                qui ramène les chips ?
+              </span>
+              <div
+                className="lp-phone"
+                role="img"
+                aria-label="La page d'un voyage : les voitures, les places prises et les places libres"
+              >
+                <div className="lp-screen" aria-hidden="true">
+                  <div className="lp-scr-head">
+                    <b>Week-end à la mer</b>
+                    <span>ven. 14 → dim. 16 nov. · 3 voitures</span>
+                    <div className="lp-tabs">
+                      <i>Aller · ven.</i>
+                      <i>Retour · dim.</i>
+                    </div>
+                  </div>
+                  <div className="lp-car">
+                    <div className="lp-car-top">
+                      <b>Voiture d'Hugo</b>
+                      <span className="lp-mini lp-s-rose">2 places dispo</span>
+                    </div>
+                    <div className="lp-rdv">
+                      <Pin />
+                      Gare d'Annecy · 18 h
+                    </div>
+                    <div className="lp-seats">
+                      <span className="lp-av lp-s-rose">J</span>
+                      <span className="lp-av lp-s-citron">T</span>
+                      <span className="lp-av lp-av--free">+</span>
+                      <span className="lp-av lp-av--free">+</span>
+                    </div>
+                    <div className="lp-mbtn">Je prends une place</div>
+                  </div>
+                  <div className="lp-car">
+                    <div className="lp-car-top">
+                      <b>Voiture de Léa</b>
+                      <span className="lp-mini lp-s-encre">complet</span>
+                    </div>
+                    <div className="lp-seats">
+                      <span className="lp-av lp-s-violet">C</span>
+                      <span className="lp-av lp-s-rose">A</span>
+                      <span className="lp-av lp-s-citron">M</span>
+                    </div>
+                  </div>
+                  <div className="lp-car">
+                    <div className="lp-car-top">
+                      <b>Voiture de Sam</b>
+                      <span className="lp-mini lp-s-rose">1 place dispo</span>
+                    </div>
+                    <div className="lp-seats">
+                      <span className="lp-av lp-s-citron">N</span>
+                      <span className="lp-av lp-s-violet">P</span>
+                      <span className="lp-av lp-av--free">+</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -140,25 +231,25 @@ export function LandingPage() {
       </header>
 
       <main className="lp-wrap">
-        <section className="lp-first" id="etapes">
+        <section id="etapes">
           <p className="lp-kicker">En trois étapes</p>
           <h2>Prêts à partir en une minute.</h2>
           <ol className="lp-steps">
-            <li>
+            <li className="lp-s-citron">
               <span className="lp-num">1</span>
               <div>
                 <strong>Créez le voyage</strong>
                 <span>Un nom, des dates, une adresse : c'est tout ce qu'il faut.</span>
               </div>
             </li>
-            <li>
+            <li className="lp-s-rose">
               <span className="lp-num">2</span>
               <div>
                 <strong>Partagez le lien</strong>
                 <span>Dans le groupe WhatsApp, par SMS ou par mail. Vos amis rejoignent avec leur email.</span>
               </div>
             </li>
-            <li>
+            <li className="lp-s-violet">
               <span className="lp-num">3</span>
               <div>
                 <strong>Chacun trouve sa place</strong>
@@ -182,8 +273,17 @@ export function LandingPage() {
               <li>Un imprévu ? On libère sa place en un clic</li>
             </ul>
           </div>
-          <div className="lp-phone">
-            <img src={booked} alt="" />
+          <div className="lp-panel lp-cocos" aria-hidden="true">
+            <div className="lp-ticket">
+              <div>
+                <span>PLACE N°</span>
+                <b>3</b>
+                <span>réservée</span>
+              </div>
+            </div>
+            <span className="lp-sticker lp-s-violet lp-tr" style={{ right: 28, bottom: 40 }}>
+              +1
+            </span>
           </div>
         </section>
 
@@ -200,8 +300,28 @@ export function LandingPage() {
               <li>Les numéros de vos passagers à portée de main</li>
             </ul>
           </div>
-          <div className="lp-phone">
-            <img src={contact} alt="" />
+          <div className="lp-panel lp-chat" aria-hidden="true">
+            <span className="lp-chat-title">Groupe « Mer · 14 personnes »</span>
+            <div className="lp-bubble lp-s-rose">On est combien finalement ?</div>
+            <div className="lp-bubble lp-bubble--me lp-s-citron">Regardez le lien, tout est dedans</div>
+            <div className="lp-contacts">
+              {[
+                ['J', 'Julie', 'lp-s-rose'],
+                ['T', 'Tom', 'lp-s-citron'],
+              ].map(([initial, name, color]) => (
+                <div key={name} className="lp-contact">
+                  <span className={`lp-av ${color}`}>{initial}</span>
+                  <b>{name}</b>
+                  <span className="lp-ic">
+                    <Call />
+                  </span>
+                  <span className="lp-ic">
+                    <Sms />
+                  </span>
+                </div>
+              ))}
+              <div className="lp-mbtn lp-s-violet">SMS aux passagers de l'aller</div>
+            </div>
           </div>
         </section>
 
@@ -218,8 +338,20 @@ export function LandingPage() {
               <li>Le point de rendez-vous toujours à portée de main</li>
             </ul>
           </div>
-          <div className="lp-phone">
-            <img src={rdv} alt="" />
+          <div className="lp-panel lp-road" aria-hidden="true">
+            <div className="lp-rdv-card">
+              <span>POINT DE RENDEZ-VOUS</span>
+              <b>Gare d'Annecy · ven. 18 h</b>
+              <div>
+                <i>Waze</i>
+                <i>Google Maps</i>
+                <i>Plans</i>
+              </div>
+            </div>
+            <span className="lp-sticker lp-s-violet lp-tl" style={{ right: 28, top: 190 }}>
+              Go !
+            </span>
+            <Van />
           </div>
         </section>
 
@@ -232,8 +364,23 @@ export function LandingPage() {
               Sur téléphone comme sur ordinateur.
             </p>
           </div>
-          <div className="lp-phone">
-            <img src={home} alt="" />
+          <div className="lp-panel lp-cocos lp-cocos--citron lp-trips" aria-hidden="true">
+            <div className="lp-trip lp-trip--next">
+              <span className="lp-sticker lp-s-citron lp-tr">dans 3 jours</span>
+              <b>Week-end à la mer</b>
+              <span>ven. 14 → dim. 16 nov. · 3 voitures</span>
+            </div>
+            <div className="lp-trip lp-trip--row">
+              <div>
+                <b>Ski à Annecy</b>
+                <span>12 → 14 déc.</span>
+              </div>
+              <span className="lp-mini lp-s-rose">J-31</span>
+            </div>
+            <div className="lp-trip lp-trip--past">
+              <b>Anniversaire de Tom</b>
+              <span>Déjà parti · septembre</span>
+            </div>
           </div>
         </section>
 
@@ -242,7 +389,7 @@ export function LandingPage() {
           <h2>Rien à installer, rien à retenir.</h2>
           <div className="lp-trust">
             <div>
-              <i aria-hidden="true">
+              <i aria-hidden="true" className="lp-s-citron">
                 <svg viewBox="0 0 24 24" {...ICON}>
                   <rect x="3" y="4" width="18" height="16" rx="3" />
                   <path d="M3 8.5h18" />
@@ -255,7 +402,7 @@ export function LandingPage() {
               <span>Un lien suffit, sur téléphone ou ordinateur.</span>
             </div>
             <div>
-              <i aria-hidden="true">
+              <i aria-hidden="true" className="lp-s-rose">
                 <svg viewBox="0 0 24 24" {...ICON}>
                   <rect x="3" y="5" width="18" height="14" rx="3" />
                   <path d="M3.8 6.6 12 12.5l8.2-5.9" />
@@ -265,7 +412,7 @@ export function LandingPage() {
               <span>Votre email vous identifie, c'est tout.</span>
             </div>
             <div>
-              <i aria-hidden="true">
+              <i aria-hidden="true" className="lp-s-violet">
                 <svg viewBox="0 0 24 24" {...ICON}>
                   <path d="M12 3 5 5.8v5.4c0 4.3 3 7.9 7 9 4-1.1 7-4.7 7-9V5.8z" />
                   <path
@@ -279,7 +426,7 @@ export function LandingPage() {
               <span>Visibles seulement par ceux qui en ont besoin.</span>
             </div>
             <div>
-              <i aria-hidden="true">
+              <i aria-hidden="true" className="lp-s-encre">
                 <svg viewBox="0 0 24 24" {...ICON}>
                   <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
                   <circle cx="12" cy="11.3" r="1.5" fill="currentColor" stroke="none" />
@@ -294,12 +441,18 @@ export function LandingPage() {
         <div className="lp-final">
           <h2>Votre prochain week-end commence ici.</h2>
           <p>Créez le voyage, partagez le lien : le reste s'organise tout seul.</p>
-          <Link className="lp-btn lp-btn--white" to={ORGANIZE}>
+          <Link className="lp-btn lp-btn--violet" to={ORGANIZE}>
             Organiser un voyage
           </Link>
+          <span className="lp-go" aria-hidden="true">
+            Go.
+          </span>
         </div>
       </main>
-      <footer className="lp-footer">cocovoiturage.fr · Le covoiturage entre amis</footer>
+      <footer className="lp-footer">
+        <img src={icon} width={52} height={52} alt="" />
+        Cocovoit · Le covoiturage entre amis
+      </footer>
     </div>
   );
 }
