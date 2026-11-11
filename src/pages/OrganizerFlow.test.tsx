@@ -52,7 +52,7 @@ describe('Parcours organisateur', () => {
   it('déjà connecté : ne demande que le nom du voyage et les dates', async () => {
     const api = createTestApi();
     signIn(await loginAs(api, 'loic@example.com', 'Loïc'));
-    const { user, container } = renderApp('/', api);
+    const { user, container } = renderApp('/voyages', api);
 
     // Astérisque rouge sur les trois champs obligatoires, et eux seuls.
     expect(await screen.findByRole('heading', { name: 'Créer un voyage' })).toBeInTheDocument();

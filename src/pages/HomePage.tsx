@@ -12,15 +12,17 @@ import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import { ApiError, type MyTrip } from '../lib/types';
 
 /**
- * Adresse du site (#/) : page de présentation pour les visiteurs, « Mes
- * voyages » (#/voyages) pour les personnes connectées.
+ * Adresse du site (#/) : toujours la page de présentation. Une fois connecté,
+ * son bouton en haut à droite mène à « Mes voyages » (#/voyages). Les anciens
+ * liens #/?creer=1 ouvrent directement la création de voyage.
  */
 export function HomePage() {
   const { auth } = useAuth();
   const { search } = useLocation();
-  if (auth.status === 'anonymous') return <LandingPage />;
-  if (auth.status === 'loading') return <p className="loading">Chargement…</p>;
-  return <Navigate to={`/voyages${search}`} replace />;
+  if (auth.status === 'connected' && new URLSearchParams(search).has('creer')) {
+    return <Navigate to={`/voyages${search}`} replace />;
+  }
+  return <LandingPage />;
 }
 
 /** « Mes voyages » : créer un voyage (organisateur) et retrouver ses voyages. */

@@ -2,11 +2,12 @@ import { useEffect, useRef, type MouseEvent, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
 import icon from '../assets/brand/icon.svg';
 import logo from '../assets/brand/logo.svg';
+import { useAuth } from '../lib/auth';
 import { APP_TITLE, useDocumentTitle } from '../lib/useDocumentTitle';
 import '../styles/landing.css';
 
 /** Connexion, puis « Mes voyages » avec le formulaire de création ouvert. */
-const ORGANIZE = `/identification?suite=${encodeURIComponent('/voyages?creer=1')}`;
+const CREATE = '/voyages?creer=1';
 
 /** Éléments qui apparaissent au défilement, avec le décalage entre éléments d'un même groupe (s). */
 const REVEAL: [string, number][] = [
@@ -121,6 +122,9 @@ export function LandingPage() {
   useDocumentTitle(APP_TITLE);
   const root = useRef<HTMLDivElement>(null);
   useLandingMotion(root);
+  const { auth } = useAuth();
+  // Connecté : création directe ; sinon connexion d'abord, puis création.
+  const organize = auth.status === 'connected' ? CREATE : `/identification?suite=${encodeURIComponent(CREATE)}`;
 
   // Défilement jusqu'aux trois étapes (pas d'ancre : l'appli route sur le # de l'URL).
   function toSteps(e: MouseEvent) {
@@ -137,7 +141,20 @@ export function LandingPage() {
             <span className="lp-logo">
               <img src={logo} width={230} height={147} alt="Coco·Voit" />
             </span>
-            <Link to="/identification">Se connecter</Link>
+            {auth.status === 'connected' ? (
+              <Link to="/voyages" className="lp-account">
+                <span className="lp-account__avatar" aria-hidden="true">
+                  {auth.account.name.trim().charAt(0).toUpperCase()}
+                </span>
+                <span className="lp-account__text">
+                  <span className="lp-account__name">{auth.account.name}</span>
+                  Mes voyages
+                </span>
+              </Link>
+            ) : (
+              // Pendant le chargement de la session, rien : pas de « Se connecter » à tort.
+              auth.status === 'anonymous' && <Link to="/identification">Se connecter</Link>
+            )}
           </nav>
           <div className="lp-hero-grid">
             <div className="lp-text">
@@ -147,7 +164,7 @@ export function LandingPage() {
                 sait où et quand il part.
               </p>
               <div className="lp-ctas">
-                <Link className="lp-btn lp-btn--rose" to={ORGANIZE}>
+                <Link className="lp-btn lp-btn--rose" to={organize}>
                   Organiser un voyage
                 </Link>
                 <a className="lp-btn lp-btn--ghost" href="#etapes" onClick={toSteps}>
@@ -441,7 +458,7 @@ export function LandingPage() {
         <div className="lp-final">
           <h2>Votre prochain week-end commence ici.</h2>
           <p>Créez le voyage, partagez le lien : le reste s'organise tout seul.</p>
-          <Link className="lp-btn lp-btn--violet" to={ORGANIZE}>
+          <Link className="lp-btn lp-btn--violet" to={organize}>
             Organiser un voyage
           </Link>
           <span className="lp-go" aria-hidden="true">

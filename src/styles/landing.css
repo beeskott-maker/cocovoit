@@ -157,6 +157,56 @@
     box-shadow 0.15s,
     transform 0.15s;
 }
+/* Connecté : prénom et « Mes voyages » à la place de « Se connecter »,
+   deux petites pulsations à l'arrivée pour le mettre en avant. */
+.lp-nav .lp-account {
+  gap: 10px;
+  height: 52px;
+  max-width: 60%;
+  padding: 0 18px 0 6px;
+  animation: lp-account-pulse 1.4s 0.6s ease-in-out 2;
+}
+.lp-account__avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--citron);
+  color: var(--encre);
+  font: 800 20px/1 var(--display);
+}
+.lp-account__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.05;
+}
+.lp-account__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 13px var(--body);
+  color: var(--muted);
+}
+@keyframes lp-account-pulse {
+  0%,
+  100% {
+    scale: 1;
+  }
+  30% {
+    scale: 1.08;
+  }
+  55% {
+    scale: 0.97;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-nav .lp-account {
+    animation: none;
+  }
+}
 .lp-hero-grid {
   display: grid;
   gap: 36px;

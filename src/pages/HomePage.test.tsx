@@ -21,7 +21,7 @@ describe('« Mes voyages »', () => {
     const api = createTestApi();
     const { organizer } = await seedTrip(api);
     signIn(organizer);
-    const { user } = renderApp('/', api);
+    const { user } = renderApp('/voyages', api);
 
     expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
     expect(document.title).toBe('Coco·Voit · Mes voyages');
@@ -42,7 +42,7 @@ describe('« Mes voyages »', () => {
     const api = createTestApi();
     const { code } = await seedTrip(api);
     signIn(await joinAs(api, code, 'lea@example.com', 'Léa'));
-    const { user } = renderApp('/', api);
+    const { user } = renderApp('/voyages', api);
     const link = await screen.findByRole('link', { name: /WE dans le Beaujolais/ });
     expect(link).toHaveTextContent('Passager');
     expect(link).not.toHaveTextContent(/Conducteur|Organisateur/);
@@ -66,7 +66,7 @@ describe('« Mes voyages »', () => {
       const { organizer } = await seedTrip(api); // 10 → 12 oct
       await api.createTrip(organizer, { name: 'Pique-nique', destination: '', startsOn: '2026-09-01', endsOn: '2026-09-01' });
       signIn(organizer);
-      renderApp('/', api);
+      renderApp('/voyages', api);
       const link = await screen.findByRole('link', { name: /WE dans le Beaujolais/ });
       expect(link).toHaveTextContent('dans 5 jours');
       const past = screen.getByRole('region', { name: 'Passés' });
@@ -86,7 +86,7 @@ describe('« Mes voyages »', () => {
         await api.createTrip(me, { name, destination: '', startsOn, endsOn });
       }
       signIn(me);
-      renderApp('/', api);
+      renderApp('/voyages', api);
       await screen.findByRole('link', { name: /Proche/ });
       const names = (region: string) =>
         [...screen.getByRole('region', { name: region }).querySelectorAll('.trip-list__text')].map((el) => el.firstChild!.textContent);
@@ -97,6 +97,20 @@ describe('« Mes voyages »', () => {
 });
 
 describe("Page d'accueil des visiteurs", () => {
+  it('connecté : #/ reste la home, avec le prénom et « Mes voyages » à la place de « Se connecter »', async () => {
+    const api = createTestApi();
+    const { organizer } = await seedTrip(api);
+    signIn(organizer);
+    const { user } = renderApp('/', api);
+    expect(await screen.findByRole('heading', { name: /sans la logistique/ })).toBeInTheDocument();
+    const account = await screen.findByRole('link', { name: /Mes voyages/ });
+    expect(account).toHaveAttribute('href', '/voyages');
+    expect(screen.queryByRole('link', { name: 'Se connecter' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Organiser un voyage' })[0]).toHaveAttribute('href', '/voyages?creer=1');
+    await user.click(account);
+    expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
+  });
+
   it('lien vers la page Confidentialité', async () => {
     const { user } = renderApp('/', createTestApi());
     await user.click(await screen.findByRole('link', { name: 'Confidentialité' }));
