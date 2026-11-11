@@ -44,7 +44,6 @@ export function BookedDialog({ state, tripUrl, onClose }: Props) {
           C'est tout bon, {state.me.name} !
         </h2>
         <div className="confirm__text">
-          <p>Vous avez une place à l'aller et au retour.</p>
           <div className="booked-legs">
             {(['aller', 'retour'] as const).map((direction) => {
               const mine = legs[direction];

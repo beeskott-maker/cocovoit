@@ -2326,3 +2326,17 @@ body {
 .trip-header__titles:has(.trip-header__day) > .title-small {
   margin-bottom: 6px;
 }
+
+/* « C'est tout bon » : textes en noir, sens et dates en gras, plus d'air entre l'aller et le retour. */
+.booked-legs {
+  gap: 16px;
+}
+.booked-leg,
+.booked-note {
+  color: var(--encre);
+}
+.booked-leg__head h3,
+.booked-leg__head span {
+  font-weight: 700;
+  color: var(--encre);
+}
