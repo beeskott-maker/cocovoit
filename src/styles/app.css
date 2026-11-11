@@ -25,7 +25,8 @@
   --outline: #8c829c;
   --success: #587527;
   --me: #3f7a22;
-  --error: #c62a22;
+  /* Framboise : rouge des actions négatives, cousin du rose. */
+  --error: #e0245e;
 
   --font: 'DM Sans', system-ui, sans-serif;
   --display: 'Baloo 2', system-ui, sans-serif;
@@ -1547,13 +1548,17 @@ body {
   background: #fff;
   color: var(--error);
   border: 0;
-  box-shadow: inset 0 0 0 2px #f2b8b5;
+  box-shadow: inset 0 0 0 2.5px var(--error);
 }
 .admin-trip__actions .btn--danger {
   color: var(--error);
 }
 .btn--destructive {
   background: var(--error);
+  color: #fff;
+}
+.confirm__icon:not(.confirm__icon--phone):not(.confirm__icon--success) {
+  background: #ffe1ea;
 }
 .btn--text {
   height: auto;
@@ -1583,7 +1588,7 @@ body {
   }
   .btn--danger:hover {
     box-shadow:
-      inset 0 0 0 2px var(--error),
+      inset 0 0 0 2.5px var(--error),
       4px 5px 0 var(--ombre);
   }
 }
