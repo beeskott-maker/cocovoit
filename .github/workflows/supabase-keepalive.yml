@@ -4,6 +4,9 @@ name: Supabase keep-alive
 # Chaque jour, on liste tous les projets du compte (ceux créés plus tard compris)
 # et on exécute une vraie requête sur chacun : SQL via l'API de gestion, puis un
 # appel public (contrôle de santé de l'authentification, avec la clé anon).
+# Le 1er du mois, appelle aussi Brevo pour garder sa clé API active (voir
+# supabase/migrations/20261112170000_brevo_keepalive.sql) ; la tâche échoue, et
+# GitHub prévient par email, si Brevo refuse la clé.
 on:
   schedule:
     - cron: '23 4 * * *' # tous les jours vers 5 h 23 (heure de Paris en hiver)
@@ -56,7 +59,33 @@ jobs:
               rest="ignoré (pas de clé anon)"
             fi
 
-            echo "$name ($ref) : SQL $sql, API $rest"
+            # 3. Le 1er du mois (ou au lancement manuel) : appel à Brevo pour que la
+            #    clé API ne soit pas désactivée après 90 jours sans usage.
+            #    Seulement pour les projets qui ont la fonction brevo_keepalive().
+            brevo=""
+            if [ "$(date -u +%d)" = "01" ] || [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+              req=$(curl -fsS "${auth[@]}" -H "Content-Type: application/json" \
+                      -d '{"query":"select case when to_regprocedure('\''public.brevo_keepalive()'\'') is null then '\''absent'\'' else coalesce(public.brevo_keepalive()::text, '\''non configuré'\'') end as r"}' \
+                      "$API/projects/$ref/database/query" | jq -r '.[0].r // empty' || true)
+              case "$req" in
+                absent) ;;
+                "") brevo=", Brevo échec"; failed=1 ;;
+                "non configuré") brevo=", Brevo non configuré"
+                  echo "::warning::$name ($ref) : clé brevo_api_key absente du Vault." ;;
+                *)
+                  sleep 15 # pg_net envoie la requête en arrière-plan
+                  code=$(curl -fsS "${auth[@]}" -H "Content-Type: application/json" \
+                           -d "{\"query\":\"select status_code from net._http_response where id = $req\"}" \
+                           "$API/projects/$ref/database/query" | jq -r '.[0].status_code // empty' || true)
+                  brevo=", Brevo ${code:-sans réponse}"
+                  if [ "$code" != "200" ]; then
+                    failed=1
+                    echo "::error::$name ($ref) : Brevo répond « ${code:-rien} ». Clé API expirée ou invalide ? Les emails de vérification ne partent plus : régénérer la clé et la remplacer dans le Vault (brevo_api_key)."
+                  fi ;;
+              esac
+            fi
+
+            echo "$name ($ref) : SQL $sql, API $rest$brevo"
           done < projects.tsv
 
           exit $failed
