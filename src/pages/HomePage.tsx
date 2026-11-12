@@ -135,7 +135,7 @@ function Home({ token }: { token: string }) {
             </ul>
           )}
           {!showForm && (
-            <button type="button" className="btn btn--tonal" onClick={() => setCreating(true)}>
+            <button type="button" className="btn btn--primary" onClick={() => setCreating(true)}>
               Créer un voyage
             </button>
           )}
