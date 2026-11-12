@@ -99,6 +99,8 @@ begin
         'sender', jsonb_build_object('name', s.sender_name, 'email', s.sender_email),
         'to', jsonb_build_array(jsonb_build_object('email', p_email)),
         'subject', 'Confirmez votre adresse email',
+        -- Étiquette pour distinguer ces envois dans un compte Brevo partagé.
+        'tags', jsonb_build_array('cocovoit'),
         'htmlContent', v_html,
         'textContent', 'Encore un clic et on part ! Confirmez votre adresse email pour Coco·Voit : '
           || v_link || E'\n\nLe lien est valable 24 heures. Vous n''avez rien demandé ? Ignorez cet email.'),
