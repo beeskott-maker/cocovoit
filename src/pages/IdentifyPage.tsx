@@ -19,7 +19,7 @@ export function IdentifyPage() {
   return (
     <IdentityForm
       title="Qui êtes-vous ?"
-      intro="Connectez-vous avec votre email. Si c'est votre première fois, on vous demandera votre nom."
+      intro="Connectez-vous avec votre email. Si c'est votre première fois, on vous enverra un lien pour le confirmer."
       disabled={auth.status === 'loading'}
       onEmail={(email) => login(email, undefined, undefined, null, target)}
       onName={async (email, name, phone, request) => {

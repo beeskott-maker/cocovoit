@@ -19,6 +19,10 @@ for f in supabase/migrations/*.sql; do
   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$f"
 done
 
+# Les tests créent des comptes directement : la vérification de l'email est
+# coupée ici, et email_verification.test.sql la réactive pour ses propres cas.
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -c 'update public.email_settings set verification_enabled = false'
+
 for f in supabase/tests/*.sql; do
   echo "→ $f"
   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$f"
