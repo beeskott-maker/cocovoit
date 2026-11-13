@@ -2,6 +2,7 @@ import calendar from '../assets/figma/calendar.svg';
 import globe from '../assets/figma/globe-white.svg';
 import pin from '../assets/figma/pin.svg';
 import share from '../assets/figma/share-primary.svg';
+import icon from '../assets/brand/icon.svg';
 import { formatTripDates, localToday } from '../lib/format';
 import { DepartureVan } from './Delight';
 import { opensMapsDirectly } from '../lib/maps';
@@ -20,6 +21,7 @@ export function TripHeader({ trip, onShare, onRoute }: Props) {
   const departureDay = trip.startsOn === localToday();
   return (
     <header className="trip-header">
+      <img className="trip-header__logo" src={icon} alt="Coco·Voit" width={48} height={48} />
       <div className="trip-header__titles">
         <p className="title-small">Votre voyage</p>
         <h1 className="title-large">{trip.name}</h1>

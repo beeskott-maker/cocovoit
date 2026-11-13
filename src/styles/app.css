@@ -2649,3 +2649,20 @@ body {
     transition: none;
   }
 }
+
+/* --- Page voyage : icône de l'appli en haut à droite de l'en-tête --- */
+.trip-header__logo {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  border-radius: 12px;
+}
+/* « C'est le grand jour ! » se range à gauche de l'icône. */
+.trip-header__day {
+  right: 60px;
+}
+/* Badge DEV à gauche : le coin droit est pris par l'icône de la page voyage. */
+.env-badge {
+  right: auto;
+  left: 16px;
+}
