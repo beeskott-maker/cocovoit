@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import calendar from '../assets/figma/calendar.svg';
 import globe from '../assets/figma/globe-white.svg';
 import pin from '../assets/figma/pin.svg';
@@ -21,7 +22,9 @@ export function TripHeader({ trip, onShare, onRoute }: Props) {
   const departureDay = trip.startsOn === localToday();
   return (
     <header className="trip-header">
-      <img className="trip-header__logo" src={icon} alt="Coco·Voit" width={48} height={48} />
+      <Link to="/voyages" className="trip-header__logo" aria-label="Coco·Voit, mes voyages">
+        <img src={icon} alt="" width={48} height={48} />
+      </Link>
       <div className="trip-header__titles">
         <p className="title-small">Votre voyage</p>
         <h1 className="title-large">{trip.name}</h1>

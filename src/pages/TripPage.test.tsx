@@ -2,6 +2,15 @@ import { screen, waitFor, within } from '@testing-library/react';
 import { createTestApi, joinAs, onIphone, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe('Page voyage', () => {
+  it("le logo en haut à droite ramène à « Mes voyages »", async () => {
+    const api = createTestApi();
+    const { code, hugo } = await seedTrip(api);
+    signIn(hugo);
+    const { user } = renderApp(`/t/${code}`, api);
+    await user.click(await screen.findByRole('link', { name: 'Coco·Voit, mes voyages' }));
+    expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
+  });
+
   it("l'organisateur peut supprimer le voyage après confirmation, pas les participants", async () => {
     const api = createTestApi();
     const { code, organizer, hugo } = await seedTrip(api);
