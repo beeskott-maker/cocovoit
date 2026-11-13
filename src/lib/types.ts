@@ -167,6 +167,8 @@ export interface Api {
   deleteTrip(token: string, code: string): Promise<void>;
   takeSeat(token: string, code: string, legId: string): Promise<void>;
   leaveSeat(token: string, code: string, legId: string): Promise<void>;
+  /** Envoie le récap de mes places dans ce voyage à l'adresse du compte (renvoyée). */
+  emailTripRecap(token: string, code: string): Promise<{ email: string }>;
   /** Gestion des voyages (page #/x/<clé>) : clé de l'URL + adresse email autorisée. */
   adminListTrips(key: string, email: string): Promise<AdminTrip[]>;
   adminDeleteTrip(key: string, email: string, code: string): Promise<void>;

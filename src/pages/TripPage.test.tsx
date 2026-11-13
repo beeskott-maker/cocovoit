@@ -69,9 +69,35 @@ describe('Page voyage', () => {
     expect(retour).not.toHaveTextContent('Ancien RDV retour');
     expect(within(retour).queryByRole('link')).not.toBeInTheDocument();
     expect(dialog).toHaveTextContent('Vous pourrez libérer vos places à tout moment');
+    // Récap par mail : désactivé par défaut, donc rien n'est envoyé.
+    const recap = vi.spyOn(api, 'emailTripRecap');
+    expect(within(dialog).getByRole('switch', { name: /Recevoir le récap par mail/ })).not.toBeChecked();
 
     await user.click(within(dialog).getByRole('button', { name: 'OK' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(recap).not.toHaveBeenCalled();
+  });
+
+  it('pop-in récapitulative : switch « Recevoir le récap par mail »', async () => {
+    const api = createTestApi();
+    const { code } = await seedTrip(api);
+    signIn(await joinAs(api, code, 'julie@example.com', 'Julie'));
+    const recap = vi.spyOn(api, 'emailTripRecap');
+    const { user } = renderApp(`/t/${code}`, api);
+
+    for (let i = 0; i < 2; i++) {
+      await user.click((await screen.findAllByRole('button', { name: 'Prendre 1 place' }))[0]);
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Libérer ma place' })).toHaveLength(i + 1));
+    }
+    const dialog = await screen.findByRole('dialog', { name: "C'est tout bon, Julie !" });
+    const toggle = within(dialog).getByRole('switch', { name: /Recevoir le récap par mail/ });
+    expect(dialog).toHaveTextContent('julie@example.com');
+    await user.click(toggle);
+    expect(toggle).toBeChecked();
+
+    await user.click(within(dialog).getByRole('button', { name: 'OK' }));
+    expect(recap).toHaveBeenCalledWith(expect.any(String), code);
+    expect(await screen.findByRole('status')).toHaveTextContent('Récap envoyé à julie@example.com');
   });
 
   it('voiture sans place libre : ni nombre de places ni « Complet » dans l’en-tête', async () => {

@@ -49,7 +49,7 @@ function Trip({ token }: { token: string }) {
   const { code = '' } = useParams();
   const api = useApi();
   const navigate = useNavigate();
-  const { sessionExpired } = useAuth();
+  const { auth, sessionExpired } = useAuth();
   const { state, error, reload } = useTripState(token, code);
   const [busyLegId, setBusyLegId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -61,7 +61,17 @@ function Trip({ token }: { token: string }) {
   // Trajet où l'on vient de prendre une place : case « Moi » qui rebondit, avec des
   // confettis seulement pour le premier des deux sens (le second ouvre la pop-in).
   const [justTaken, setJustTaken] = useState<{ legId: string; confetti: boolean } | null>(null);
-  const closeBooked = useCallback(() => setBookedBoth(false), []);
+  const closeBooked = useCallback(
+    (recap: boolean) => {
+      setBookedBoth(false);
+      if (!recap) return;
+      api
+        .emailTripRecap(token, code)
+        .then(({ email }) => setToast(`Récap envoyé à ${email} 📬`))
+        .catch((err) => setToast(err instanceof Error ? err.message : 'Une erreur est survenue'));
+    },
+    [api, token, code],
+  );
   const carOrder = useRef<string[] | null>(null);
   const [phoneOpen, setPhoneOpen] = useState(false);
   const closePhone = useCallback(() => setPhoneOpen(false), []);
@@ -252,7 +262,12 @@ function Trip({ token }: { token: string }) {
           <Link to="/voyages">Mes voyages</Link>
         </span>
       </footer>
-      {bookedBoth && <BookedDialog state={state} tripUrl={inviteUrl(code)} onClose={closeBooked} />}
+      {bookedBoth && <BookedDialog
+          state={state}
+          tripUrl={inviteUrl(code)}
+          email={auth.status === 'connected' ? auth.account.email : undefined}
+          onClose={closeBooked}
+        />}
       {confirmDelete && (
         <ConfirmDialog title="Supprimer le voyage ?" onConfirm={deleteTrip} onCancel={() => setConfirmDelete(false)}>
           <p>

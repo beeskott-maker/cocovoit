@@ -528,6 +528,17 @@ export function createLocalApi(
       save(db);
     },
 
+    // Comme la fonction SQL email_trip_recap ; en démo, aucun email ne part.
+    async emailTripRecap(token, code) {
+      await tick();
+      const db = load();
+      const me = participant(db, token, code);
+      if (!db.bookings.some((b) => b.participantId === me.id)) {
+        throw new ApiError("Vous n'avez pas de place dans ce voyage", 'invalid');
+      }
+      return { email: account(db, token).email };
+    },
+
     async takeSeat(token, code, legId) {
       await tick();
       const db = load();

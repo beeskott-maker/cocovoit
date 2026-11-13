@@ -2560,3 +2560,92 @@ body {
     transform: scaleY(-0.35) skewX(-6deg);
   }
 }
+
+/* --- « C'est tout bon » : switch « Recevoir le récap par mail » --- */
+.recap-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--lilas);
+  cursor: pointer;
+  text-align: left;
+}
+.recap-switch__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--encre);
+}
+.recap-switch__text small {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+/* Case à cocher native, invisible mais accessible (clavier, lecteur d'écran). */
+.recap-switch__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.recap-switch__track {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: inset 0 0 0 2.5px var(--violet);
+  transition: background 0.2s;
+}
+.recap-switch__thumb {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--violet);
+  transition: all 0.2s;
+}
+.recap-switch__input:checked + .recap-switch__track {
+  background: var(--violet);
+}
+.recap-switch__input:checked + .recap-switch__track .recap-switch__thumb {
+  top: 4px;
+  left: 24px;
+  width: 24px;
+  height: 24px;
+  background: var(--citron);
+  box-shadow: 0 0 0 2px var(--ombre);
+}
+.recap-switch__input:checked + .recap-switch__track .recap-switch__thumb::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--ombre);
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+.recap-switch__input:focus-visible + .recap-switch__track {
+  outline: 3px solid var(--rose);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .recap-switch__track,
+  .recap-switch__thumb {
+    transition: none;
+  }
+}

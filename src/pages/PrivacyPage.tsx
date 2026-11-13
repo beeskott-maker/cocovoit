@@ -71,7 +71,7 @@ export function PrivacyPage() {
           <ul>
             <li>Supabase : base de données, hébergée dans l'Union européenne.</li>
             <li>GitHub Pages : hébergement des pages du site, qui ne contiennent aucune donnée personnelle.</li>
-            <li>Brevo : envoi de l'email de vérification de l'adresse (France).</li>
+            <li>Brevo : envoi des emails (vérification de l'adresse, récap d'un voyage si vous le demandez) (France).</li>
             <li>Google Fonts : polices de caractères du site.</li>
           </ul>
           <p>Les données ne sont ni vendues, ni cédées, ni utilisées à d'autres fins que le fonctionnement du site.</p>

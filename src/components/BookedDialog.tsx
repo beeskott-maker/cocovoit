@@ -1,4 +1,4 @@
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import carIcon from '../assets/figma/car-dark.svg';
 import calendarIcon from '../assets/figma/calendar-dark-padded.svg';
 import pin from '../assets/figma/pin-dark.svg';
@@ -21,23 +21,32 @@ function myLegs(state: TripState): Partial<Record<Direction, { car: Car; leg: Le
 interface Props {
   state: TripState;
   tripUrl: string;
-  onClose: () => void;
+  /** Adresse du compte, rappelée sous le switch du récap. */
+  email?: string;
+  /** `recap` : le switch « Recevoir le récap par mail » était activé. */
+  onClose: (recap: boolean) => void;
 }
 
 /** Pop-in affichée quand on vient d'avoir une place à l'aller et au retour. */
-export function BookedDialog({ state, tripUrl, onClose }: Props) {
+export function BookedDialog({ state, tripUrl, email, onClose }: Props) {
   const titleId = useId();
+  const recapId = useId();
   const legs = myLegs(state);
+  // Désactivé par défaut ; pris en compte à la fermeture, quelle qu'elle soit.
+  const [recap, setRecap] = useState(false);
+  const recapRef = useRef(recap);
+  recapRef.current = recap;
+  const close = () => onClose(recapRef.current);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose(recapRef.current);
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
   return (
     <div className="confirm-layer">
-      <div className="sheet-scrim" onClick={onClose} aria-hidden="true" />
+      <div className="sheet-scrim" onClick={close} aria-hidden="true" />
       <div className="confirm" role="dialog" aria-modal="true" aria-labelledby={titleId}>
         <CheerCoconut />
         <h2 id={titleId} className="confirm__title">
@@ -86,8 +95,25 @@ export function BookedDialog({ state, tripUrl, onClose }: Props) {
           </div>
         </div>
         <p className="booked-note">Un empêchement ? Vous pourrez libérer vos places à tout moment depuis la page du voyage.</p>
+        <label className="recap-switch" htmlFor={recapId}>
+          <span className="recap-switch__text">
+            Recevoir le récap par mail
+            {email && <small>{email}</small>}
+          </span>
+          <input
+            id={recapId}
+            type="checkbox"
+            role="switch"
+            className="recap-switch__input"
+            checked={recap}
+            onChange={(e) => setRecap(e.target.checked)}
+          />
+          <span className="recap-switch__track" aria-hidden="true">
+            <span className="recap-switch__thumb" />
+          </span>
+        </label>
         <div className="confirm__actions">
-          <button type="button" className="btn btn--primary" onClick={onClose} autoFocus>
+          <button type="button" className="btn btn--primary" onClick={close} autoFocus>
             OK
           </button>
         </div>

@@ -57,6 +57,7 @@ export function createSupabaseApi(url: string, anonKey: string): Api {
     getTripPreview: (code) => rpc<TripPreview | null>('get_trip_preview', { p_code: code }),
     joinTrip: (token, code) => rpc('join_trip', { p_token: token, p_code: code }),
     myTrips: (token) => rpc<MyTrip[]>('my_trips', { p_token: token }),
+    emailTripRecap: (token, code) => rpc<{ email: string }>('email_trip_recap', { p_token: token, p_code: code }),
     getTripState: (token, code) => rpc<TripState>('get_trip_state', { p_token: token, p_code: code }),
     saveCar: (token, code, input) =>
       rpc<string>('save_car', {
