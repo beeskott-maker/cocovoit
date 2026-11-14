@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import pin from '../assets/figma/pin-dark.svg';
 import { BrandHeader } from '../components/BrandHeader';
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog';
 import { SleepyCoconut } from '../components/Delight';
@@ -161,7 +160,6 @@ function Home({ token }: { token: string }) {
               />
               <TextField
                 label="Destination"
-                icon={pin}
                 placeholder="Adresse du lieu"
                 autoComplete="street-address"
                 value={form.destination}
