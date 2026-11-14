@@ -1,4 +1,5 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
+import { toDateTimeLocal } from '../lib/format';
 import { createTestApi, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe('Ma voiture', () => {
@@ -28,5 +29,28 @@ describe('Ma voiture', () => {
     expect(screen.getByRole('group', { name: 'Places dispos' })).toHaveTextContent('6');
     const legs = [{ direction: 'aller' as const, departsAt: '2026-10-10T07:00:00Z', meetingPoint: null }];
     await expect(api.saveCar(organizer, code, { carId: null, seats: 7, legs })).rejects.toThrow('Entre 1 et 6 places');
+  });
+
+  it("départ saisi en deux champs, date puis heure (l'heure n'est pas dans tous les calendriers natifs)", async () => {
+    const api = createTestApi();
+    const { code, organizer } = await seedTrip(api);
+    signIn(organizer);
+    const { user } = renderApp(`/t/${code}/voiture`, api);
+    const [dateAller] = await screen.findAllByLabelText('Départ le');
+    const [heureAller] = screen.getAllByLabelText('Heure');
+    expect(dateAller).toHaveAttribute('type', 'date');
+    expect(dateAller).toHaveValue('2026-10-10');
+    expect(heureAller).toHaveAttribute('type', 'time');
+    expect(heureAller).toHaveValue('09:00');
+    fireEvent.change(dateAller, { target: { value: '2026-10-11' } });
+    fireEvent.change(heureAller, { target: { value: '08:30' } });
+    // Heure effacée : on ne peut pas enregistrer.
+    const save = screen.getByRole('button', { name: 'Ajouter ma voiture' });
+    fireEvent.change(heureAller, { target: { value: '' } });
+    expect(save).toBeDisabled();
+    fireEvent.change(heureAller, { target: { value: '08:30' } });
+    await user.click(save);
+    const car = (await api.getTripState(organizer, code)).cars.find((c) => c.driver.name === 'Loïc');
+    expect(toDateTimeLocal(car!.legs.find((l) => l.direction === 'aller')!.departsAt)).toBe('2026-10-11T08:30');
   });
 });

@@ -21,6 +21,13 @@ interface LegForm {
 
 const MAX_SEATS = 6;
 
+/** « 2026-11-14T09:00 » ↔ date et heure, saisies dans deux champs (l'un peut être vide pendant la saisie). */
+const splitDateTime = (value: string) => {
+  const [date = '', time = ''] = value.split('T');
+  return { date, time };
+};
+const isCompleteDateTime = (value: string) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value);
+
 /** « Julie », « Julie et Sarah », « Julie, Sarah et Tom ». */
 const listNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(', ')} et ${names.at(-1)}` : names[0]);
 
@@ -83,11 +90,12 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
     .filter((d) => form[d].enabled)
     .map((d) => ({
       direction: d,
-      departsAt: new Date(form[d].departsAt).toISOString(),
+      // Incomplet pendant la saisie : le formulaire reste invalide (voir « valid »).
+      departsAt: isCompleteDateTime(form[d].departsAt) ? new Date(form[d].departsAt).toISOString() : '',
       // Le retour part du lieu du voyage : pas de point de RDV.
       meetingPoint: d === 'aller' ? form[d].meetingPoint.trim() || null : null,
     }));
-  const valid = legs.length > 0 && (['aller', 'retour'] as const).every((d) => !form[d].enabled || form[d].departsAt);
+  const valid = legs.length > 0 && (['aller', 'retour'] as const).every((d) => !form[d].enabled || isCompleteDateTime(form[d].departsAt));
 
   const setLeg = (d: Direction, patch: Partial<LegForm>) => setForm((f) => ({ ...f, [d]: { ...f[d], ...patch } }));
 
@@ -164,12 +172,21 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
             </label>
             {form[d].enabled && (
               <>
-                <TextField
-                  label="Départ"
-                  type="datetime-local"
-                  value={form[d].departsAt}
-                  onChange={(e) => setLeg(d, { departsAt: e.target.value })}
-                />
+                {/* Date et heure séparées : le sélecteur natif de datetime-local n'offre pas l'heure partout (Safari, Firefox). */}
+                <div className="row">
+                  <TextField
+                    label="Départ le"
+                    type="date"
+                    value={splitDateTime(form[d].departsAt).date}
+                    onChange={(e) => setLeg(d, { departsAt: `${e.target.value}T${splitDateTime(form[d].departsAt).time}` })}
+                  />
+                  <TextField
+                    label="Heure"
+                    type="time"
+                    value={splitDateTime(form[d].departsAt).time}
+                    onChange={(e) => setLeg(d, { departsAt: `${splitDateTime(form[d].departsAt).date}T${e.target.value}` })}
+                  />
+                </div>
                 {d === 'aller' && (
                   <TextField
                     label="Point de RDV"
