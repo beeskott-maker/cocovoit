@@ -16,7 +16,11 @@ export type PushStatus = 'unsupported' | 'needs-install' | 'denied' | 'off' | 'o
 
 const ASKED_KEY = storageKey('push-asked');
 const DEMO_KEY = storageKey('push-demo');
+const RESUME_KEY = storageKey('push-resume');
 const ASK_AGAIN_DAYS = 30;
+
+/** Réabonnement en cours après une reconnexion (l'état affiché l'attend). */
+let resuming: Promise<unknown> = Promise.resolve();
 
 function supported(): boolean {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -58,8 +62,11 @@ export async function pushStatus(api: Api): Promise<PushStatus> {
   return (await reg?.pushManager.getSubscription()) ? 'on' : 'off';
 }
 
-/** Demande l'autorisation puis abonne cet appareil. Renvoie le nouvel état. */
-export async function enablePush(api: Api, token: string): Promise<PushStatus> {
+/**
+ * Demande l'autorisation puis abonne cet appareil. Renvoie le nouvel état.
+ * `silent` : réabonnement automatique, sans notification d'exemple en démo.
+ */
+export async function enablePush(api: Api, token: string, silent = false): Promise<PushStatus> {
   const permission = await Notification.requestPermission();
   if (permission === 'denied') return 'denied';
   if (permission !== 'granted') return 'off';
@@ -72,6 +79,7 @@ export async function enablePush(api: Api, token: string): Promise<PushStatus> {
       throw new ApiError('Notifications indisponibles pour le moment, réessaie plus tard.', 'unknown');
     // Démo : pas de vrai envoi, une notification d'exemple sur l'appareil.
     write(DEMO_KEY, '1');
+    if (silent) return 'on';
     await reg.showNotification('Julie monte dans ta voiture 🥥', {
       body: 'Week-end à Annecy · Aller. Il reste 2 places sur 4. (exemple)',
       icon: 'pwa-192.png',
@@ -106,6 +114,22 @@ export async function disablePush(api: Api, token: string): Promise<PushStatus> 
   return pushStatus(api);
 }
 
+/**
+ * Déconnexion : si les notifications étaient activées, l'appareil s'en souvient
+ * pour les réactiver quand ce même compte se reconnecte.
+ */
+export async function rememberPushForReturn(api: Api, email: string) {
+  write(RESUME_KEY, (await pushStatus(api)) === 'on' ? email.toLowerCase() : null);
+}
+
+/** Connexion : réabonne l'appareil si ce compte les avait activées avant de se déconnecter. */
+export function resumePushAfterLogin(api: Api, token: string, email: string) {
+  const saved = read(RESUME_KEY);
+  write(RESUME_KEY, null);
+  if (saved !== email.toLowerCase() || !supported() || Notification.permission !== 'granted') return;
+  resuming = enablePush(api, token, true).catch(() => undefined);
+}
+
 /** Message après la demande : activées, refusées, ou erreur. */
 export function pushResultMessage(status: PushStatus): string | null {
   if (status === 'on') return 'Notifications activées 🔔';
@@ -129,7 +153,7 @@ export function usePush(token: string) {
   const [status, setStatus] = useState<PushStatus | null>(null);
   useEffect(() => {
     let alive = true;
-    void pushStatus(api).then((s) => alive && setStatus(s));
+    void resuming.then(() => pushStatus(api)).then((s) => alive && setStatus(s));
     return () => {
       alive = false;
     };

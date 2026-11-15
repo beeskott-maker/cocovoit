@@ -1,7 +1,14 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { ApiContext } from '../lib/api';
-import { disablePush, enablePush, pushStatus, shouldAskPush } from '../lib/push';
+import {
+  disablePush,
+  enablePush,
+  pushStatus,
+  rememberPushForReturn,
+  resumePushAfterLogin,
+  shouldAskPush,
+} from '../lib/push';
 import type { Api } from '../lib/types';
 import { PushAskSheet, PushSetting } from './Push';
 
@@ -140,5 +147,35 @@ describe('notifications push', () => {
     fireEvent.click(toggle);
     await waitFor(() => expect(toggle).not.toBeChecked());
     expect(onMessage).toHaveBeenLastCalledWith('Notifications coupées sur cet appareil');
+  });
+
+  it('déconnexion puis reconnexion du même compte : notifications réactivées', async () => {
+    const { reg } = fakeBrowser('granted');
+    const api = fakeApi('supabase');
+    const logout = async (token: string, email: string) => {
+      await rememberPushForReturn(api, email);
+      await disablePush(api, token);
+    };
+
+    // Un autre compte se connecte ensuite : rien.
+    await enablePush(api, 'tok1');
+    await logout('tok1', 'Loic@exemple.fr');
+    resumePushAfterLogin(api, 'tok2', 'julie@exemple.fr');
+    expect(await pushStatus(api)).toBe('off');
+
+    // Le même compte : l'appareil est réabonné.
+    await enablePush(api, 'tok3');
+    await logout('tok3', 'loic@exemple.fr');
+    expect(await pushStatus(api)).toBe('off');
+    resumePushAfterLogin(api, 'tok4', 'LOIC@exemple.fr');
+    await waitFor(() => expect(api.pushSubscribe).toHaveBeenLastCalledWith('tok4', expect.anything()));
+    expect(await pushStatus(api)).toBe('on');
+    expect(reg.showNotification).not.toHaveBeenCalled();
+
+    // Désactivées avant de se déconnecter : restent coupées.
+    await disablePush(api, 'tok4');
+    await logout('tok4', 'loic@exemple.fr');
+    resumePushAfterLogin(api, 'tok5', 'loic@exemple.fr');
+    expect(api.pushSubscribe).not.toHaveBeenCalledWith('tok5', expect.anything());
   });
 });

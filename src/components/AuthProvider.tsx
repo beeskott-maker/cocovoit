@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useApi } from '../lib/api';
 import { AuthContext, forgetLegacyStorage, readToken, writeToken, type AuthState, type LoginOutcome } from '../lib/auth';
-import { disablePush } from '../lib/push';
+import { disablePush, rememberPushForReturn, resumePushAfterLogin } from '../lib/push';
 import { ApiError } from '../lib/types';
 
 /** Charge le compte de la session mémorisée et expose connexion / déconnexion. */
@@ -41,18 +41,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.status === 'needs_name') return 'needs_name';
       if (res.status === 'verification_sent') return { request: res.request };
       writeToken(res.token);
+      resumePushAfterLogin(api, res.token, res.account.email);
       setAuth({ status: 'connected', token: res.token, account: res.account });
       return 'done';
     },
     [api],
   );
 
+  // Email du compte connecté, lu à la déconnexion (sans changer l'identité de logout).
+  const email = useRef<string | null>(null);
+  email.current = auth.status === 'connected' ? auth.account.email : null;
+
   const logout = useCallback(async () => {
     const token = readToken();
     writeToken(null);
     setAuth({ status: 'anonymous' });
     if (!token) return;
-    // Cet appareil ne reçoit plus les notifications du compte.
+    // Cet appareil ne reçoit plus les notifications du compte (réactivées s'il se reconnecte).
+    const was = email.current;
+    if (was) await rememberPushForReturn(api, was).catch(() => undefined);
     await disablePush(api, token).catch(() => undefined);
     await api.logout(token).catch(() => undefined);
   }, [api]);
