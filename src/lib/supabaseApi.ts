@@ -15,6 +15,7 @@ function toApiError(error: PostgrestError): ApiError {
     case '23514':
       return new ApiError(error.message, 'invalid');
     default:
+      if (!navigator.onLine) return new ApiError('Pas de réseau, réessayez une fois connecté.', 'unknown');
       return new ApiError('Une erreur est survenue, réessayez.', 'unknown');
   }
 }

@@ -24,9 +24,11 @@ export function useTripState(token: string, code: string) {
     const timer = setInterval(() => document.visibilityState === 'visible' && void reload(), REFRESH_MS);
     const onFocus = () => void reload();
     window.addEventListener('focus', onFocus);
+    window.addEventListener('online', onFocus);
     return () => {
       clearInterval(timer);
       window.removeEventListener('focus', onFocus);
+      window.removeEventListener('online', onFocus);
     };
   }, [reload]);
 

@@ -1,6 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { ApiContext } from './lib/api';
 import { AuthProvider } from './components/AuthProvider';
+import { OfflineBanner } from './components/OfflineBanner';
 import { IS_DEV_ENV } from './lib/env';
 import type { Api } from './lib/types';
 import { CarFormPage } from './pages/CarFormPage';
@@ -23,6 +24,7 @@ export function AppRoutes() {
             DEV
           </p>
         )}
+        <OfflineBanner />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/voyages" element={<MyTripsPage />} />

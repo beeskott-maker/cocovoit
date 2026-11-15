@@ -13,16 +13,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = readToken();
     if (!token) return;
     let alive = true;
-    api.me(token).then(
-      (account) => alive && setAuth({ status: 'connected', token, account }),
-      (err) => {
-        if (!alive) return;
-        if (err instanceof ApiError && err.code === 'unauthenticated') writeToken(null);
-        setAuth({ status: 'anonymous' });
-      },
-    );
+    const load = () =>
+      api.me(token).then(
+        (account) => alive && setAuth({ status: 'connected', token, account }),
+        (err) => {
+          if (!alive) return;
+          // Lancée sans réseau : on garde la session et on réessaie au retour de la connexion.
+          if (!navigator.onLine) {
+            window.addEventListener('online', load, { once: true });
+            return;
+          }
+          if (err instanceof ApiError && err.code === 'unauthenticated') writeToken(null);
+          setAuth({ status: 'anonymous' });
+        },
+      );
+    void load();
     return () => {
       alive = false;
+      window.removeEventListener('online', load);
     };
   }, [api]);
 
