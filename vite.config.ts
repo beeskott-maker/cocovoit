@@ -45,6 +45,10 @@ export default defineConfig({
         // La prod ne répond jamais à la place de la version de test.
         navigateFallbackDenylist: [/\/dev\//],
         cleanupOutdatedCaches: true,
+        // Nouvelle version active tout de suite (sans attendre que l'appli soit fermée) :
+        // la page se recharge alors d'elle-même (src/lib/swUpdate.ts).
+        skipWaiting: true,
+        clientsClaim: true,
         // Affichage des notifications push et ouverture du voyage au toucher.
         importScripts: ['push-sw.js'],
         runtimeCaching: [
