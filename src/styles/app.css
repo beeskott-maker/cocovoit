@@ -2716,7 +2716,8 @@ body {
   text-align: center;
 }
 
-/* Mes voyages : encart « Installer l'appli », fixé en bas, aux marges de la liste (20 px). */
+/* Encart « Installer l'appli », fixé en bas, aux marges de l'écran :
+   20 px dans Mes voyages (listes), 16 px sur la page voyage. */
 .app:has(.install-card) {
   padding-bottom: 110px;
 }
@@ -2737,6 +2738,9 @@ body {
   border-radius: 24px;
   background: #efeaff;
   box-shadow: 3px 4px 0 var(--ombre);
+}
+.app:has(.trip-body) .install-card {
+  width: calc(min(100vw, 480px) - 32px);
 }
 .install-card img {
   display: block;

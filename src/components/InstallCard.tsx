@@ -55,7 +55,7 @@ export function InstallHelpSheet({ onClose }: { onClose: () => void }) {
   );
 }
 
-/** Encart fixé en bas de Mes voyages : installer l'appli sur l'écran d'accueil. */
+/** Encart fixé en bas de Mes voyages et de la page voyage : installer l'appli sur l'écran d'accueil. */
 export function InstallCard() {
   const { mode, install, dismiss } = useInstall();
   const [help, setHelp] = useState(false);

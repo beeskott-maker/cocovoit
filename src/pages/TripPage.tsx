@@ -6,6 +6,7 @@ import { CarCard } from '../components/CarCard';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { MapsSheet } from '../components/MapsSheet';
 import { PhoneDialog } from '../components/PhoneDialog';
+import { InstallCard } from '../components/InstallCard';
 import { PushAskSheet } from '../components/Push';
 import { CallIcon } from '../components/PhoneIcons';
 import { RequireAccount } from '../components/RequireAccount';
@@ -322,6 +323,7 @@ function Trip({ token }: { token: string }) {
         <MapsSheet address={state.trip.destination} onClose={closeMaps} />
       )}
       {pushAsk && <PushAskSheet token={token} role={pushAsk} onDone={closePushAsk} />}
+      <InstallCard />
       {toast && <Toast message={toast} onDone={hideToast} />}
     </>
   );
