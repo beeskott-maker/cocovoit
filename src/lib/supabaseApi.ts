@@ -59,6 +59,16 @@ export function createSupabaseApi(url: string, anonKey: string): Api {
     joinTrip: (token, code) => rpc('join_trip', { p_token: token, p_code: code }),
     myTrips: (token) => rpc<MyTrip[]>('my_trips', { p_token: token }),
     emailTripRecap: (token, code) => rpc<{ email: string }>('email_trip_recap', { p_token: token, p_code: code }),
+    async pushPublicKey() {
+      const key = await rpc<string | null>('push_public_key', {});
+      if (key) return key;
+      // Clés pas encore créées : la fonction d'envoi les crée à son premier appel.
+      await fetch(`${url}/functions/v1/push-send`, { method: 'POST' }).catch(() => undefined);
+      return rpc<string | null>('push_public_key', {});
+    },
+    pushSubscribe: (token, sub) =>
+      rpc('push_subscribe', { p_token: token, p_endpoint: sub.endpoint, p_p256dh: sub.p256dh, p_auth: sub.auth }),
+    pushUnsubscribe: (token, endpoint) => rpc('push_unsubscribe', { p_token: token, p_endpoint: endpoint }),
     getTripState: (token, code) => rpc<TripState>('get_trip_state', { p_token: token, p_code: code }),
     saveCar: (token, code, input) =>
       rpc<string>('save_car', {

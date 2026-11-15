@@ -105,7 +105,8 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
     setBusy(true);
     try {
       await api.saveCar(token, code, { carId: carId ?? null, seats: form.seats, legs });
-      navigate(`/t/${code}`);
+      // Nouvelle voiture : la page du voyage propose d'activer les notifications.
+      navigate(`/t/${code}`, { state: carId ? null : { askPush: 'driver' } });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
       setBusy(false);

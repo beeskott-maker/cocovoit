@@ -136,6 +136,13 @@ export interface MyTrip {
  * Accès aux données. Toutes les opérations liées à une personne prennent le
  * jeton de session de son compte (`token`), obtenu à la connexion.
  */
+/** Abonnement push d'un appareil (PushSubscription.toJSON()). */
+export interface PushSubscriptionInput {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+}
+
 export interface Api {
   readonly mode: 'supabase' | 'demo';
   /** Le numéro (facultatif) n'est pris qu'à la création du compte. */
@@ -169,6 +176,11 @@ export interface Api {
   leaveSeat(token: string, code: string, legId: string): Promise<void>;
   /** Envoie le récap de mes places dans ce voyage à l'adresse du compte (renvoyée). */
   emailTripRecap(token: string, code: string): Promise<{ email: string }>;
+  /** Notifications push : clé publique VAPID (null en démo, ou si l'envoi n'est pas encore prêt). */
+  pushPublicKey(): Promise<string | null>;
+  /** Abonne cet appareil aux notifications du compte. */
+  pushSubscribe(token: string, sub: PushSubscriptionInput): Promise<void>;
+  pushUnsubscribe(token: string, endpoint: string): Promise<void>;
   /** Gestion des voyages (page #/x/<clé>) : clé de l'URL + adresse email autorisée. */
   adminListTrips(key: string, email: string): Promise<AdminTrip[]>;
   adminDeleteTrip(key: string, email: string, code: string): Promise<void>;

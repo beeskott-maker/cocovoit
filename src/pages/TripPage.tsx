@@ -1,11 +1,12 @@
-import { useCallback, useRef, useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import carIcon from '../assets/figma/car.svg';
 import { BookedDialog } from '../components/BookedDialog';
 import { CarCard } from '../components/CarCard';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { MapsSheet } from '../components/MapsSheet';
 import { PhoneDialog } from '../components/PhoneDialog';
+import { PushAskSheet } from '../components/Push';
 import { CallIcon } from '../components/PhoneIcons';
 import { RequireAccount } from '../components/RequireAccount';
 import { Toast } from '../components/Toast';
@@ -14,6 +15,7 @@ import { useApi } from '../lib/api';
 import { storageKey } from '../lib/env';
 import { inviteUrl } from '../lib/format';
 import { useAuth } from '../lib/auth';
+import { pushStatus, shouldAskPush } from '../lib/push';
 import { bookedDirections, keepOrder, sortCars } from '../lib/seats';
 import type { Leg } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
@@ -23,6 +25,8 @@ import { Loading } from '../components/Delight';
 
 /** Délai avant la pop-in « C'est tout bon » (ms). */
 const BOOKED_DELAY = 300;
+/** Délai avant la proposition de notifications, après les confettis (ms). */
+const PUSH_ASK_DELAY = 1300;
 
 // « Plus tard » sur l'invitation à donner son numéro : mémorisé dans ce navigateur.
 const PHONE_LATER = storageKey('phone-later');
@@ -49,6 +53,7 @@ function Trip({ token }: { token: string }) {
   const { code = '' } = useParams();
   const api = useApi();
   const navigate = useNavigate();
+  const location = useLocation();
   const { auth, sessionExpired } = useAuth();
   const { state, error, reload } = useTripState(token, code);
   const [busyLegId, setBusyLegId] = useState<string | null>(null);
@@ -61,16 +66,41 @@ function Trip({ token }: { token: string }) {
   // Trajet où l'on vient de prendre une place : case « Moi » qui rebondit, avec des
   // confettis seulement pour le premier des deux sens (le second ouvre la pop-in).
   const [justTaken, setJustTaken] = useState<{ legId: string; confetti: boolean } | null>(null);
+  // Proposition d'activer les notifications : une fois par visite, au bon moment.
+  const [pushAsk, setPushAsk] = useState<'driver' | 'passenger' | null>(null);
+  const pushAsked = useRef(false);
+  const offerPush = useCallback(
+    (role: 'driver' | 'passenger', delay = 0) => {
+      if (pushAsked.current) return;
+      pushAsked.current = true;
+      void pushStatus(api).then((s) => {
+        if (shouldAskPush(s)) setTimeout(() => setPushAsk(role), delay);
+      });
+    },
+    [api],
+  );
+  // Arrivée depuis « Ajouter ma voiture » : proposition au conducteur.
+  const askDriver = (location.state as { askPush?: string } | null)?.askPush === 'driver';
+  useEffect(() => {
+    if (!askDriver) return;
+    navigate('.', { replace: true, state: null });
+    offerPush('driver', BOOKED_DELAY);
+  }, [askDriver, navigate, offerPush]);
+  const closePushAsk = useCallback((message: string | null) => {
+    setPushAsk(null);
+    if (message) setToast(message);
+  }, []);
   const closeBooked = useCallback(
     (recap: boolean) => {
       setBookedBoth(false);
+      offerPush('passenger', BOOKED_DELAY);
       if (!recap) return;
       api
         .emailTripRecap(token, code)
         .then(({ email }) => setToast(`Récap envoyé à ${email} 📬`))
         .catch((err) => setToast(err instanceof Error ? err.message : 'Une erreur est survenue'));
     },
-    [api, token, code],
+    [api, token, code, offerPush],
   );
   const carOrder = useRef<string[] | null>(null);
   const [phoneOpen, setPhoneOpen] = useState(false);
@@ -118,6 +148,8 @@ function Trip({ token }: { token: string }) {
       if (action === 'take') {
         setJustTaken({ legId: leg.id, confetti: !both });
         setTimeout(() => setJustTaken((t) => (t?.legId === leg.id ? null : t)), 1500);
+        // Première place : proposition des notifications après les confettis.
+        if (!both) offerPush('passenger', PUSH_ASK_DELAY);
       }
     } catch (err) {
       setToast(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -289,6 +321,7 @@ function Trip({ token }: { token: string }) {
       {mapsOpen && state.trip.destination && (
         <MapsSheet address={state.trip.destination} onClose={closeMaps} />
       )}
+      {pushAsk && <PushAskSheet token={token} role={pushAsk} onDone={closePushAsk} />}
       {toast && <Toast message={toast} onDone={hideToast} />}
     </>
   );

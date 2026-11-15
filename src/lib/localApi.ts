@@ -528,6 +528,19 @@ export function createLocalApi(
       save(db);
     },
 
+    // En démo, pas de vrai envoi : l'appli affiche une notification d'exemple sur l'appareil.
+    async pushPublicKey() {
+      return null;
+    },
+    async pushSubscribe(token) {
+      await tick();
+      account(load(), token);
+    },
+    async pushUnsubscribe(token) {
+      await tick();
+      account(load(), token);
+    },
+
     // Comme la fonction SQL email_trip_recap ; en démo, aucun email ne part.
     async emailTripRecap(token, code) {
       await tick();

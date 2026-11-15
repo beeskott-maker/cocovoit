@@ -21,6 +21,40 @@ function AddIcon() {
   );
 }
 
+/** Aide iPhone / iPad : ajouter l'appli à l'écran d'accueil depuis Safari. */
+export function InstallHelpSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <Sheet title="Ajouter à l'écran d'accueil" onClose={onClose}>
+      <ol className="install-steps">
+        <li>
+          <span>
+            Touche <b>Partager</b> en bas de Safari
+          </span>
+          <span className="install-steps__icon">
+            <ShareIcon />
+          </span>
+        </li>
+        <li>
+          <span>
+            Choisis <b>« Sur l'écran d'accueil »</b>
+          </span>
+          <span className="install-steps__icon">
+            <AddIcon />
+          </span>
+        </li>
+        <li>
+          <span>
+            Touche <b>Ajouter</b>, en haut à droite
+          </span>
+        </li>
+      </ol>
+      <button type="button" className="btn btn--primary" onClick={onClose}>
+        J'ai compris
+      </button>
+    </Sheet>
+  );
+}
+
 /** Encart fixé en bas de Mes voyages : installer l'appli sur l'écran d'accueil. */
 export function InstallCard() {
   const { mode, install, dismiss } = useInstall();
@@ -46,36 +80,7 @@ export function InstallCard() {
           ✕
         </button>
       </aside>
-      {help && (
-        <Sheet title="Ajouter à l'écran d'accueil" onClose={() => setHelp(false)}>
-          <ol className="install-steps">
-            <li>
-              <span>
-                Touche <b>Partager</b> en bas de Safari
-              </span>
-              <span className="install-steps__icon">
-                <ShareIcon />
-              </span>
-            </li>
-            <li>
-              <span>
-                Choisis <b>« Sur l'écran d'accueil »</b>
-              </span>
-              <span className="install-steps__icon">
-                <AddIcon />
-              </span>
-            </li>
-            <li>
-              <span>
-                Touche <b>Ajouter</b>, en haut à droite
-              </span>
-            </li>
-          </ol>
-          <button type="button" className="btn btn--primary" onClick={() => setHelp(false)}>
-            J'ai compris
-          </button>
-        </Sheet>
-      )}
+      {help && <InstallHelpSheet onClose={() => setHelp(false)} />}
     </>
   );
 }

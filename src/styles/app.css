@@ -2829,3 +2829,81 @@ body {
   border-radius: 10px;
   background: #efeaff;
 }
+
+/* Notifications : proposition (cloche citron au-dessus du titre) et réglage de Mes voyages. */
+.sheet:has(.push-ask) .sheet__handle {
+  order: -2;
+}
+.sheet:has(.push-ask) .sheet__title {
+  text-align: center;
+  text-wrap: balance;
+}
+.push-ask {
+  display: contents;
+}
+.push-ask__bell {
+  order: -1;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin: 4px auto 0;
+  border: 2.5px solid var(--ombre);
+  border-radius: 999px;
+  background: var(--citron);
+  box-shadow: 3px 4px 0 var(--ombre);
+  color: var(--ombre);
+}
+.push-ask__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.push-ask__list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--encre);
+}
+.push-ask__list li span:first-child {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: #efeaff;
+  font-size: 15px;
+}
+.push-ask__ios {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #efeaff;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--encre);
+}
+.push-ask__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.push-ask__actions .btn {
+  width: 100%;
+}
+.push-ask__actions .link-btn {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--violet);
+}
+.push-setting {
+  margin: 8px 20px 0;
+}

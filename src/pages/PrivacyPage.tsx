@@ -40,6 +40,11 @@ export function PrivacyPage() {
             Votre session est gardée dans votre navigateur (stockage local) jusqu'à ce que vous vous déconnectiez. Le
             site n'utilise ni cookie, ni publicité, ni outil de mesure d'audience.
           </p>
+          <p>
+            Si vous activez les notifications, l'adresse d'envoi fournie par votre navigateur ou votre téléphone est
+            enregistrée pour cet appareil. Elle est effacée quand vous les coupez, quand vous vous déconnectez ou quand
+            vous supprimez votre compte.
+          </p>
         </section>
 
         <section>
@@ -72,6 +77,10 @@ export function PrivacyPage() {
             <li>Supabase : base de données, hébergée dans l'Union européenne.</li>
             <li>GitHub Pages : hébergement des pages du site, qui ne contiennent aucune donnée personnelle.</li>
             <li>Brevo : envoi des emails (vérification de l'adresse, récap d'un voyage si vous le demandez, avis au conducteur quand une place est prise dans sa voiture) (France).</li>
+            <li>
+              Services de notification d'Apple, Google ou Mozilla (selon votre appareil) : acheminement des
+              notifications, si vous les activez. Leur contenu est chiffré de bout en bout.
+            </li>
             <li>Google Fonts : polices de caractères du site.</li>
           </ul>
           <p>Les données ne sont ni vendues, ni cédées, ni utilisées à d'autres fins que le fonctionnement du site.</p>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useApi } from '../lib/api';
 import { AuthContext, forgetLegacyStorage, readToken, writeToken, type AuthState, type LoginOutcome } from '../lib/auth';
+import { disablePush } from '../lib/push';
 import { ApiError } from '../lib/types';
 
 /** Charge le compte de la session mémorisée et expose connexion / déconnexion. */
@@ -50,7 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = readToken();
     writeToken(null);
     setAuth({ status: 'anonymous' });
-    if (token) await api.logout(token).catch(() => undefined);
+    if (!token) return;
+    // Cet appareil ne reçoit plus les notifications du compte.
+    await disablePush(api, token).catch(() => undefined);
+    await api.logout(token).catch(() => undefined);
   }, [api]);
 
   const sessionExpired = useCallback(() => {

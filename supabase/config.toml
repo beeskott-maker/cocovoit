@@ -6,3 +6,7 @@ schemas = ["public"]
 
 [db]
 major_version = 15
+
+# Notifications push : appelée par la base (pg_net), sans jeton.
+[functions.push-send]
+verify_jwt = false

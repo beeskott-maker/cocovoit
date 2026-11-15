@@ -1,8 +1,10 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { BrandHeader } from '../components/BrandHeader';
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog';
 import { InstallCard } from '../components/InstallCard';
+import { PushSetting } from '../components/Push';
+import { Toast } from '../components/Toast';
 import { SleepyCoconut } from '../components/Delight';
 import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
@@ -60,6 +62,8 @@ function Home({ token }: { token: string }) {
   const navigate = useNavigate();
   const { auth, logout, sessionExpired } = useAuth();
   const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const hideToast = useCallback(() => setToast(null), []);
   // « Mes voyages » : les voyages du compte, lus en base.
   const [myTrips, setMyTrips] = useState<MyTrip[] | null>(null);
   useEffect(() => {
@@ -208,6 +212,7 @@ function Home({ token }: { token: string }) {
           </ul>
         </section>
       )}
+      {myTrips && myTrips.length > 0 && !showForm && <PushSetting token={token} onMessage={setToast} />}
       {auth.status === 'connected' && (
         <footer className="trip-footer body-medium">
           <span>Connecté·e en tant que {auth.account.name}</span>
@@ -220,6 +225,7 @@ function Home({ token }: { token: string }) {
         </footer>
       )}
       {myTrips && myTrips.length > 0 && !showForm && <InstallCard />}
+      {toast && <Toast message={toast} onDone={hideToast} />}
       {deleting && auth.status === 'connected' && (
         <DeleteAccountDialog
           token={token}

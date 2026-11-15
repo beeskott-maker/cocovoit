@@ -45,6 +45,8 @@ export default defineConfig({
         // La prod ne répond jamais à la place de la version de test.
         navigateFallbackDenylist: [/\/dev\//],
         cleanupOutdatedCaches: true,
+        // Affichage des notifications push et ouverture du voyage au toucher.
+        importScripts: ['push-sw.js'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com',
