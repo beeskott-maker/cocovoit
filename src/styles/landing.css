@@ -135,7 +135,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
 }
 .lp-logo img {
   display: block;

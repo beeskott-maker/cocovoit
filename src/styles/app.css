@@ -2910,3 +2910,29 @@ body {
 .push-setting {
   margin: 8px 20px 0;
 }
+
+/* Appli installée sur iPhone : l'heure et la batterie s'affichent par-dessus la
+   page (barre d'état translucide, voir index.html). Les en-têtes violets
+   remontent dessous ; leur contenu descend de la hauteur de la barre (0 ailleurs). */
+.brand-header {
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+}
+.trip-header {
+  padding-top: calc(24px + env(safe-area-inset-top, 0px));
+}
+.trip-header__logo {
+  top: calc(14px + env(safe-area-inset-top, 0px));
+}
+.env-badge {
+  top: env(safe-area-inset-top, 0px);
+}
+/* Au défilement, la page passe sous une bande violette : l'heure reste lisible. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--violet);
+  z-index: 15; /* sous les pop-ins et panneaux (20 et plus) */
+  pointer-events: none;
+}
