@@ -7,7 +7,7 @@ describe('Page voyage', () => {
     const { code, hugo } = await seedTrip(api);
     signIn(hugo);
     const { user } = renderApp(`/t/${code}`, api);
-    await user.click(await screen.findByRole('link', { name: 'Coco·Voit, mes voyages' }));
+    await user.click(await screen.findByRole('link', { name: 'Coco·voit, mes voyages' }));
     expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
   });
 

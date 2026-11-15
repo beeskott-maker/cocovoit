@@ -152,7 +152,7 @@ export function LandingPage() {
         <div className="lp-wrap">
           <nav className="lp-nav">
             <span className="lp-logo">
-              <img src={logo} width={230} height={147} alt="Coco·Voit" />
+              <img src={logo} width={230} height={147} alt="Coco·voit" />
             </span>
             {auth.status === 'connected' ? (
               <Link to="/voyages" className="lp-account">
@@ -482,7 +482,7 @@ export function LandingPage() {
       {toast && <Toast message={toast} onDone={() => navigate('.', { replace: true, state: null })} />}
       <footer className="lp-footer">
         <img src={icon} width={52} height={52} alt="" />
-        Cocovoit · Le covoiturage entre amis
+        Coco·voit · Le covoiturage entre amis
         <Link to="/confidentialite">Confidentialité</Link>
       </footer>
     </div>

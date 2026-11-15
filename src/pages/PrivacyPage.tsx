@@ -16,14 +16,14 @@ export function PrivacyPage() {
       <div className="page-title">
         <h1 className="display-small">Confidentialité</h1>
         <p className="body-medium">
-          Quelles données personnelles Coco·Voit utilise, pourquoi, qui peut les voir et comment exercer vos droits.
+          Quelles données personnelles Coco·voit utilise, pourquoi, qui peut les voir et comment exercer vos droits.
         </p>
       </div>
       <main className="legal">
         <section>
           <h2>Responsable</h2>
           <p>
-            Coco·Voit est un site entre amis pour organiser le covoiturage d'un voyage. Pour toute question sur vos
+            Coco·voit est un site entre amis pour organiser le covoiturage d'un voyage. Pour toute question sur vos
             données : <a href={`mailto:${CONTACT}`}>{CONTACT}</a>.
           </p>
         </section>

@@ -47,7 +47,7 @@ export function icsFile(e: CalendarEvent, now = new Date()): string {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Coco·Voit//FR',
+    'PRODID:-//Coco·voit//FR',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',

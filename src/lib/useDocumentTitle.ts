@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { IS_DEV_ENV } from './env';
 
-export const APP_TITLE = IS_DEV_ENV ? 'Coco·Voit DEV' : 'Coco·Voit';
+export const APP_TITLE = IS_DEV_ENV ? 'Coco·voit DEV' : 'Coco·voit';
 
 /**
- * Titre de l'onglet : « nom du voyage · Coco·Voit » sur les pages d'un voyage,
- * « Coco·Voit · Authentification » sur la connexion, sinon « Coco·Voit ».
- * Sans titre (données pas encore chargées), on garde « Coco·Voit ».
+ * Titre de l'onglet : « nom du voyage · Coco·voit » sur les pages d'un voyage,
+ * « Coco·voit · Authentification » sur la connexion, sinon « Coco·voit ».
+ * Sans titre (données pas encore chargées), on garde « Coco·voit ».
  */
 export function useDocumentTitle(title: string | null | undefined) {
   useEffect(() => {

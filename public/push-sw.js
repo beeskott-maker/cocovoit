@@ -8,7 +8,7 @@ self.addEventListener('push', (event) => {
     data = { body: event.data ? event.data.text() : '' };
   }
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Coco·Voit', {
+    self.registration.showNotification(data.title || 'Coco·voit', {
       body: data.body || '',
       icon: 'pwa-192.png',
       tag: data.tag || undefined,

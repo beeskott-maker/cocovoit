@@ -21,8 +21,8 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         id: base,
-        name: isDev ? 'Coco·Voit (dev)' : 'Coco·Voit',
-        short_name: isDev ? 'Coco dev' : 'Coco·Voit',
+        name: isDev ? 'Coco·voit (dev)' : 'Coco·voit',
+        short_name: isDev ? 'Coco dev' : 'Coco·voit',
         description: 'Organise le covoiturage de ton voyage entre proches.',
         lang: 'fr',
         start_url: `${base}#/voyages`,

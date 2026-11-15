@@ -22,7 +22,7 @@ export function TripHeader({ trip, onShare, onRoute }: Props) {
   const departureDay = trip.startsOn === localToday();
   return (
     <header className="trip-header">
-      <Link to="/voyages" className="trip-header__logo" aria-label="Coco·Voit, mes voyages">
+      <Link to="/voyages" className="trip-header__logo" aria-label="Coco·voit, mes voyages">
         <img src={icon} alt="" width={48} height={48} />
       </Link>
       <div className="trip-header__titles">

@@ -66,7 +66,7 @@ export function InstallCard() {
       <aside className="install-card" aria-label="Installer l'appli">
         <img src={icon} alt="" width={44} height={44} />
         <div className="install-card__text">
-          <p className="install-card__title">Coco·Voit en appli</p>
+          <p className="install-card__title">Coco·voit en appli</p>
           <p>Tes voyages en un geste</p>
         </div>
         <button

@@ -9,7 +9,7 @@
 - **Ne pas pousser sans demande explicite** : commiter en local, puis pousser (donc déployer) seulement quand l'utilisateur le demande (« Déploie », « Go », « push »…), même si un hook réclame le push. Sans précision, demander s'il s'agit de dev ou de prod.
 - Chaque push sur `main` déclenche la CI qui teste, applique les migrations Supabase et déploie (prod + dev) sur GitHub Pages. Un push sur `dev` relance cette CI de `main` sans toucher à la base.
 - Avant de pousser, lancer les vérifications locales : `npm run lint && npm run typecheck && npm test && npm run build`, et `scripts/test-db.sh` si `supabase/` change.
-- Après chaque mise en prod, mettre à jour la documentation Notion « Coco·Voit » (pages concernées et Journal des décisions), sans demander.
+- Après chaque mise en prod, mettre à jour la documentation Notion « Coco·voit » (pages concernées et Journal des décisions), sans demander.
 
 ## Base de données
 

@@ -24,7 +24,7 @@ describe('« Mes voyages »', () => {
     const { user } = renderApp('/voyages', api);
 
     expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
-    expect(document.title).toBe('Coco·Voit · Mes voyages');
+    expect(document.title).toBe('Coco·voit · Mes voyages');
     // Organisateur prime sur conducteur et passager.
     expect(screen.getByRole('link', { name: /WE dans le Beaujolais/ })).toHaveTextContent('Organisateur');
     expect(screen.queryByRole('button', { name: 'Créer' })).not.toBeInTheDocument();

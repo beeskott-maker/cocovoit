@@ -4,8 +4,8 @@ import logo from '../assets/brand/logo.svg';
 export function BrandHeader() {
   return (
     <header className="brand-header">
-      <Link to="/" className="brand-header__logo" aria-label="Coco·Voit, accueil">
-        <img src={logo} width={120} height={77} alt="Coco·Voit" />
+      <Link to="/" className="brand-header__logo" aria-label="Coco·voit, accueil">
+        <img src={logo} width={120} height={77} alt="Coco·voit" />
       </Link>
     </header>
   );
