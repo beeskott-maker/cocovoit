@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { BrandHeader } from '../components/BrandHeader';
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog';
+import { InstallCard } from '../components/InstallCard';
 import { SleepyCoconut } from '../components/Delight';
 import { RequireAccount } from '../components/RequireAccount';
 import { TextField } from '../components/TextField';
@@ -218,6 +219,7 @@ function Home({ token }: { token: string }) {
           </button>
         </footer>
       )}
+      {myTrips && myTrips.length > 0 && !showForm && <InstallCard />}
       {deleting && auth.status === 'connected' && (
         <DeleteAccountDialog
           token={token}

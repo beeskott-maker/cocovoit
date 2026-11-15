@@ -2699,3 +2699,117 @@ body {
   line-height: 18px;
   text-align: center;
 }
+
+/* Mes voyages : encart « Installer l'appli », fixé en bas, aux marges de la liste (20 px). */
+.app:has(.install-card) {
+  padding-bottom: 110px;
+}
+.install-card {
+  position: fixed;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 20;
+  box-sizing: border-box;
+  width: calc(min(100vw, 480px) - 40px);
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 12px 12px 14px;
+  border: 2px solid var(--ombre);
+  border-radius: 24px;
+  background: #efeaff;
+  box-shadow: 3px 4px 0 var(--ombre);
+}
+.install-card img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+}
+.install-card__text {
+  min-width: 0;
+}
+.install-card__text p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--encre);
+}
+.install-card__text .install-card__title {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 19px;
+}
+.install-card .install-card__btn {
+  width: auto;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.install-card__close {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid var(--ombre);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--violet);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+.install-card__close:focus-visible {
+  outline: 3px solid var(--violet);
+  outline-offset: 2px;
+}
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+  counter-reset: etape;
+}
+.install-steps li {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--encre);
+  counter-increment: etape;
+}
+.install-steps li::before {
+  content: counter(etape);
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--ombre);
+  border-radius: 999px;
+  background: var(--citron);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 16px;
+}
+.install-steps__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #efeaff;
+}
