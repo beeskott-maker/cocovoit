@@ -2164,7 +2164,7 @@ body {
   right: 0;
   padding: 3px 12px;
   border-radius: 999px;
-  background: var(--citron);
+  background: var(--blush);
   color: var(--encre);
   box-shadow: 3px 4px 0 var(--ombre);
   font: 800 15px/22px var(--display);
