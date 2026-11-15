@@ -2644,16 +2644,15 @@ body {
   background: var(--citron);
   box-shadow: 0 0 0 2px var(--ombre);
 }
+/* Coche dessinée en SVG, centrée dans le rond (le tracé est centré sur 12,12). */
 .recap-switch__input:checked + .recap-switch__track .recap-switch__thumb::after {
   content: '';
   position: absolute;
-  left: 8px;
-  top: 4px;
-  width: 6px;
-  height: 11px;
-  border: solid var(--ombre);
-  border-width: 0 2.5px 2.5px 0;
-  transform: rotate(45deg);
+  inset: 0;
+  background: var(--ombre);
+  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 12.25l3.75 3.75 7.25-7.5' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  -webkit-mask: var(--check) center / 16px 16px no-repeat;
+  mask: var(--check) center / 16px 16px no-repeat;
 }
 .recap-switch__input:focus-visible + .recap-switch__track {
   outline: 3px solid var(--rose);

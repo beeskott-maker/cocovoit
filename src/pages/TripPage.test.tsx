@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react';
-import { createTestApi, joinAs, onIphone, renderApp, seedTrip, signIn } from '../test/renderApp';
+import { createTestApi, joinAs, loginAs, onIphone, renderApp, seedTrip, signIn } from '../test/renderApp';
 
 describe('Page voyage', () => {
   it("le logo en haut à droite ramène à « Mes voyages »", async () => {
@@ -9,6 +9,42 @@ describe('Page voyage', () => {
     const { user } = renderApp(`/t/${code}`, api);
     await user.click(await screen.findByRole('link', { name: 'Coco·Voit, mes voyages' }));
     expect(await screen.findByRole('heading', { name: 'Mes voyages' })).toBeInTheDocument();
+  });
+
+  it('voyage passé : consultation seule, sans bouton de place ni modification', async () => {
+    const api = createTestApi();
+    const hugo = await loginAs(api, 'hugo@example.com', 'Hugo');
+    const code = await api.createTrip(hugo, { name: 'Pâques', destination: 'Annecy', startsOn: '2026-09-10', endsOn: '2026-09-12' });
+    await api.saveCar(hugo, code, {
+      carId: null,
+      seats: 3,
+      legs: [
+        { direction: 'aller', departsAt: '2026-09-10T07:00:00Z', meetingPoint: null },
+        { direction: 'retour', departsAt: '2026-09-12T15:00:00Z', meetingPoint: null },
+      ],
+    });
+    const julie = await joinAs(api, code, 'julie@example.com', 'Julie');
+    const aller = (await api.getTripState(julie, code)).cars[0].legs[0];
+    await api.takeSeat(julie, code, aller.id);
+    await joinAs(api, code, 'max@example.com', 'Max');
+
+    for (const token of [julie, await loginAs(api, 'max@example.com', 'Max')]) {
+      signIn(token);
+      const view = renderApp(`/t/${code}`, api);
+      expect(await screen.findByText('Pâques')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Libérer ma place' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Prendre 1 place' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'Ajouter ma voiture' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Ajouter ma voiture' })).not.toBeInTheDocument();
+      expect(screen.queryByText('Ajoute ton numéro')).not.toBeInTheDocument();
+      view.unmount();
+    }
+
+    signIn(hugo);
+    renderApp(`/t/${code}`, api);
+    expect(await screen.findByText('Ma voiture')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Modifier ma voiture' })).not.toBeInTheDocument();
+    expect(screen.getAllByText('2 places libres')).toHaveLength(1);
   });
 
   it("l'organisateur peut supprimer le voyage après confirmation, pas les participants", async () => {

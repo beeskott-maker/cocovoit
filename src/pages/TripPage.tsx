@@ -14,7 +14,7 @@ import { Toast } from '../components/Toast';
 import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
 import { storageKey } from '../lib/env';
-import { inviteUrl } from '../lib/format';
+import { inviteUrl, localToday } from '../lib/format';
 import { useAuth } from '../lib/auth';
 import { pushStatus, shouldAskPush } from '../lib/push';
 import { bookedDirections, keepOrder, sortCars } from '../lib/seats';
@@ -134,7 +134,9 @@ function Trip({ token }: { token: string }) {
   const myDirections = bookedDirections(state.cars, state.me.id);
   const carHref = myCar ? `/t/${code}/voiture/${myCar.id}` : `/t/${code}/voiture`;
   // Invitation à donner son numéro : seulement si on conduit ou qu'on a une place.
-  const askPhone = !state.me.phone && !askPhoneLater && (!!myCar || myDirections.size > 0);
+  // Voyage terminé : consultation seule.
+  const past = state.trip.endsOn < localToday();
+  const askPhone = !past && !state.me.phone && !askPhoneLater && (!!myCar || myDirections.size > 0);
 
   async function act(leg: Leg, action: 'take' | 'leave') {
     setBusyLegId(leg.id);
@@ -239,8 +241,14 @@ function Trip({ token }: { token: string }) {
         {state.cars.length === 0 ? (
           <div className="empty">
             <img src={carIcon} alt="" />
-            <p className="body-large">Personne n'a encore proposé de voiture.</p>
-            <p className="body-medium">Tu conduis ? Ajoute ta voiture pour que les autres réservent une place.</p>
+            {past ? (
+              <p className="body-large">Personne n'a proposé de voiture pour ce voyage.</p>
+            ) : (
+              <>
+                <p className="body-large">Personne n'a encore proposé de voiture.</p>
+                <p className="body-medium">Tu conduis ? Ajoute ta voiture pour que les autres réservent une place.</p>
+              </>
+            )}
           </div>
         ) : (
           cars.map((car) => (
@@ -257,10 +265,12 @@ function Trip({ token }: { token: string }) {
               onLeave={(leg) => act(leg, 'leave')}
               tripName={state.trip.name}
               tripUrl={inviteUrl(code)}
+              past={past}
             />
           ))
         )}
         {!myCar &&
+          !past &&
           (myDirections.size > 0 ? (
             // Un passager ne peut pas aussi conduire : il libère d'abord ses places.
             <div className="add-car-locked">

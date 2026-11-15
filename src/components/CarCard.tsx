@@ -30,9 +30,11 @@ interface Props {
   /** Pour l'événement d'agenda du point de rendez-vous. */
   tripName: string;
   tripUrl: string;
+  /** Voyage passé : consultation seule (ni prendre ni libérer de place, ni modifier). */
+  past?: boolean;
 }
 
-export function CarCard({ car, meId, editHref, busyLegId, celebrate, myDirections, iDrive, onTake, onLeave, tripName, tripUrl }: Props) {
+export function CarCard({ car, meId, editHref, busyLegId, celebrate, myDirections, iDrive, onTake, onLeave, tripName, tripUrl, past = false }: Props) {
   const mine = car.driver.id === meId;
   const carLabel = mine ? 'Ma voiture' : carOf(car.driver.name);
   const [rdvLeg, setRdvLeg] = useState<(Leg & { meetingPoint: string }) | null>(null);
@@ -54,7 +56,7 @@ export function CarCard({ car, meId, editHref, busyLegId, celebrate, myDirection
           />
           <div className="car__title-group">
             <h2 className="car__title">{carLabel}</h2>
-            {mine && (
+            {mine && !past && (
               <Link className="car__edit" to={editHref} aria-label="Modifier ma voiture">
                 Modifier
               </Link>
@@ -78,7 +80,7 @@ export function CarCard({ car, meId, editHref, busyLegId, celebrate, myDirection
           <LegSeats
             key={leg.id}
             leg={leg}
-            cells={seatCells(car, leg, meId, myDirections, iDrive)}
+            cells={seatCells(car, leg, meId, myDirections, iDrive, past)}
             busy={busyLegId === leg.id}
             celebrate={celebrate?.legId === leg.id ? (celebrate.confetti ? 'confetti' : 'pop') : null}
             onTake={() => onTake(leg)}

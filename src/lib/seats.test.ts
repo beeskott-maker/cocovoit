@@ -38,6 +38,16 @@ describe('seatCells', () => {
     const c = car([]);
     expect(seatCells(c, c.legs[0], 'hugo')).toEqual([{ kind: 'free', count: 3 }]);
   });
+  it('voyage passé : ni prendre, ni libérer, ni « Voiture pleine »', () => {
+    const libre = car(['lea']);
+    expect(seatCells(libre, libre.legs[0], 'moi', new Set(), false, true).map((x) => x.kind)).toEqual(['occupied', 'free']);
+    const moi = car(['lea', 'moi', 'max']);
+    expect(seatCells(moi, moi.legs[0], 'moi', new Set(), false, true).map((x) => x.kind)).toEqual([
+      'occupied',
+      'me',
+      'occupied',
+    ]);
+  });
   it('voiture pleine : pas de bouton', () => {
     const c = car(['a', 'b', 'c']);
     expect(seatCells(c, c.legs[0], 'moi').map((x) => x.kind)).toEqual(['occupied', 'occupied', 'occupied', 'full']);

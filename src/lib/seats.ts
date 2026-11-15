@@ -17,6 +17,7 @@ export type SeatCell =
  * sens (aller ou retour) dans une autre voiture, et absent si je conduis une
  * voiture de ce voyage : un conducteur n'est jamais passager. Si le trajet est
  * complet, « Voiture pleine 😢 » prend la place du bouton.
+ * Voyage passé (`past`) : seulement les passagers et les places restées libres.
  */
 export function seatCells(
   car: Car,
@@ -24,6 +25,7 @@ export function seatCells(
   meId: string,
   myDirections: ReadonlySet<Direction> = new Set(),
   iDrive = car.driver.id === meId,
+  past = false,
 ): SeatCell[] {
   const iAmIn = leg.passengers.some((p) => p.id === meId);
   const canTake = !iAmIn && !iDrive;
@@ -32,6 +34,7 @@ export function seatCells(
   );
   const free = Math.max(0, car.seats - leg.passengers.length);
   if (free > 0) cells.push({ kind: 'free', count: free });
+  if (past) return cells;
   if (iAmIn) cells.push({ kind: 'leave' });
   else if (canTake) cells.push(free > 0 ? { kind: 'take', disabled: myDirections.has(leg.direction) } : { kind: 'full' });
   return cells;
