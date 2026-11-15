@@ -63,7 +63,7 @@ export function TripHeader({ trip, onShare, onRoute }: Props) {
               Itinéraire
             </button>
           ))}
-        <button type="button" className="header-btn header-btn--filled" onClick={onShare} title="Copier le lien du voyage">
+        <button type="button" className="header-btn header-btn--filled" onClick={onShare} title="Partager le lien du voyage">
           <img src={share} alt="" width={20} height={20} />
           Partager
         </button>

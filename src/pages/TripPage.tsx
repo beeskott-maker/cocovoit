@@ -15,6 +15,7 @@ import { TripHeader } from '../components/TripHeader';
 import { useApi } from '../lib/api';
 import { storageKey } from '../lib/env';
 import { inviteUrl, localToday } from '../lib/format';
+import { shareInvite } from '../lib/share';
 import { useAuth } from '../lib/auth';
 import { pushStatus, shouldAskPush } from '../lib/push';
 import { bookedDirections, keepOrder, sortCars } from '../lib/seats';
@@ -166,6 +167,8 @@ function Trip({ token }: { token: string }) {
   }
 
   async function shareLink() {
+    // Menu de partage du téléphone, avec le nom du voyage dans le message.
+    if ((await shareInvite(state!.trip.name, inviteUrl(code))) === 'shared') return;
     try {
       await navigator.clipboard.writeText(inviteUrl(code));
       setToast("Lien copié : envoie-le aux nouveaux passagers");

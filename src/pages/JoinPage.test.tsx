@@ -32,7 +32,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     // Un seul « Point de RDV » : celui de l'aller.
     expect(screen.getAllByRole('button', { name: 'Point de RDV' })).toHaveLength(1);
 
-    // Partager : copie le lien d'invitation.
+    // Partager : sans menu de partage (ordinateur), copie le lien d'invitation.
     await user.click(screen.getByRole('button', { name: 'Partager' }));
     expect(await navigator.clipboard.readText()).toMatch(new RegExp(`#/j/${code}$`));
     expect(screen.getByRole('status')).toHaveTextContent('Lien copié');

@@ -4,6 +4,7 @@ import { BrandHeader } from '../components/BrandHeader';
 import { Toast } from '../components/Toast';
 import { useApi } from '../lib/api';
 import { inviteUrl } from '../lib/format';
+import { shareInvite } from '../lib/share';
 import { tripTitle, useDocumentTitle } from '../lib/useDocumentTitle';
 import type { TripPreview } from '../lib/types';
 import { NotFoundPage } from './NotFoundPage';
@@ -32,7 +33,6 @@ export function InvitePage() {
   if (!trip) return <Loading />;
 
   const url = inviteUrl(code);
-  const text = `Rejoins « ${trip.name} » sur Coco·voit pour t'organiser en covoiturage :`;
 
   async function copy() {
     try {
@@ -44,11 +44,7 @@ export function InvitePage() {
   }
 
   async function share() {
-    try {
-      await navigator.share({ title: trip!.name, text, url });
-    } catch {
-      // Partage annulé par l'utilisateur.
-    }
+    if ((await shareInvite(trip!.name, url)) === 'unavailable') await copy();
   }
 
   return (
