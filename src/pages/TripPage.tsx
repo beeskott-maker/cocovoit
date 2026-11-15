@@ -135,7 +135,9 @@ function Trip({ token }: { token: string }) {
       await navigator.clipboard.writeText(inviteUrl(code));
       setToast("Lien copié : envoie-le aux nouveaux passagers");
     } catch {
-      setToast(`Copie impossible. Lien : ${inviteUrl(code)}`);
+      // Copie refusée par le navigateur : la page d'invitation affiche le lien en entier, à sélectionner
+      // (trop long pour une snack bar sur deux lignes).
+      navigate(`/t/${code}/inviter`);
     }
   }
 

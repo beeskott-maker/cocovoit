@@ -1799,11 +1799,27 @@ body {
   border: 2px solid #d9cff7;
   border-radius: 16px;
 }
+/* Snack bar : centrée sur toute la largeur (et non limitée à la moitié de l'écran
+   comme avec left: 50% + translate), 24 px de marge de chaque côté, 440 px au
+   plus ; deux lignes équilibrées si le texte est long. Rayon 24 px : pilule sur
+   une ligne, coins arrondis sur deux. */
 .toast {
-  border-radius: 999px;
+  left: 0;
+  right: 0;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: none;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: min(440px, calc(100% - 48px));
+  margin-inline: auto;
+  padding: 14px 20px;
+  border-radius: 24px;
   background: var(--encre);
   color: #fff;
   font-weight: 600;
+  text-align: center;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 @media (min-width: 600px) {
   .sheet {
