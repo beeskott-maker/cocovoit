@@ -191,9 +191,9 @@ function EmailLogin({ onSubmit }: { onSubmit: (email: string) => Promise<LoadRes
     setError(null);
     const result = await onSubmit(value.trim());
     if (result === 'unauthorized') {
-      setError(`L'adresse ${value.trim()} n'est pas autorisée à accéder à cette page. Vérifiez qu'il s'agit de la bonne adresse.`);
+      setError(`L'adresse ${value.trim()} n'est pas autorisée à accéder à cette page. Vérifie qu'il s'agit de la bonne adresse.`);
     } else if (result === 'error') {
-      setError('Vérification impossible pour le moment, réessayez.');
+      setError('Vérification impossible pour le moment, réessaie.');
     }
     if (result !== 'ok') setBusy(false);
   }
@@ -203,7 +203,7 @@ function EmailLogin({ onSubmit }: { onSubmit: (email: string) => Promise<LoadRes
       <BrandHeader />
       <div className="page-title">
         <h1 className="display-small">Accès réservé</h1>
-        <p className="body-medium">Indiquez votre adresse email pour gérer les voyages.</p>
+        <p className="body-medium">Indique ton adresse email pour gérer les voyages.</p>
       </div>
       <form className="form" onSubmit={submit} noValidate>
         <TextField

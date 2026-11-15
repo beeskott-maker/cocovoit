@@ -41,7 +41,7 @@ export function VerifyEmailPage() {
     })();
   }, [api, auth, login, navigate, token]);
 
-  if (!result || (result.status === 'verified' && !askName)) return <Loading label="Vérification de votre adresse…" />;
+  if (!result || (result.status === 'verified' && !askName)) return <Loading label="Vérification de ton adresse…" />;
 
   if (result.status === 'verified') {
     return (
@@ -61,7 +61,7 @@ export function VerifyEmailPage() {
   const next = result.status === 'expired' ? result.next : null;
   return (
     <IdentityForm
-      title="Qui êtes-vous ?"
+      title="Qui es-tu ?"
       start={{ step: { kind: 'expired' }, email }}
       onEmail={(e) => login(e, undefined, undefined, null, next)}
       onName={async (e, name, phone, request) => {

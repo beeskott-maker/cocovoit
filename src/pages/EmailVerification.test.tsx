@@ -20,7 +20,7 @@ describe("Vérification de l'email", () => {
     await user.type(await screen.findByLabelText('Mon email'), 'lea@example.com');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
 
-    expect(await screen.findByRole('heading', { name: 'Vérifiez vos emails' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Vérifie tes emails' })).toBeInTheDocument();
     expect(screen.getByText('lea@example.com')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Renvoyer l'email \(dans \d+ s\)/ })).toBeDisabled();
     // Pas de compte tant que le lien n'est pas cliqué.
@@ -40,7 +40,7 @@ describe("Vérification de l'email", () => {
     const { user } = renderApp('/identification', api);
     await user.type(await screen.findByLabelText('Mon email'), 'lea@example.com');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
-    await screen.findByRole('heading', { name: 'Vérifiez vos emails' });
+    await screen.findByRole('heading', { name: 'Vérifie tes emails' });
 
     // L'autre appareil ouvre le lien.
     const sent = await api.login('lea@example.com');

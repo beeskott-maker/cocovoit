@@ -17,7 +17,7 @@ describe('Page voyage', () => {
 
     signIn(hugo);
     const first = renderApp(`/t/${code}`, api);
-    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(await screen.findByText('Ton voyage')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Supprimer ce voyage' })).not.toBeInTheDocument();
     first.unmount();
 
@@ -77,7 +77,7 @@ describe('Page voyage', () => {
     expect(retour).toHaveTextContent("Voiture d'Hugo");
     expect(retour).not.toHaveTextContent('Ancien RDV retour');
     expect(within(retour).queryByRole('link')).not.toBeInTheDocument();
-    expect(dialog).toHaveTextContent('Vous pourrez libérer vos places à tout moment');
+    expect(dialog).toHaveTextContent('Tu pourras libérer tes places à tout moment');
     // Récap par mail : désactivé par défaut, donc rien n'est envoyé.
     const recap = vi.spyOn(api, 'emailTripRecap');
     expect(within(dialog).getByRole('switch', { name: /Recevoir le récap par mail/ })).not.toBeChecked();
@@ -321,18 +321,18 @@ describe('Page voyage', () => {
     signIn(lea);
     const { user } = renderApp(`/t/${code}`, api);
     // Sans place ni voiture : pas d'invitation.
-    await screen.findByText('Votre voyage');
-    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+    await screen.findByText('Ton voyage');
+    expect(screen.queryByRole('region', { name: 'Ajoute ton numéro' })).not.toBeInTheDocument();
 
     await user.click(screen.getAllByRole('button', { name: 'Prendre 1 place' })[0]);
-    const ask = await screen.findByRole('region', { name: 'Ajoutez votre numéro' });
-    expect(ask).toHaveTextContent('Votre chauffeur pourra vous appeler');
+    const ask = await screen.findByRole('region', { name: 'Ajoute ton numéro' });
+    expect(ask).toHaveTextContent("Ton chauffeur pourra t'appeler");
     await user.click(within(ask).getByRole('button', { name: 'Ajouter' }));
     const dialog = screen.getByRole('dialog', { name: 'Mon numéro de téléphone' });
     await user.type(within(dialog).getByLabelText('Mon téléphone'), '06 98 76 54 32');
     await user.click(within(dialog).getByRole('button', { name: 'Enregistrer' }));
     expect(await screen.findByText('Numéro enregistré')).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Ajoute ton numéro' })).not.toBeInTheDocument();
     expect((await api.me(lea)).phone).toBe('+33698765432');
   });
 
@@ -341,13 +341,13 @@ describe('Page voyage', () => {
     const { code, hugo } = await seedTrip(api);
     signIn(hugo);
     const first = renderApp(`/t/${code}`, api);
-    const ask = await screen.findByRole('region', { name: 'Ajoutez votre numéro' });
-    expect(ask).toHaveTextContent('Vos passagers pourront vous appeler');
+    const ask = await screen.findByRole('region', { name: 'Ajoute ton numéro' });
+    expect(ask).toHaveTextContent("Tes passagers pourront t'appeler");
     await first.user.click(within(ask).getByRole('button', { name: 'Plus tard' }));
-    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Ajoute ton numéro' })).not.toBeInTheDocument();
     first.unmount();
     renderApp(`/t/${code}`, api);
-    await screen.findByText('Votre voyage');
-    expect(screen.queryByRole('region', { name: 'Ajoutez votre numéro' })).not.toBeInTheDocument();
+    await screen.findByText('Ton voyage');
+    expect(screen.queryByRole('region', { name: 'Ajoute ton numéro' })).not.toBeInTheDocument();
   });
 });

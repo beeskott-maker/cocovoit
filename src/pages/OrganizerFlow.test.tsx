@@ -8,7 +8,7 @@ describe('Parcours organisateur', () => {
     // Visiteur : page de présentation, puis identification avant de créer.
     expect(await screen.findByRole('heading', { name: /sans la logistique/ })).toBeInTheDocument();
     await user.click(screen.getAllByRole('link', { name: 'Organiser un voyage' })[0]);
-    expect(await screen.findByRole('heading', { name: 'Qui êtes-vous ?' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Qui es-tu ?' })).toBeInTheDocument();
     await user.type(screen.getByLabelText('Mon email'), 'loic@example.com');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
     await user.type(await screen.findByLabelText('Mon nom'), 'Loïc');

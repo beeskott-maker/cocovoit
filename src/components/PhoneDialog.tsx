@@ -56,8 +56,8 @@ export function PhoneDialog({ phone, driver, onSave, onClose }: Props) {
         <div className="confirm__text">
           <p>
             {driver
-              ? 'Visible par les participants du voyage, puisque vous conduisez : ils pourront vous appeler ou vous écrire.'
-              : 'Visible par votre chauffeur seulement, pour qu’il puisse vous joindre le jour du départ.'}
+              ? "Visible par les participants du voyage, puisque tu conduis : ils pourront t'appeler ou t'écrire."
+              : 'Visible par ton chauffeur seulement, pour qu’il puisse te joindre le jour du départ.'}
           </p>
         </div>
         <TextField
@@ -72,7 +72,7 @@ export function PhoneDialog({ phone, driver, onSave, onClose }: Props) {
             setError(null);
           }}
           error={error}
-          hint={phone ? 'Videz le champ pour retirer votre numéro.' : undefined}
+          hint={phone ? 'Vide le champ pour retirer ton numéro.' : undefined}
           autoFocus
         />
         <div className="confirm__actions">

@@ -67,8 +67,8 @@ begin
   -- Julie : aller seulement, avec téléphone.
   m := _new_passenger_email(aller, julie_p);
   assert m->>'to' = 'np-hugo@example.com', 'envoyé au conducteur';
-  assert m->>'subject' = 'Julie monte dans votre voiture 🥥', m->>'subject';
-  assert m->>'html' like '%Julie monte dans<br>votre voiture !%', 'titre';
+  assert m->>'subject' = 'Julie monte dans ta voiture 🥥', m->>'subject';
+  assert m->>'html' like '%Julie monte dans<br>ta voiture !%', 'titre';
   assert m->>'html' like '%href="tel:+33612345678"%06 12 34 56 78%', 'téléphone';
   assert m->>'html' like '%<b>Aller</b> · Sam 5 déc à 9h00%', 'trajet aller';
   assert m->>'html' like '%Voiture complète%', 'aller complet (Julie et Tom, 2 places)';

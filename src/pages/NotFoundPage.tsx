@@ -41,7 +41,7 @@ export function NotFoundPage() {
         <LostCoconut />
         <h1 className="lost__title">Ce voyage est tombé du cocotier !</h1>
         <p className="body-large">
-          Il a été supprimé, ou le lien est incomplet. Demandez à l'organisateur de vous renvoyer le bon lien.
+          Il a été supprimé, ou le lien est incomplet. Demande à l'organisateur de te renvoyer le bon lien.
         </p>
         <div className="lost__actions">
           <Link className="btn btn--primary" to="/voyages?creer=1">

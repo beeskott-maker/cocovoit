@@ -12,10 +12,10 @@ describe('Ma voiture', () => {
     signIn(hugo);
     const { user } = renderApp(`/t/${code}/voiture/${car.id}`, api);
     await user.click(await screen.findByRole('button', { name: 'Supprimer ma voiture' }));
-    const dialog = screen.getByRole('alertdialog', { name: 'Supprimer votre voiture ?' });
+    const dialog = screen.getByRole('alertdialog', { name: 'Supprimer ta voiture ?' });
     expect(dialog).toHaveTextContent('Loïc perdra sa place et pourra en reprendre une dans une autre voiture.');
     await user.click(within(dialog).getByRole('button', { name: 'Supprimer' }));
-    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(await screen.findByText('Ton voyage')).toBeInTheDocument();
     expect((await api.getTripState(hugo, code)).cars).toEqual([]);
   });
 

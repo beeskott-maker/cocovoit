@@ -128,7 +128,7 @@ export function createLocalApi(
   function account(db: Db, token: string): DbAccount {
     const session = db.sessions.find((s) => s.token === token);
     const found = session && db.accounts.find((a) => a.id === session.accountId);
-    if (!found) throw new ApiError('Session expirée, reconnectez-vous', 'unauthenticated');
+    if (!found) throw new ApiError('Session expirée, reconnecte-toi', 'unauthenticated');
     return found;
   }
   function participant(db: Db, token: string, code: string): DbParticipant {
@@ -136,7 +136,7 @@ export function createLocalApi(
     const trip = db.trips.find((t) => t.code === code);
     if (!trip) throw new ApiError('Voyage introuvable', 'not_found');
     const p = db.participants.find((x) => x.tripId === trip.id && x.accountId === me.id);
-    if (!p) throw new ApiError('Vous ne participez pas à ce voyage', 'forbidden');
+    if (!p) throw new ApiError('Tu ne participes pas à ce voyage', 'forbidden');
     return p;
   }
   const accountOf = (db: Db, participantId: string) => {
@@ -466,7 +466,7 @@ export function createLocalApi(
       await tick();
       const db = load();
       const me = participant(db, token, code);
-      if (input.legs.length === 0) throw new ApiError('Indiquez au moins un trajet', 'invalid');
+      if (input.legs.length === 0) throw new ApiError('Indique au moins un trajet', 'invalid');
       if (input.seats < 1 || input.seats > 6) throw new ApiError('Entre 1 et 6 places', 'invalid');
 
       let car: DbCar | undefined;
@@ -475,9 +475,9 @@ export function createLocalApi(
         if (!car) throw new ApiError('Accès refusé', 'forbidden');
         car.seats = input.seats;
       } else {
-        if (db.cars.some((c) => c.driverId === me.id)) throw new ApiError('Vous avez déjà une voiture', 'invalid');
+        if (db.cars.some((c) => c.driverId === me.id)) throw new ApiError('Tu as déjà une voiture', 'invalid');
         if (db.bookings.some((b) => b.participantId === me.id)) {
-          throw new ApiError('Vous avez une place de passager : libérez-la pour ajouter votre voiture', 'invalid');
+          throw new ApiError('Tu as une place de passager : libère-la pour ajouter ta voiture', 'invalid');
         }
         car = { id: newId(), tripId: me.tripId, driverId: me.id, seats: input.seats, createdAt: now() };
         db.cars.push(car);
@@ -534,7 +534,7 @@ export function createLocalApi(
       const db = load();
       const me = participant(db, token, code);
       if (!db.bookings.some((b) => b.participantId === me.id)) {
-        throw new ApiError("Vous n'avez pas de place dans ce voyage", 'invalid');
+        throw new ApiError("Tu n'as pas de place dans ce voyage", 'invalid');
       }
       return { email: account(db, token).email };
     },
@@ -546,9 +546,9 @@ export function createLocalApi(
       const leg = db.legs.find((l) => l.id === legId);
       const car = leg && db.cars.find((c) => c.id === leg.carId);
       if (!leg || !car || car.tripId !== me.tripId) throw new ApiError('Trajet introuvable', 'not_found');
-      if (car.driverId === me.id) throw new ApiError('Vous conduisez cette voiture', 'invalid');
+      if (car.driverId === me.id) throw new ApiError('Tu conduis cette voiture', 'invalid');
       if (db.cars.some((c) => c.driverId === me.id)) {
-        throw new ApiError('Vous conduisez une voiture : vous ne pouvez pas être passager', 'invalid');
+        throw new ApiError('Tu conduis une voiture : tu ne peux pas être passager', 'invalid');
       }
 
       const bookedElsewhere = db.bookings.some(
@@ -558,7 +558,7 @@ export function createLocalApi(
           db.legs.find((l) => l.id === b.legId)?.direction === leg.direction,
       );
       if (bookedElsewhere) {
-        throw new ApiError(`Vous avez déjà une place ${leg.direction === 'aller' ? "à l'aller" : 'au retour'}`, 'invalid');
+        throw new ApiError(`Tu as déjà une place ${leg.direction === 'aller' ? "à l'aller" : 'au retour'}`, 'invalid');
       }
       const others = db.bookings.filter((b) => b.legId === leg.id && b.participantId !== me.id);
       if (others.length >= car.seats) throw new ApiError('Plus de place disponible', 'invalid');

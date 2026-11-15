@@ -39,7 +39,7 @@ export function InvitePage() {
       await navigator.clipboard.writeText(url);
       setToast('Lien copié');
     } catch {
-      setToast('Copie impossible, sélectionnez le lien à la main');
+      setToast('Copie impossible, sélectionne le lien à la main');
     }
   }
 
@@ -57,7 +57,7 @@ export function InvitePage() {
       <div className="page-title stack">
         <h1 className="display-small">{params.has('nouveau') ? 'Voyage créé !' : 'Inviter des proches'}</h1>
         <p className="body-large">
-          Envoyez ce lien aux participants de <strong>{trip.name}</strong>. Ils indiqueront leur email et leur nom,
+          Envoie ce lien aux participants de <strong>{trip.name}</strong>. Ils indiqueront leur email et leur nom,
           puis pourront réserver une place ou proposer leur voiture.
         </p>
       </div>

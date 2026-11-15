@@ -133,7 +133,7 @@ function Trip({ token }: { token: string }) {
   async function shareLink() {
     try {
       await navigator.clipboard.writeText(inviteUrl(code));
-      setToast("Lien copié : envoyez-le aux nouveaux passagers");
+      setToast("Lien copié : envoie-le aux nouveaux passagers");
     } catch {
       setToast(`Copie impossible. Lien : ${inviteUrl(code)}`);
     }
@@ -173,22 +173,22 @@ function Trip({ token }: { token: string }) {
       <TripHeader trip={state.trip} onShare={shareLink} onRoute={() => setMapsOpen(true)} />
       {api.mode === 'demo' && (
         <p className="banner">
-          Mode démo : les données restent dans ce navigateur. Configurez Supabase pour partager le voyage.
+          Mode démo : les données restent dans ce navigateur. Configure Supabase pour partager le voyage.
         </p>
       )}
       <main className="trip-body">
         {askPhone && (
-          <section className="ask-phone" aria-label="Ajoutez votre numéro">
+          <section className="ask-phone" aria-label="Ajoute ton numéro">
             <span className="ask-phone__icon" aria-hidden="true">
               <CallIcon size={20} />
             </span>
             <div className="ask-phone__body">
               <p>
-                <strong>Ajoutez votre numéro</strong>
+                <strong>Ajoute ton numéro</strong>
                 <br />
                 {myCar
-                  ? 'Vos passagers pourront vous appeler ou vous écrire le jour du départ.'
-                  : 'Votre chauffeur pourra vous appeler ou vous écrire le jour du départ.'}
+                  ? "Tes passagers pourront t'appeler ou t'écrire le jour du départ."
+                  : "Ton chauffeur pourra t'appeler ou t'écrire le jour du départ."}
               </p>
               <div className="ask-phone__actions">
                 <button type="button" className="btn btn--text" onClick={later}>
@@ -205,7 +205,7 @@ function Trip({ token }: { token: string }) {
           <div className="empty">
             <img src={carIcon} alt="" />
             <p className="body-large">Personne n'a encore proposé de voiture.</p>
-            <p className="body-medium">Vous conduisez ? Ajoutez votre voiture pour que les autres réservent une place.</p>
+            <p className="body-medium">Tu conduis ? Ajoute ta voiture pour que les autres réservent une place.</p>
           </div>
         ) : (
           cars.map((car) => (
@@ -233,7 +233,7 @@ function Trip({ token }: { token: string }) {
                 Ajouter ma voiture
               </button>
               <p id="add-car-hint" className="body-medium">
-                Vous avez une place de passager : libérez-la pour ajouter votre voiture.
+                Tu as une place de passager : libère-la pour ajouter ta voiture.
               </p>
             </div>
           ) : (

@@ -23,7 +23,7 @@ export default defineConfig({
         id: base,
         name: isDev ? 'Coco·Voit (dev)' : 'Coco·Voit',
         short_name: isDev ? 'Coco dev' : 'Coco·Voit',
-        description: 'Organisez le covoiturage de votre voyage entre proches.',
+        description: 'Organise le covoiturage de ton voyage entre proches.',
         lang: 'fr',
         start_url: `${base}#/voyages`,
         scope: base,

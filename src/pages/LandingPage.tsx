@@ -268,15 +268,15 @@ export function LandingPage() {
             <li className="lp-s-citron">
               <span className="lp-num">1</span>
               <div>
-                <strong>Créez le voyage</strong>
+                <strong>Crée le voyage</strong>
                 <span>Un nom, des dates, une adresse : c'est tout ce qu'il faut.</span>
               </div>
             </li>
             <li className="lp-s-rose">
               <span className="lp-num">2</span>
               <div>
-                <strong>Partagez le lien</strong>
-                <span>Dans le groupe WhatsApp, par SMS ou par mail. Vos amis rejoignent avec leur email.</span>
+                <strong>Partage le lien</strong>
+                <span>Dans le groupe WhatsApp, par SMS ou par mail. Tes amis rejoignent avec leur email.</span>
               </div>
             </li>
             <li className="lp-s-violet">
@@ -320,14 +320,14 @@ export function LandingPage() {
         <section className="lp-feature lp-rev">
           <div className="lp-text">
             <p className="lp-kicker">Pour les chauffeurs</p>
-            <h2>Votre voiture, vos règles, zéro relance.</h2>
+            <h2>Ta voiture, tes règles, zéro relance.</h2>
             <p>
-              Nombre de places, horaires, point de rendez-vous : vous le dites une fois, tout le monde le voit. Et vos
-              passagers sont à un SMS de vous.
+              Nombre de places, horaires, point de rendez-vous : tu le dis une fois, tout le monde le voit. Et tes
+              passagers sont à un SMS de toi.
             </p>
             <ul className="lp-points">
               <li>Un SMS à tous les passagers de l'aller, en un bouton</li>
-              <li>Les numéros de vos passagers à portée de main</li>
+              <li>Les numéros de tes passagers à portée de main</li>
             </ul>
           </div>
           <div className="lp-panel lp-chat" aria-hidden="true">
@@ -360,7 +360,7 @@ export function LandingPage() {
             <p className="lp-kicker">Le jour du départ</p>
             <h2>Le rendez-vous, sans se perdre ni oublier.</h2>
             <p>
-              L'adresse s'ouvre directement dans Waze, Google Maps ou Plans. L'horaire s'ajoute à votre agenda, avec un
+              L'adresse s'ouvre directement dans Waze, Google Maps ou Plans. L'horaire s'ajoute à ton agenda, avec un
               rappel une heure avant.
             </p>
             <ul className="lp-points">
@@ -387,7 +387,7 @@ export function LandingPage() {
 
         <section className="lp-feature lp-rev">
           <div className="lp-text">
-            <p className="lp-kicker">Tous vos voyages</p>
+            <p className="lp-kicker">Tous tes voyages</p>
             <h2>Le prochain week-end et tous les autres.</h2>
             <p>
               « Mes voyages » rassemble les sorties à venir, avec le compte à rebours et garde la trace des précédentes.
@@ -439,7 +439,7 @@ export function LandingPage() {
                 </svg>
               </i>
               <b>Sans mot de passe</b>
-              <span>Votre email vous identifie, c'est tout.</span>
+              <span>Ton email t'identifie, c'est tout.</span>
             </div>
             <div>
               <i aria-hidden="true" className="lp-s-violet">
@@ -469,8 +469,8 @@ export function LandingPage() {
         </section>
 
         <div className="lp-final">
-          <h2>Votre prochain week-end commence ici.</h2>
-          <p>Créez le voyage, partagez le lien : le reste s'organise tout seul.</p>
+          <h2>Ton prochain week-end commence ici.</h2>
+          <p>Crée le voyage, partage le lien : le reste s'organise tout seul.</p>
           <Link className="lp-btn lp-btn--violet" to={organize}>
             Organiser un voyage
           </Link>

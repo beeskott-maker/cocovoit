@@ -50,7 +50,7 @@ export function JoinPage() {
       (err) => {
         joinStarted.current = false;
         if (err instanceof ApiError && err.code === 'unauthenticated') sessionExpired();
-        else setJoinError(err instanceof ApiError ? err.message : 'Connexion impossible, réessayez.');
+        else setJoinError(err instanceof ApiError ? err.message : 'Connexion impossible, réessaie.');
       },
     );
   }, [api, auth, code, navigate, sessionExpired, switching, trip]);

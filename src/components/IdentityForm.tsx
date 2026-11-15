@@ -87,7 +87,7 @@ export function IdentityForm({ title, intro, disabled, start, onEmail, onName }:
         <Screen>
           <MailboxCoconut />
           <h1 className="verify__title">C'est vérifié !</h1>
-          <p className="verify__text">Votre adresse est confirmée. Il ne reste qu'à vous présenter.</p>
+          <p className="verify__text">Ton adresse est confirmée. Il ne reste qu'à te présenter.</p>
           <div className="verify__actions">
             <button type="button" className="btn btn--primary" onClick={() => setStep({ kind: 'name', request: step.request })} autoFocus>
               Continuer
@@ -102,8 +102,8 @@ export function IdentityForm({ title, intro, disabled, start, onEmail, onName }:
           <h1 className="verify__title">{email ? 'Ce lien a expiré' : "Ce lien n'est pas valide"}</h1>
           <p className="verify__text">
             {email
-              ? 'Les liens de confirmation sont valables 24 h. On vous en envoie un nouveau ?'
-              : 'Le lien est peut-être incomplet. Reconnectez-vous pour en recevoir un nouveau.'}
+              ? "Les liens de confirmation sont valables 24 h. On t'en envoie un nouveau ?"
+              : 'Le lien est peut-être incomplet. Reconnecte-toi pour en recevoir un nouveau.'}
           </p>
           {error && (
             <p className="field-hint field-hint--error" role="alert">
@@ -231,13 +231,13 @@ function EmailSent({
   return (
     <Screen>
       <PaperPlaneCoconut />
-      <h1 className="verify__title">Vérifiez vos emails</h1>
+      <h1 className="verify__title">Vérifie tes emails</h1>
       <p className="verify__text">
-        On vient d'envoyer un lien à <strong>{email}</strong>. Cliquez dessus pour continuer : il est valable 24 h.
+        On vient d'envoyer un lien à <strong>{email}</strong>. Clique dessus pour continuer : il est valable 24 h.
       </p>
-      <p className="verify__small">Rien reçu ? Regardez dans les spams.</p>
+      <p className="verify__small">Rien reçu ? Regarde dans les spams.</p>
       <p className="verify__live" role="status">
-        En attente de votre clic…
+        En attente de ton clic…
       </p>
       {error && (
         <p className="field-hint field-hint--error" role="alert">
@@ -351,7 +351,7 @@ function EmailAndName({
               setPhoneError(null);
             }}
             error={phoneError}
-            hint="Pour vous joindre le jour du départ : visible par votre chauffeur si vous êtes passager, par le voyage si vous conduisez."
+            hint="Pour te joindre le jour du départ : visible par ton chauffeur si tu es passager, par le voyage si tu conduis."
           />
         )}
         {error && (

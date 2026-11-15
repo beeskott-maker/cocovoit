@@ -33,7 +33,7 @@ export function InstallCard() {
         <img src={icon} alt="" width={44} height={44} />
         <div className="install-card__text">
           <p className="install-card__title">Coco·Voit en appli</p>
-          <p>Vos voyages en un geste</p>
+          <p>Tes voyages en un geste</p>
         </div>
         <button
           type="button"
@@ -51,7 +51,7 @@ export function InstallCard() {
           <ol className="install-steps">
             <li>
               <span>
-                Touchez <b>Partager</b> en bas de Safari
+                Touche <b>Partager</b> en bas de Safari
               </span>
               <span className="install-steps__icon">
                 <ShareIcon />
@@ -59,7 +59,7 @@ export function InstallCard() {
             </li>
             <li>
               <span>
-                Choisissez <b>« Sur l'écran d'accueil »</b>
+                Choisis <b>« Sur l'écran d'accueil »</b>
               </span>
               <span className="install-steps__icon">
                 <AddIcon />
@@ -67,7 +67,7 @@ export function InstallCard() {
             </li>
             <li>
               <span>
-                Touchez <b>Ajouter</b>, en haut à droite
+                Touche <b>Ajouter</b>, en haut à droite
               </span>
             </li>
           </ol>

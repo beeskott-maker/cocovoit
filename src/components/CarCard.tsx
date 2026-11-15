@@ -216,7 +216,7 @@ function Seat({
           className="btn btn--primary"
           onClick={onTake}
           disabled={busy || cell.disabled}
-          title={cell.disabled ? 'Vous avez déjà une place dans ce sens : libérez-la d\'abord' : undefined}
+          title={cell.disabled ? 'Tu as déjà une place dans ce sens : libère-la d\'abord' : undefined}
         >
           Prendre 1 place
         </button>

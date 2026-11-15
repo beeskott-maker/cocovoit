@@ -94,7 +94,7 @@ export function BookedDialog({ state, tripUrl, email, onClose }: Props) {
             })}
           </div>
         </div>
-        <p className="booked-note">Un empêchement ? Vous pourrez libérer vos places à tout moment depuis la page du voyage.</p>
+        <p className="booked-note">Un empêchement ? Tu pourras libérer tes places à tout moment depuis la page du voyage.</p>
         <label className="recap-switch" htmlFor={recapId}>
           <span className="recap-switch__text">
             Recevoir le récap par mail

@@ -9,11 +9,11 @@ describe('Suppression du compte', () => {
     const { user } = renderApp('/voyages', api);
 
     await user.click(await screen.findByRole('button', { name: 'Supprimer mon compte' }));
-    const dialog = await screen.findByRole('alertdialog', { name: 'Supprimer votre compte ?' });
+    const dialog = await screen.findByRole('alertdialog', { name: 'Supprimer ton compte ?' });
     expect(await within(dialog).findByText(/Hugo devient l'organisateur/)).toBeInTheDocument();
 
     const confirm = within(dialog).getByRole('button', { name: 'Supprimer' });
-    const field = within(dialog).getByLabelText('Retapez votre email pour confirmer');
+    const field = within(dialog).getByLabelText('Retape ton email pour confirmer');
     await user.type(field, 'hugo@example.com');
     expect(confirm).toBeDisabled();
     await user.clear(field);

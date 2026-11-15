@@ -148,7 +148,7 @@ function Home({ token }: { token: string }) {
             {myTrips?.length === 0 && <SleepyCoconut />}
             <div className="page-title">
               <h1 className="display-small">Créer un voyage</h1>
-              <p className="body-medium">Créez le voyage puis partagez le lien : chacun propose sa voiture ou réserve une place.</p>
+              <p className="body-medium">Crée le voyage puis partage le lien : chacun propose sa voiture ou réserve une place.</p>
             </div>
             <form className="form form--compact" onSubmit={submit} noValidate>
               <TextField

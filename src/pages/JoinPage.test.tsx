@@ -25,7 +25,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
 
     // Écran du voyage
-    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(await screen.findByText('Ton voyage')).toBeInTheDocument();
     expect(document.title).toBe('WE dans le Beaujolais · Coco·Voit');
     expect(screen.getByRole('heading', { name: "Voiture d'Hugo" })).toBeInTheDocument();
     expect(screen.getByText('sam 10 → lun 12 oct 2026')).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
     await user.type(await screen.findByLabelText('Mon nom'), 'Léa');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
-    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(await screen.findByText('Ton voyage')).toBeInTheDocument();
 
     // Compte en base et participation au voyage : le navigateur ne garde que le jeton.
     const token = localStorage.getItem(storageKey('token'))!;
@@ -91,7 +91,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
     signIn(lea);
     renderApp(`/j/${code}`, api);
 
-    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(await screen.findByText('Ton voyage')).toBeInTheDocument();
     expect(screen.queryByLabelText('Mon email')).not.toBeInTheDocument();
     expect(screen.getByText(/Connecté·e en tant que/)).toHaveTextContent('Léa');
     expect((await api.myTrips(lea)).map((t) => t.code)).toEqual([code]);
@@ -125,7 +125,7 @@ describe("Parcours d'un invité (maquette Figma)", () => {
 
     await user.type(screen.getByLabelText('Mon téléphone (facultatif)'), ' 34 56 78');
     await user.click(screen.getByRole('button', { name: 'Suivant' }));
-    expect(await screen.findByText('Votre voyage')).toBeInTheDocument();
+    expect(await screen.findByText('Ton voyage')).toBeInTheDocument();
     expect((await api.me(localStorage.getItem(storageKey('token'))!)).phone).toBe('+33612345678');
   });
 });

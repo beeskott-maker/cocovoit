@@ -201,7 +201,7 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
             )}
           </fieldset>
         ))}
-        {legs.length === 0 && <p className="field-hint">Choisissez au moins un trajet.</p>}
+        {legs.length === 0 && <p className="field-hint">Choisis au moins un trajet.</p>}
         {error && (
           <p className="field-hint field-hint--error" role="alert">
             {error}
@@ -220,14 +220,14 @@ function CarForm({ code, token, state, carId }: { code: string; token: string; s
         </Link>
       </form>
       {confirmRemove && (
-        <ConfirmDialog title="Supprimer votre voiture ?" icon="car" onConfirm={remove} onCancel={() => setConfirmRemove(false)}>
+        <ConfirmDialog title="Supprimer ta voiture ?" icon="car" onConfirm={remove} onCancel={() => setConfirmRemove(false)}>
           {passengers.length ? (
             <p>
               <strong>{listNames(passengers)}</strong> {passengers.length > 1 ? 'perdront leur place. Ils pourront' : 'perdra sa place et pourra'}{' '}
               en reprendre une dans une autre voiture.
             </p>
           ) : (
-            <p>Votre voiture sera retirée du voyage.</p>
+            <p>Ta voiture sera retirée du voyage.</p>
           )}
         </ConfirmDialog>
       )}

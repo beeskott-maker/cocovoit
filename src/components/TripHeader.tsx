@@ -26,7 +26,7 @@ export function TripHeader({ trip, onShare, onRoute }: Props) {
         <img src={icon} alt="" width={48} height={48} />
       </Link>
       <div className="trip-header__titles">
-        <p className="title-small">Votre voyage</p>
+        <p className="title-small">Ton voyage</p>
         <h1 className="title-large">{trip.name}</h1>
         {departureDay && <p className="trip-header__day">C'est le grand jour !</p>}
       </div>

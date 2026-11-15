@@ -40,7 +40,7 @@ export function DeleteAccountDialog({ token, email, onDeleted, onCancel }: Props
       await api.deleteAccount(token, typed);
       onDeleted();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Une erreur est survenue, réessayez.');
+      setError(err instanceof ApiError ? err.message : 'Une erreur est survenue, réessaie.');
     }
   }
 
@@ -60,7 +60,7 @@ export function DeleteAccountDialog({ token, email, onDeleted, onCancel }: Props
           tag: 'Supprimé',
           text: (
             <>
-              <strong>{trip}</strong> : vous étiez seul·e dans ce voyage.
+              <strong>{trip}</strong> : tu étais seul·e dans ce voyage.
             </>
           ),
         })),
@@ -81,7 +81,7 @@ export function DeleteAccountDialog({ token, email, onDeleted, onCancel }: Props
           tag: 'Libérée',
           text: (
             <>
-              Votre place dans la <strong>voiture de {s.driver}</strong> ({s.trip}).
+              Ta place dans la <strong>voiture de {s.driver}</strong> ({s.trip}).
             </>
           ),
         })),
@@ -90,13 +90,13 @@ export function DeleteAccountDialog({ token, email, onDeleted, onCancel }: Props
 
   return (
     <ConfirmDialog
-      title="Supprimer votre compte ?"
+      title="Supprimer ton compte ?"
       icon="person"
       confirmDisabled={!preview || !same(typed, email)}
       onConfirm={confirm}
       onCancel={onCancel}
     >
-      <p>Votre email, votre nom et votre numéro seront effacés. Cette action est irréversible.</p>
+      <p>Ton email, ton nom et ton numéro seront effacés. Cette action est irréversible.</p>
       {preview === null ? (
         <p>Chargement…</p>
       ) : (
@@ -112,7 +112,7 @@ export function DeleteAccountDialog({ token, email, onDeleted, onCancel }: Props
         )
       )}
       <TextField
-        label="Retapez votre email pour confirmer"
+        label="Retape ton email pour confirmer"
         type="email"
         autoComplete="off"
         inputMode="email"
