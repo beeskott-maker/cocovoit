@@ -181,7 +181,7 @@ export function LandingPage() {
                   Organiser un voyage
                 </Link>
                 <a className="lp-btn lp-btn--ghost" href="#etapes" onClick={toSteps}>
-                  Comment ça marche
+                  Comment ça marche ?
                 </a>
               </div>
               <ul className="lp-reassure">
