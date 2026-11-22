@@ -15,10 +15,10 @@ function LostCoconut() {
         <circle cx="62" cy="50" r="4" fill="#5b3cc4" />
       </g>
       <g className="lost__bob">
-        <ellipse cx="110" cy="108" rx="54" ry="46" fill="#aa614b" stroke="#390175" strokeWidth="5" />
+        <ellipse cx="110" cy="106" rx="50" ry="50" fill="#aa614b" stroke="#390175" strokeWidth="5" />
         <path d="M70 100q-2 14 6 26M78 132q8 8 18 10" fill="none" stroke="#7f3d2e" strokeWidth="2.5" strokeLinecap="round" />
-        <ellipse cx="114" cy="100" rx="42" ry="36" fill="#fff" stroke="#390175" strokeWidth="4.5" />
-        <ellipse cx="115" cy="101" rx="34" ry="28" fill="#f7e9da" />
+        <ellipse cx="114" cy="100" rx="39" ry="39" fill="#fff" stroke="#390175" strokeWidth="4.5" />
+        <ellipse cx="115" cy="101" rx="31" ry="31" fill="#f7e9da" />
         <path d="M95 88l10 10m0-10l-10 10M125 88l10 10m0-10l-10 10" stroke="#390175" strokeWidth="4" strokeLinecap="round" />
         <ellipse cx="115" cy="114" rx="7" ry="8" fill="#390175" />
         <circle cx="93" cy="108" r="5" fill="#ff7ab6" opacity=".7" />

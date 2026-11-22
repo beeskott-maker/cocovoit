@@ -37,9 +37,9 @@ export function CheerCoconut() {
     <svg className="cheer" viewBox="0 0 120 96" width="120" height="96" aria-hidden="true">
       <path className="cheer__arm cheer__arm--l" d="M28 56 L8 40" stroke="#390175" strokeWidth="6" strokeLinecap="round" />
       <path className="cheer__arm cheer__arm--r" d="M92 56 L112 40" stroke="#390175" strokeWidth="6" strokeLinecap="round" />
-      <ellipse cx="60" cy="58" rx="36" ry="32" fill="#aa614b" stroke="#390175" strokeWidth="4.5" />
-      <ellipse cx="62" cy="54" rx="28" ry="25" fill="#fff" stroke="#390175" strokeWidth="4" />
-      <ellipse cx="62" cy="55" rx="22" ry="19" fill="#f7e9da" />
+      <ellipse cx="60" cy="58" rx="34" ry="34" fill="#aa614b" stroke="#390175" strokeWidth="4.5" />
+      <ellipse cx="62" cy="55" rx="26.5" ry="26.5" fill="#fff" stroke="#390175" strokeWidth="4" />
+      <ellipse cx="62" cy="56" rx="21" ry="21" fill="#f7e9da" />
       <path d="M47 50q4-5 8 0" fill="none" stroke="#390175" strokeWidth="3.5" strokeLinecap="round" />
       <ellipse className="cheer__wink" cx="73" cy="49" rx="3.5" ry="4" fill="#390175" />
       <path d="M52 60q10 9 20 0" fill="#390175" />
@@ -105,10 +105,10 @@ export function SleepyCoconut() {
       <ellipse cx="104" cy="138" rx="56" ry="7" fill="#390175" opacity=".12" />
       <g transform="rotate(-14 104 100)">
         <g className="sleepy__breath">
-          <ellipse cx="104" cy="100" rx="48" ry="38" fill="#aa614b" stroke="#390175" strokeWidth="5" />
+          <ellipse cx="104" cy="96" rx="43" ry="43" fill="#aa614b" stroke="#390175" strokeWidth="5" />
           <path d="M66 92q-2 12 5 22M73 120q7 7 16 9" fill="none" stroke="#7f3d2e" strokeWidth="2.5" strokeLinecap="round" />
-          <ellipse cx="108" cy="95" rx="37" ry="30" fill="#fff" stroke="#390175" strokeWidth="4.5" />
-          <ellipse cx="109" cy="96" rx="30" ry="24" fill="#f7e9da" />
+          <ellipse cx="108" cy="93" rx="33.5" ry="33.5" fill="#fff" stroke="#390175" strokeWidth="4.5" />
+          <ellipse cx="109" cy="94" rx="27" ry="27" fill="#f7e9da" />
           <path
             d="M84 88h20a6 6 0 0 1-6 9h-8a6 6 0 0 1-6-9zM112 88h20a6 6 0 0 1-6 9h-8a6 6 0 0 1-6-9zM104 89h8"
             fill="#1b1b1b"
@@ -130,9 +130,9 @@ export function SleepyCoconut() {
 function CocoHalf({ cx, cy, mood }: { cx: number; cy: number; mood: 'happy' | 'joy' | 'sad' }) {
   return (
     <g>
-      <ellipse cx={cx} cy={cy} rx="42" ry="36" fill="#aa614b" stroke="#390175" strokeWidth="4.5" />
-      <ellipse cx={cx + 3} cy={cy - 4} rx="32" ry="28" fill="#fff" stroke="#390175" strokeWidth="4" />
-      <ellipse cx={cx + 4} cy={cy - 3} rx="25" ry="22" fill="#f7e9da" />
+      <ellipse cx={cx} cy={cy} rx="39" ry="39" fill="#aa614b" stroke="#390175" strokeWidth="4.5" />
+      <ellipse cx={cx + 3} cy={cy - 3} rx="30" ry="30" fill="#fff" stroke="#390175" strokeWidth="4" />
+      <ellipse cx={cx + 4} cy={cy - 2} rx="23.5" ry="23.5" fill="#f7e9da" />
       {mood === 'happy' && (
         <>
           <ellipse cx={cx - 6} cy={cy - 9} rx="3.5" ry="4.5" fill="#390175" />
